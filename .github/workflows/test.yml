@@ -1,0 +1,46 @@
+name: test
+
+on:
+- push
+- pull_request
+
+jobs:
+  phpunit:
+    name: phpunit
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        php-version:
+        - "8.0"
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        coverage: xdebug
+        php-version: "${{ matrix.php-version }}"
+        ini-values: memory_limit=-1
+        tools: composer:v2
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.composer/cache
+          vendor
+        key: "php-${{ matrix.php-version }}"
+        restore-keys: "php-${{ matrix.php-version }}"
+
+    - name: Install dependencies
+      run: composer install --no-interaction --no-progress
+
+    - name: Run PHPUnit
+      run: make test-coveralls
+
+    - name: Upload code coverage
+      if: ${{ matrix.php-version == '8.0' }}
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        composer global require php-coveralls/php-coveralls
+        php-coveralls --coverage_clover=build/logs/clover.xml -v
