@@ -23,12 +23,12 @@ final class Collector
     /**
      * @var array<class-string, TargetClassRaw[]>
      */
-    private array $classes = [];
+    public array $classes = [];
 
     /**
      * @var array<class-string, TargetMethodRaw[]>
      */
-    private array $methods = [];
+    public array $methods = [];
 
     /**
      * @param ReflectionAttribute<object> $attribute
@@ -47,13 +47,5 @@ final class Collector
     {
         $this->methods[$attribute->getName()][]
             = new TargetMethodRaw($attribute->getArguments(), $method->class, $method->name);
-    }
-
-    public function collect(): Collection
-    {
-        return new Collection(
-            $this->classes,
-            $this->methods,
-        );
     }
 }

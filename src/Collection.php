@@ -16,15 +16,13 @@ use function array_map;
  */
 final class Collection
 {
-    // @phpstan-ignore-next-line
-    public static function __set_state(array $args): object
-    {
-        return new self($args['targetClasses'], $args['targetMethods']);
-    }
-
     /**
-     * @param array<class-string, TargetClassRaw[]> $targetClasses
-     * @param array<class-string, TargetMethodRaw[]> $targetMethods
+     * @param array<class-string, array<array{ mixed[], class-string }>> $targetClasses
+     *     Where _key_ is an attribute class and _value_ an array of arrays
+     *     where 0 are the attribute arguments and 1 is a target class.
+     * @param array<class-string, array<array{ mixed[], class-string, string }>> $targetMethods
+     *     Where _key_ is an attribute class and _value_ an array of arrays
+     *     where 0 are the attribute arguments, 1 is a target class, and 2 is the target method.
      */
     public function __construct(
         private array $targetClasses,
@@ -42,7 +40,7 @@ final class Collection
     public function findTargetClasses(string $attribute): array
     {
         return array_map(
-            fn(TargetClassRaw $t) => $t->toTarget($attribute),
+            fn(array $a) => new TargetClass(new $attribute(...$a[0]), $a[1]),
             $this->targetClasses[$attribute] ?? []
         );
     }
@@ -57,7 +55,7 @@ final class Collection
     public function findTargetMethods(string $attribute): array
     {
         return array_map(
-            fn(TargetMethodRaw $t) => $t->toTarget($attribute),
+            fn(array $a) => new TargetMethod(new $attribute(...$a[0]), $a[1], $a[2]),
             $this->targetMethods[$attribute] ?? []
         );
     }

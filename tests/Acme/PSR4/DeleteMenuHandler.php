@@ -9,15 +9,12 @@
 
 namespace Acme\PSR4;
 
-use Acme\Attribute\Permission;
+use Acme\Attribute\Handler;
 
-#[Permission('is_admin')]
-#[Permission('can_create_menu')]
-final class CreateMenu
+#[Handler]
+final class DeleteMenuHandler
 {
-    // @phpstan-ignore-next-line
-    public function __construct(
-        public array $properties
-    ) {
+    public function __invoke(DeleteMenu $command): void
+    {
     }
 }

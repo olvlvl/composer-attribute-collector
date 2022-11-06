@@ -39,6 +39,8 @@ final class ClassMapBuilderTest extends TestCase
         $expected = [
             'Acme\PSR4\CreateMenu' => "$cwd/tests/Acme/PSR4/CreateMenu.php",
             'Acme\PSR4\CreateMenuHandler' => "$cwd/tests/Acme/PSR4/CreateMenuHandler.php",
+            'Acme\PSR4\DeleteMenu' => "$cwd/tests/Acme/PSR4/DeleteMenu.php",
+            'Acme\PSR4\DeleteMenuHandler' => "$cwd/tests/Acme/PSR4/DeleteMenuHandler.php",
             'Acme\PSR4\EventA' => "$cwd/tests/Acme/PSR4/EventA.php",
             'Acme\PSR4\Presentation\ArticleController' => "$cwd/tests/Acme/PSR4/Presentation/ArticleController.php",
             'Acme\PSR4\SubscriberA' => "$cwd/tests/Acme/PSR4/SubscriberA.php",

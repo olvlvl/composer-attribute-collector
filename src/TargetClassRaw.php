@@ -15,12 +15,6 @@ namespace olvlvl\ComposerAttributeCollector;
  */
 final class TargetClassRaw
 {
-    // @phpstan-ignore-next-line
-    public static function __set_state(array $args): object
-    {
-        return new self($args['arguments'], $args['name']);
-    }
-
     /**
      * @param array<int|string, mixed> $arguments
      * @param class-string $name
@@ -29,17 +23,5 @@ final class TargetClassRaw
         public array $arguments,
         public string $name
     ) {
-    }
-
-    /**
-     * @template T of object
-     *
-     * @param class-string<T> $attribute
-     *
-     * @return TargetClass<T>
-     */
-    public function toTarget(string $attribute): TargetClass
-    {
-        return new TargetClass(new $attribute(...$this->arguments), $this->name);
     }
 }

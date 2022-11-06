@@ -7,17 +7,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Acme\PSR4;
+namespace Acme\Attribute;
 
-use Acme\Attribute\Permission;
+use Attribute;
 
-#[Permission('is_admin')]
-#[Permission('can_create_menu')]
-final class CreateMenu
+#[Attribute(Attribute::TARGET_CLASS)]
+final class Permission
 {
-    // @phpstan-ignore-next-line
     public function __construct(
-        public array $properties
+        public string $permission
     ) {
     }
 }

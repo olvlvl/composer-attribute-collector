@@ -12,12 +12,11 @@ namespace Acme\PSR4;
 use Acme\Attribute\Permission;
 
 #[Permission('is_admin')]
-#[Permission('can_create_menu')]
-final class CreateMenu
+#[Permission('can_delete_menu')]
+final class DeleteMenu
 {
-    // @phpstan-ignore-next-line
     public function __construct(
-        public array $properties
+        public int $id
     ) {
     }
 }

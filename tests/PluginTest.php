@@ -10,6 +10,7 @@
 namespace tests\olvlvl\ComposerAttributeCollector;
 
 use Acme\Attribute\Handler;
+use Acme\Attribute\Permission;
 use Acme\Attribute\Route;
 use Acme\Attribute\Subscribe;
 use Composer\Composer;
@@ -60,11 +61,21 @@ final class PluginTest extends TestCase
 
         require $filepath;
 
+        $targets = Attributes::findTargetClasses(Permission::class);
+
+        $this->assertEquals([
+            [ new Permission('is_admin'), \Acme\PSR4\CreateMenu::class ],
+            [ new Permission('can_create_menu'), \Acme\PSR4\CreateMenu::class ],
+            [ new Permission('is_admin'), \Acme\PSR4\DeleteMenu::class ],
+            [ new Permission('can_delete_menu'), \Acme\PSR4\DeleteMenu::class ],
+        ], $this->collectClasses($targets));
+
         $targets = Attributes::findTargetClasses(Handler::class);
 
         $this->assertEquals([
-            new TargetClass(new Handler(), 'Acme\PSR4\CreateMenuHandler')
-        ], $targets);
+            [ new Handler(), \Acme\PSR4\CreateMenuHandler::class ],
+            [ new Handler(), \Acme\PSR4\DeleteMenuHandler::class ],
+        ], $this->collectClasses($targets));
 
         $targets = Attributes::findTargetMethods(Route::class);
 
@@ -83,6 +94,26 @@ final class PluginTest extends TestCase
             [ new Subscribe(), 'Acme\PSR4\SubscriberA::onEventA' ],
             [ new Subscribe(), 'Acme\PSR4\SubscriberB::onEventA' ],
         ], $this->collectMethods($targets));
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param TargetClass<T>[] $targets
+     *
+     * @return array<array{T, class-string}>
+     */
+    private function collectClasses(array $targets): array
+    {
+        $methods = [];
+
+        foreach ($targets as $target) {
+            $methods[] = [ $target->attribute, $target->name ];
+        }
+
+        usort($methods, fn ($a, $b) => $a[1] <=> $b[1]);
+
+        return $methods;
     }
 
     /**
