@@ -19,6 +19,7 @@ use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use Throwable;
 
 use function array_map;
 use function file_get_contents;
@@ -122,7 +123,13 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
                 continue;
             }
 
-            if (interface_exists($class)) {
+            try {
+                if (interface_exists($class)) {
+                    continue;
+                }
+            } catch (Throwable $e) {
+                $io->warning("Discarding '$class' because an error occurred during loading: {$e->getMessage()}");
+
                 continue;
             }
 
