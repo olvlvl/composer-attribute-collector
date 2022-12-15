@@ -13,9 +13,11 @@ Later, these targets can be retrieved through a convenient interface.
 #### Features
 
 - Zero configuration.
+- No reflection.
 - No impact on performance.
-- No dependency (except Composer for course).
-- A unique interface to get attribute targets.
+- No dependency (except Composer of course).
+- A single interface to get attribute targets.
+- A single interface to class attributes.
 
 
 
@@ -33,15 +35,23 @@ use Symfony\Component\Routing\Annotation\Route;
 require_once 'vendor/autoload.php';
 require_once 'vendor/attributes.php'; // <-- the file created by the plugin
 
+// Find the target classes of the AsMessageHandler attribute.
 foreach (Attributes::findTargetClasses(AsMessageHandler::class) as $target) {
     // $target->attribute is an instance of the specified attribute
     // with the actual data.
     var_dump($target->name, $target->attribute);
 }
 
+// Find the target methods of the Route attribute.
 foreach (Attributes::findTargetMethods(Route::class) as $target) {
     var_dump($target->class, $target->name, $target->attribute);
 }
+
+// Find attributes for the ArticleController class.
+$attributes = Attributes::forClass(ArticleController::class);
+
+var_dump($attributes->classAttributes);
+var_dump($attributes->methodsAttributes);
 ```
 
 
@@ -58,12 +68,12 @@ future.
 
 ## Use cases
 
-### A simpler way to configure your DIC
+### A simpler way to configure your Dependency Injection Container
 
-composer-attribute-collector can help simplify DIC configuration. Long error-prone YAML can be
-completely replaced with attributes and a compiler pass to use them. You can still support both
-YAML and attributes, the "attribute" compiler pass would just configure the services and tag
-them automatically.
+composer-attribute-collector can help simplify DIC (Dependency Injection Container) configuration.
+Long error-prone YAML can be completely replaced with attributes and a compiler pass to use them.
+You can still support both YAML and attributes, the "attribute" compiler pass would just configure
+the services and tag them automatically.
 
 ```yaml
 services:
@@ -166,7 +176,7 @@ composer require olvlvl/composer-attribute-collector:dev-main
 ```
 
 The plugin should have generated the file `vendor/attributes.php`. It should look something like
-this (excerpt):
+this excerpt:
 
 ```php
 <?php

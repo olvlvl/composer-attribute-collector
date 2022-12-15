@@ -11,8 +11,10 @@ namespace tests\olvlvl\ComposerAttributeCollector;
 
 use Acme\Attribute\Handler;
 use Acme\Attribute\Permission;
+use Acme\Attribute\Resource;
 use Acme\Attribute\Route;
 use Acme\Attribute\Subscribe;
+use Acme\PSR4\Presentation\ArticleController;
 use Composer\Composer;
 use Composer\IO\NullIO;
 use olvlvl\ComposerAttributeCollector\Attributes;
@@ -94,6 +96,17 @@ final class PluginTest extends TestCase
             [ new Subscribe(), 'Acme\PSR4\SubscriberA::onEventA' ],
             [ new Subscribe(), 'Acme\PSR4\SubscriberB::onEventA' ],
         ], $this->collectMethods($targets));
+
+        $forClass = Attributes::forClass(ArticleController::class);
+
+        $this->assertEquals([
+            new Resource('articles'),
+        ], $forClass->classAttributes);
+
+        $this->assertEquals([
+            'list' => [ new Route("/articles") ],
+            'show' => [ new Route("/articles/{id}") ],
+        ], $forClass->methodsAttributes);
     }
 
     /**

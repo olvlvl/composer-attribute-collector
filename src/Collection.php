@@ -59,4 +59,38 @@ final class Collection
             $this->targetMethods[$attribute] ?? []
         );
     }
+
+    /**
+     * @param class-string $class
+     *
+     * @return ForClass
+     */
+    public function forClass(string $class): ForClass
+    {
+        $classAttributes = [];
+
+        foreach ($this->targetClasses as $attribute => $references) {
+            foreach ($references as [ $arguments, $targetClass ]) {
+                if ($targetClass != $class) {
+                    continue;
+                }
+
+                $classAttributes[] = new $attribute(...$arguments);
+            }
+        }
+
+        $methodAttributes = [];
+
+        foreach ($this->targetMethods as $attribute => $references) {
+            foreach ($references as [ $arguments, $targetClass, $targetMethod ]) {
+                if ($targetClass != $class) {
+                    continue;
+                }
+
+                $methodAttributes[$targetMethod][] = new $attribute(...$arguments);
+            }
+        }
+
+        return new ForClass($classAttributes, $methodAttributes);
+    }
 }

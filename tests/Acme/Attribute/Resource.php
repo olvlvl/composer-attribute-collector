@@ -11,11 +11,11 @@ namespace Acme\Attribute;
 
 use Attribute;
 
-#[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
-final class Permission
+#[Attribute(Attribute::TARGET_CLASS)]
+final class Resource
 {
     public function __construct(
-        public string $permission
+        public string $name
     ) {
     }
 }

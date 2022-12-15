@@ -38,6 +38,8 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
 {
     /**
      * @uses onPostAutoloadDump
+     *
+     * @codeCoverageIgnore
      */
     public static function getSubscribedEvents(): array
     {
@@ -46,14 +48,23 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         ];
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function activate(Composer $composer, IOInterface $io): void
     {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function deactivate(Composer $composer, IOInterface $io): void
     {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function uninstall(Composer $composer, IOInterface $io): void
     {
     }

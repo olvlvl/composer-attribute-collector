@@ -88,7 +88,9 @@ class ClassMapBuilder
         return $classMapGenerator->getClassMap()->getMap();
     }
 
-    // see: \Composer\Autoload\AutoloadGenerator::buildExclusionRegex
+    /**
+     * {@link \Composer\Autoload\AutoloadGenerator::buildExclusionRegex}
+     */
     // @phpstan-ignore-next-line
     private static function buildExclusionRegex(string $dir, ?array $excluded): ?string
     {
@@ -97,7 +99,7 @@ class ClassMapBuilder
         }
 
         // filter excluded patterns here to only use those matching $dir
-        // exclude-from-classmap patterns are all realpath'd so we can only filter them if $dir exists so that
+        // exclude-from-classmap patterns are all realpath'd, so we can only filter them if $dir exists so that
         //realpath($dir) will work if $dir does not exist, it should anyway not find anything there so no trouble
         if (file_exists($dir)) {
             // transform $dir in the same way that exclude-from-classmap patterns are transformed so we can match them

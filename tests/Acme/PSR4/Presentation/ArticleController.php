@@ -9,8 +9,10 @@
 
 namespace Acme\PSR4\Presentation;
 
+use Acme\Attribute\Resource;
 use Acme\Attribute\Route;
 
+#[Resource("articles")]
 final class ArticleController
 {
     #[Route("/articles")]

@@ -54,6 +54,21 @@ final class Attributes
         return self::getCollection()->findTargetMethods($attribute);
     }
 
+    /**
+     * @var array<class-string, ForClass>
+     */
+    private static array $forClassCache = [];
+
+    /**
+     * @param class-string $class
+     *
+     * @return ForClass
+     */
+    public static function forClass(string $class): ForClass
+    {
+        return self::$forClassCache[$class] ??= self::getCollection()->forClass($class);
+    }
+
     private static function getCollection(): Collection
     {
         return self::$collection ??= (
