@@ -1,4 +1,5 @@
-FROM php:8.0-cli-buster
+ARG PHP_VERSION=8.0
+FROM php:${PHP_VERSION}-cli-buster
 
 RUN apt-get update && \
 	apt-get install -y autoconf pkg-config && \

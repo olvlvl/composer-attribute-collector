@@ -1,8 +1,22 @@
 ---
 version: "3.2"
 services:
-  app:
-    build: .
+  app80:
+    build:
+      context: .
+      args:
+        PHP_VERSION: '8.0'
+    environment:
+        PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
+    volumes:
+    - .:/app:delegated
+    - ~/.composer:/root/.composer:delegated
+    working_dir: /app
+  app82:
+    build:
+      context: .
+      args:
+        PHP_VERSION: '8.2'
     environment:
         PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
     volumes:
