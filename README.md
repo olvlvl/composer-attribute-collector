@@ -13,11 +13,11 @@ Later, these targets can be retrieved through a convenient interface.
 #### Features
 
 - Zero configuration.
-- No reflection.
+- No reflection in the generated file.
 - No impact on performance.
 - No dependency (except Composer of course).
 - A single interface to get attribute targets.
-- A single interface to class attributes.
+- A single interface to get class attributes.
 
 
 
@@ -65,6 +65,25 @@ composer require olvlvl/composer-attribute-collector
 The plugin is currently experimental and its interface subject to change. Also, it only supports
 class and method targets. Please [contribute](CONTRIBUTING.md) if you're interested in shaping its
 future.
+
+
+
+## Frequently Asked Questions
+
+**Do I need to generate an optimized autoloader?**
+
+You don't need to generate an optimized autoloader for this to work. The
+plugin uses code similar to Composer to find classes. Anything that works with Composer should work
+with the plugin.
+
+**Can I use the plugin during development?**
+
+Yes, you can use the plugin during development, but keep in mind the attributes file is only
+generated after the autoloader is dumped. If you modify attributes you'll have to
+run `composer dump` to refresh the attributes file.
+
+As a workaround you could have a watcher on your source directory that runs `composer dump` when you
+make changes, but that could be an overkill.
 
 
 
