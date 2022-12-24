@@ -82,8 +82,9 @@ Yes, you can use the plugin during development, but keep in mind the attributes 
 generated after the autoloader is dumped. If you modify attributes you'll have to
 run `composer dump` to refresh the attributes file.
 
-As a workaround you could have a watcher on your source directory that runs `composer dump` when you
-make changes, but that could be an overkill.
+As a workaround you could have watchers on the directories that contain classes with attributes to
+run `composer dump` when you make changes. [PhpStorm offers file watchers][phpstorm-watchers]. You
+could also use [spatie/file-system-watcher][], it only requires PHP.
 
 
 
@@ -271,3 +272,5 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 [Composer]: https://getcomposer.org/
 [ICanBoogie/MessageBus]: https://github.com/ICanBoogie/MessageBus
+[spatie/file-system-watcher]: https://github.com/spatie/file-system-watcher
+[phpstorm-watchers]: https://www.jetbrains.com/help/phpstorm/using-file-watchers.html
