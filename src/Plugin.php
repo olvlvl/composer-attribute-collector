@@ -15,27 +15,38 @@ use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
+use olvlvl\ComposerAttributeCollector\Filter\ContentFilter;
+use olvlvl\ComposerAttributeCollector\Filter\InterfaceFilter;
+use olvlvl\ComposerAttributeCollector\Filter\PathFilter;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
-use Throwable;
 
+use function array_filter;
 use function array_map;
-use function file_get_contents;
+use function array_merge;
 use function file_put_contents;
 use function implode;
-use function interface_exists;
 use function is_string;
 use function spl_autoload_register;
-use function str_contains;
 use function var_export;
+
+use const ARRAY_FILTER_USE_BOTH;
 
 /**
  * @internal
  */
 final class Plugin implements PluginInterface, EventSubscriberInterface
 {
+    public const EXTRA = 'composer-attribute-collector';
+    public const EXTRA_IGNORE_PATHS = 'ignore-paths';
+
+    private const PROBLEMATIC_PATHS = [
+        // https://github.com/olvlvl/composer-attribute-collector/issues/4
+        'symfony/cache/Traits'
+    ];
+
     /**
      * @uses onPostAutoloadDump
      *
@@ -97,6 +108,13 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
 
         self::setupAutoload($classMap);
 
+        $filter = self::buildClassMapFilter($composer);
+        $classMap = array_filter(
+            $classMap,
+            fn ($class, $filepath) => $filter->filter($class, $filepath, $io),
+            ARRAY_FILTER_USE_BOTH
+        );
+
         $collection = self::collectAttributes($classMap, $io);
         $code = self::render($collection);
 
@@ -116,6 +134,23 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         });
     }
 
+    private static function buildClassMapFilter(Composer $composer): Filter
+    {
+        $extra = $composer->getPackage()->getExtra()[self::EXTRA] ?? [];
+        /** @var string[] $ignore_paths */
+        $ignore_paths = array_merge(
+            // @phpstan-ignore-next-line
+            $extra[self::EXTRA_IGNORE_PATHS] ?? [],
+            self::PROBLEMATIC_PATHS
+        );
+
+        return new Filter\Chain([
+            new PathFilter($ignore_paths),
+            new ContentFilter(),
+            new InterfaceFilter()
+        ]);
+    }
+
     /**
      * @param array<class-string, non-empty-string> $classMap
      *
@@ -126,24 +161,6 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         $collector = new Collector();
 
         foreach ($classMap as $class => $filepath) {
-            $content = file_get_contents($filepath);
-
-            assert(is_string($content));
-
-            if (!str_contains($content, '#[')) {
-                continue;
-            }
-
-            try {
-                if (interface_exists($class)) {
-                    continue;
-                }
-            } catch (Throwable $e) {
-                $io->warning("Discarding '$class' because an error occurred during loading: {$e->getMessage()}");
-
-                continue;
-            }
-
             $classReflection = new ReflectionClass($class);
 
             if (self::isAttribute($classReflection)) {

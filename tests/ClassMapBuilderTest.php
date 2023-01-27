@@ -47,6 +47,7 @@ final class ClassMapBuilderTest extends TestCase
             'Acme\PSR4\SubscriberB' => "$cwd/tests/Acme/PSR4/SubscriberB.php",
             'Acme\Presentation\ImageController' => "$cwd/tests/Acme/ClassMap/controllers.php",
             'Acme\Presentation\FileController' => "$cwd/tests/Acme/ClassMap/controllers.php",
+            'Acme\PSR4\IncompatibleSignature' => "$cwd/tests/Acme/PSR4/IncompatibleSignature.php",
             'Acme\PSR4\MissingInterface' => "$cwd/tests/Acme/PSR4/MissingInterface.php",
             'Acme\PSR4\MissingParent' => "$cwd/tests/Acme/PSR4/MissingParent.php",
         ];

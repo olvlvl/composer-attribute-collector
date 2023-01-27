@@ -88,6 +88,29 @@ could also use [spatie/file-system-watcher][], it only requires PHP.
 
 
 
+## Configuration
+
+### Ignoring paths ([root-only][])
+
+composer-attribute-collector inspects files that participate in the autoload process. This can cause
+issues with files that have side effects. For instance, `symfony/cache` is known to cause issues, so
+we're excluding paths matching `symfony/cache/Traits` from inspection. Additional paths can be
+specified using the `extra` section of `composer.json`:
+
+```json
+{
+  "extra": {
+    "composer-attribute-collector": {
+      "ignore-paths": [
+        "path/to/ignore"
+      ]
+    }
+  }
+}
+```
+
+
+
 ## Test drive with a Symfony app
 
 You can try the plugin with a fresh installation of Symfony.
@@ -124,6 +147,8 @@ Attributes::with(fn () => new Collection(
             [ ['debug:validator', 'Display validation constraints for classes'], \Symfony\Component\Validator\Command\DebugCommand::class ],
             [ ['translation:pull', 'Pull translations from a given provider.'], \Symfony\Component\Translation\Command\TranslationPullCommand::class ],
 ```
+
+We also have [a repository to test the Symfony usecase](https://github.com/olvlvl/composer-attribute-collector-usecase-symfony).
 
 
 
@@ -270,7 +295,8 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 
 
-[Composer]: https://getcomposer.org/
+[Composer]:  https://getcomposer.org/
+[root-only]: https://getcomposer.org/doc/04-schema.md#root-package
 [ICanBoogie/MessageBus]: https://github.com/ICanBoogie/MessageBus
 [spatie/file-system-watcher]: https://github.com/spatie/file-system-watcher
 [phpstorm-watchers]: https://www.jetbrains.com/help/phpstorm/using-file-watchers.html

@@ -17,6 +17,7 @@ use Acme\Attribute\Subscribe;
 use Acme\PSR4\Presentation\ArticleController;
 use Composer\Composer;
 use Composer\IO\NullIO;
+use Composer\Package\RootPackageInterface;
 use olvlvl\ComposerAttributeCollector\Attributes;
 use olvlvl\ComposerAttributeCollector\AutoloadsBuilder;
 use olvlvl\ComposerAttributeCollector\Plugin;
@@ -30,7 +31,24 @@ final class PluginTest extends TestCase
 {
     public function testDump(): void
     {
+        $extra = [
+            Plugin::EXTRA => [
+                Plugin::EXTRA_IGNORE_PATHS => [
+                    'IncompatibleSignature'
+                ]
+            ]
+        ];
+
+        $package = $this->getMockBuilder(RootPackageInterface::class)->getMock();
+        $package
+            ->method('getExtra')
+            ->willReturn($extra);
+
         $composer = $this->getMockBuilder(Composer::class)->getMock();
+        $composer
+            ->method('getPackage')
+            ->willReturn($package);
+
         $autoloadsBuilder = $this->getMockBuilder(AutoloadsBuilder::class)->getMock();
         $autoloadsBuilder
             ->method('buildAutoloads')
