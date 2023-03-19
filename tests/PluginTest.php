@@ -100,8 +100,8 @@ final class PluginTest extends TestCase
         $targets = Attributes::findTargetMethods(Route::class);
 
         $this->assertEquals([
-            [ new Route("/articles"), 'Acme\PSR4\Presentation\ArticleController::list' ],
-            [ new Route("/articles/{id}"), 'Acme\PSR4\Presentation\ArticleController::show' ],
+            [ new Route("/articles", 'GET', 'articles:list'), 'Acme\PSR4\Presentation\ArticleController::list' ],
+            [ new Route("/articles/{id}", 'GET', 'articles:show'), 'Acme\PSR4\Presentation\ArticleController::show' ],
             [ new Route("/files"), 'Acme\Presentation\FileController::list' ],
             [ new Route("/files/{id}"), 'Acme\Presentation\FileController::show' ],
             [ new Route("/images"), 'Acme\Presentation\ImageController::list' ],
@@ -122,8 +122,8 @@ final class PluginTest extends TestCase
         ], $forClass->classAttributes);
 
         $this->assertEquals([
-            'list' => [ new Route("/articles") ],
-            'show' => [ new Route("/articles/{id}") ],
+            'list' => [ new Route("/articles", id: 'articles:list') ],
+            'show' => [ new Route("/articles/{id}", id: 'articles:show') ],
         ], $forClass->methodsAttributes);
     }
 

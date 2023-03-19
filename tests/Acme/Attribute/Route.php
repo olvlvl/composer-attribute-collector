@@ -14,8 +14,13 @@ use Attribute;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class Route
 {
+    /**
+     * @param string|string[] $method
+     */
     public function __construct(
-        public string $pattern
+        public string $pattern,
+        public string|array $method = 'GET',
+        public ?string $id = null,
     ) {
     }
 }
