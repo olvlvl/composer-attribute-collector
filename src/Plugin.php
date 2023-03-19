@@ -24,11 +24,8 @@ use ReflectionException;
 use ReflectionMethod;
 
 use function array_filter;
-use function array_map;
 use function array_merge;
-use function array_walk;
 use function file_put_contents;
-use function implode;
 use function is_string;
 use function spl_autoload_register;
 use function var_export;
@@ -268,28 +265,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
      */
     private static function renderArguments(array $array): string
     {
-        if (self::array_is_list($array)) {
-            return '[' . implode(', ', array_map(fn($v) => var_export($v, true), $array)) . ']';
-        }
-
-        array_walk($array, fn(&$v, $k) => $v = var_export($k, true) . " => " . var_export($v, true));
-
-        return '[' . implode(', ', $array) . ']';
-    }
-
-    /**
-     * @param array<int|string, mixed> $array
-     */
-    private static function array_is_list(array $array): bool
-    {
-        $expectedKey = 0;
-        foreach ($array as $i => $_) {
-            if ($i !== $expectedKey) {
-                return false;
-            }
-            $expectedKey++;
-        }
-        return true;
+        return var_export($array, true);
     }
 
     /**
