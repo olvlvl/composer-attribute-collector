@@ -39,10 +39,14 @@ final class Collection
      */
     public function findTargetClasses(string $attribute): array
     {
-        return array_map(
-            fn(array $a) => new TargetClass(new $attribute(...$a[0]), $a[1]),
-            $this->targetClasses[$attribute] ?? []
-        );
+        try {
+            return array_map(
+                fn(array $a) => new TargetClass(new $attribute(...$a[0]), $a[1]),
+                $this->targetClasses[$attribute] ?? []
+            );
+        } catch(\Throwable $e) {
+            throw new \LogicException("'Error creating attribute [$attribute].", previous: $e);
+        }
     }
 
     /**
@@ -54,10 +58,14 @@ final class Collection
      */
     public function findTargetMethods(string $attribute): array
     {
-        return array_map(
-            fn(array $a) => new TargetMethod(new $attribute(...$a[0]), $a[1], $a[2]),
-            $this->targetMethods[$attribute] ?? []
-        );
+        try {
+            return array_map(
+                fn(array $a) => new TargetMethod(new $attribute(...$a[0]), $a[1], $a[2]),
+                $this->targetMethods[$attribute] ?? []
+            );
+        } catch(\Throwable $e) {
+            throw new \LogicException("'Error creating attribute [$attribute].", previous: $e);
+        }
     }
 
     /**
@@ -74,8 +82,11 @@ final class Collection
                 if ($targetClass != $class) {
                     continue;
                 }
-
-                $classAttributes[] = new $attribute(...$arguments);
+                try {
+                    $classAttributes[] = new $attribute(...$arguments);
+                } catch(\Throwable $e) {
+                    throw new \LogicException("'Error creating attribute [$attribute].", previous: $e);
+                }
             }
         }
 
@@ -87,7 +98,11 @@ final class Collection
                     continue;
                 }
 
-                $methodAttributes[$targetMethod][] = new $attribute(...$arguments);
+                try {
+                    $methodAttributes[$targetMethod][] = new $attribute(...$arguments);
+                } catch(\Throwable $e) {
+                   throw new \LogicException("'Error creating attribute [$attribute].", previous: $e);
+                }
             }
         }
 
