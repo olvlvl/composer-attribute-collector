@@ -14,12 +14,12 @@ use Acme\Attribute\Route;
 final class ImageController
 {
     #[Route("/images")]
-    public function list(): void
+    protected function list(): void
     {
     }
 
     #[Route("/images/{id}")]
-    public function show(int $id): void
+    private function show(int $id): void
     {
     }
 }

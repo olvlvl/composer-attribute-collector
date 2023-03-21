@@ -177,7 +177,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
                 $collector->addTargetClass($attribute, $classReflection);
             }
 
-            foreach ($classReflection->getMethods(ReflectionMethod::IS_PUBLIC) as $methodReflection) {
+            foreach ($classReflection->getMethods() as $methodReflection) {
                 foreach ($methodReflection->getAttributes() as $attribute) {
                     if (self::isAttributeIgnored($attribute)) {
                         continue;
