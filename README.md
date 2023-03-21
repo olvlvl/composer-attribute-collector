@@ -83,8 +83,23 @@ generated after the autoloader is dumped. If you modify attributes you'll have t
 run `composer dump` to refresh the attributes file.
 
 As a workaround you could have watchers on the directories that contain classes with attributes to
-run `composer dump` when you make changes. [PhpStorm offers file watchers][phpstorm-watchers]. You
-could also use [spatie/file-system-watcher][], it only requires PHP.
+run `XDEBUG_MODE=off composer dump` when you make changes. [PhpStorm offers file watchers][phpstorm-watchers]. You could also use [spatie/file-system-watcher][], it only requires PHP.
+
+
+
+## Autoloading
+
+You can require the attributes file as shown in the usage example, but it's preferable to use Composer's autoloading feature:
+
+```json
+{
+  "autoloading": {
+    "files": [
+      "vendor/attributes.php"
+    ]
+  }
+}
+```
 
 
 
@@ -103,6 +118,20 @@ specified using the `extra` section of `composer.json`:
     "composer-attribute-collector": {
       "ignore-paths": [
         "path/to/ignore"
+      ]
+    }
+  }
+}
+```
+
+For instance, if you are only concerned about the attributes of your own project, you could ignore the vendor directory:
+
+```json
+{
+  "extra": {
+    "composer-attribute-collector": {
+      "ignore-paths": [
+        "vendor"
       ]
     }
   }
