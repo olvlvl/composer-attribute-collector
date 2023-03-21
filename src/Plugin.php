@@ -21,7 +21,6 @@ use olvlvl\ComposerAttributeCollector\Filter\PathFilter;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
-use ReflectionMethod;
 
 use function array_filter;
 use function array_merge;

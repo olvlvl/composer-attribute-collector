@@ -29,6 +29,7 @@ test-coveralls: test-dependencies
 
 .PHONY: test-cleanup
 test-cleanup:
+	@rm -rf .composer-attribute-collector/*
 	@rm -rf tests/sandbox/*
 
 .PHONY: test-container
