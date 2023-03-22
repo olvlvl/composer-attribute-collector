@@ -12,11 +12,19 @@ use function unserialize;
 
 use const DIRECTORY_SEPARATOR;
 
+/**
+ * @internal
+ */
 final class FileDatastore implements Datastore
 {
+    /**
+     * @param non-empty-string $dir
+     */
     public function __construct(
         private string $dir
     ) {
+        assert($dir !== '');
+
         if (!is_dir($dir)) {
             mkdir($dir);
         }

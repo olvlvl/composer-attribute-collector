@@ -2,6 +2,9 @@
 
 namespace olvlvl\ComposerAttributeCollector;
 
+/**
+ * @internal
+ */
 interface Datastore
 {
     /**

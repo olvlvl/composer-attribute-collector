@@ -9,7 +9,6 @@
 
 namespace olvlvl\ComposerAttributeCollector;
 
-use Attribute;
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
@@ -20,9 +19,6 @@ use Composer\Util\Platform;
 use olvlvl\ComposerAttributeCollector\Filter\ContentFilter;
 use olvlvl\ComposerAttributeCollector\Filter\InterfaceFilter;
 use olvlvl\ComposerAttributeCollector\Filter\PathFilter;
-use ReflectionAttribute;
-use ReflectionClass;
-use ReflectionException;
 
 use function array_merge;
 use function file_put_contents;
@@ -108,6 +104,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         $classMapGenerator = new MemoizeClassMapGenerator($datastore, $io);
         $classMapBuilder ??= new ClassMapBuilder($classMapGenerator);
         $classMapFilter = new MemoizeClassMapFilter($datastore, $io);
+        $attributeCollector = new MemoizeAttributeCollector(new ClassAttributeCollector($io), $datastore, $io);
 
         $start = microtime(true);
         $autoloads = $autoloadsBuilder->buildAutoloads($composer);
@@ -131,7 +128,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         $io->debug("Generating attributes file: filtered class map in $elapsed");
 
         $start = microtime(true);
-        $collection = self::collectAttributes($classMap, $io);
+        $collection = $attributeCollector->collectAttributes($classMap);
         $elapsed = self::renderElapsedTime($start);
         $io->debug("Generating attributes file: collected attributes in $elapsed");
 
@@ -145,9 +142,9 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
 
     private static function buildDefaultDatastore(): Datastore
     {
-        $filesystem = new Filesystem();
-        // @phpstan-ignore-next-line
-        $basePath = $filesystem->normalizePath(realpath(realpath(Platform::getCwd())));
+        $basePath = Platform::getCwd();
+
+        assert($basePath !== '');
 
         return new FileDatastore($basePath . DIRECTORY_SEPARATOR . self::CACHE_DIR);
     }
@@ -162,7 +159,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
      */
     private static function setupAutoload(array $classMap): void
     {
-        spl_autoload_register(function (string $class) use ($classMap) {
+        spl_autoload_register(static function (string $class) use ($classMap): void {
             $file = $classMap[$class] ?? null;
             if ($file) {
                 require_once $file;
@@ -185,50 +182,6 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
             new ContentFilter(),
             new InterfaceFilter()
         ]);
-    }
-
-    /**
-     * @param array<class-string, non-empty-string> $classMap
-     *
-     * @throws ReflectionException
-     */
-    private static function collectAttributes(array $classMap, IOInterface $io): Collector
-    {
-        $collector = new Collector();
-
-        foreach ($classMap as $class => $filepath) {
-            $classReflection = new ReflectionClass($class);
-
-            if (self::isAttribute($classReflection)) {
-                continue;
-            }
-
-            $attributes = $classReflection->getAttributes();
-
-            foreach ($attributes as $attribute) {
-                if (self::isAttributeIgnored($attribute)) {
-                    continue;
-                }
-
-                $io->debug("Found attribute {$attribute->getName()} on $class");
-
-                $collector->addTargetClass($attribute, $classReflection);
-            }
-
-            foreach ($classReflection->getMethods() as $methodReflection) {
-                foreach ($methodReflection->getAttributes() as $attribute) {
-                    if (self::isAttributeIgnored($attribute)) {
-                        continue;
-                    }
-
-                    $io->debug("Found attribute {$attribute->getName()} on $class::{$methodReflection->name}");
-
-                    $collector->addTargetMethod($attribute, $methodReflection);
-                }
-            }
-        }
-
-        return $collector;
     }
 
     public static function render(Collector $collector): string
@@ -304,33 +257,5 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
     private static function renderArguments(array $array): string
     {
         return var_export($array, true);
-    }
-
-    /**
-     * Determines if a class is an attribute.
-     *
-     * @param ReflectionClass<object> $classReflection
-     */
-    private static function isAttribute(ReflectionClass $classReflection): bool
-    {
-        foreach ($classReflection->getAttributes() as $attribute) {
-            if ($attribute->getName() === Attribute::class) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param ReflectionAttribute<object> $attribute
-     */
-    private static function isAttributeIgnored(ReflectionAttribute $attribute): bool
-    {
-        static $ignored = [
-            \ReturnTypeWillChange::class => true,
-        ];
-
-        return isset($ignored[$attribute->getName()]);
     }
 }

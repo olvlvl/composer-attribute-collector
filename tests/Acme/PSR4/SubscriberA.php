@@ -10,10 +10,12 @@
 namespace Acme\PSR4;
 
 use Acme\Attribute\Subscribe;
+use ReturnTypeWillChange;
 
 final class SubscriberA
 {
     #[Subscribe]
+    #[ReturnTypeWillChange]
     public function onEventA(EventA $event): void
     {
     }

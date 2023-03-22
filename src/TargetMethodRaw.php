@@ -16,7 +16,7 @@ namespace olvlvl\ComposerAttributeCollector;
 final class TargetMethodRaw
 {
     /**
-     * @param array<string, mixed> $arguments
+     * @param array<int|string, mixed> $arguments
      * @param class-string $class
      * @param string $name
      */

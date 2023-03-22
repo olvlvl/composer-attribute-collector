@@ -9,10 +9,6 @@
 
 namespace olvlvl\ComposerAttributeCollector;
 
-use ReflectionAttribute;
-use ReflectionClass;
-use ReflectionMethod;
-
 /**
  * Collects classes and methods with attributes.
  *
@@ -31,21 +27,29 @@ final class Collector
     public array $methods = [];
 
     /**
-     * @param ReflectionAttribute<object> $attribute
-     * @param ReflectionClass<object> $class
+     * @param array<array{ class-string, array<int|string, mixed> }> $attributes
+     *     An array of method attributes, where `0` is an attribute class, `1` the attributes arguments.
+     * @param class-string $class
+     *     The target class.
      */
-    public function addTargetClass(ReflectionAttribute $attribute, ReflectionClass $class): void
+    public function addClassAttributes(array $attributes, string $class): void
     {
-        $this->classes[$attribute->getName()][]
-            = new TargetClassRaw($attribute->getArguments(), $class->name);
+        foreach ($attributes as [ $attribute, $arguments ]) {
+            $this->classes[$attribute][] = new TargetClassRaw($arguments, $class);
+        }
     }
 
     /**
-     * @param ReflectionAttribute<object> $attribute
+     * @param array<array{ class-string, array<int|string, mixed>, string }> $attributes
+     *     An array of method attributes, where `0` is an attribute class, `1` the attributes arguments,
+     *     and `2` the method.
+     * @param class-string $class
+     *     The target class.
      */
-    public function addTargetMethod(ReflectionAttribute $attribute, ReflectionMethod $method): void
+    public function addMethodAttributes(array $attributes, string $class): void
     {
-        $this->methods[$attribute->getName()][]
-            = new TargetMethodRaw($attribute->getArguments(), $method->class, $method->name);
+        foreach ($attributes as [ $attribute, $arguments, $method ]) {
+            $this->methods[$attribute][] = new TargetMethodRaw($arguments, $class, $method);
+        }
     }
 }

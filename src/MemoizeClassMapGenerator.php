@@ -14,6 +14,9 @@ use function time;
 
 use const ARRAY_FILTER_USE_KEY;
 
+/**
+ * @internal
+ */
 class MemoizeClassMapGenerator
 {
     private const KEY = 'classmap';

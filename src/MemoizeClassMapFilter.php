@@ -12,6 +12,9 @@ use function time;
 
 use const ARRAY_FILTER_USE_KEY;
 
+/**
+ * @internal
+ */
 class MemoizeClassMapFilter
 {
     private const KEY = 'filtered';
@@ -65,7 +68,7 @@ class MemoizeClassMapFilter
          */
         $this->state = array_filter(
             $this->state,
-            fn(string $k): bool => $paths[$k] ?? false,
+            static fn(string $k): bool => $paths[$k] ?? false,
             ARRAY_FILTER_USE_KEY
         );
 
