@@ -27,7 +27,9 @@ use function array_filter;
 use function array_merge;
 use function file_put_contents;
 use function is_string;
+use function microtime;
 use function spl_autoload_register;
+use function sprintf;
 use function var_export;
 
 use const ARRAY_FILTER_USE_BOTH;
@@ -86,9 +88,11 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         assert(is_string($vendorDir));
         $filepath = "$vendorDir/attributes.php";
 
+        $start = microtime(true);
         $io->write('<info>Generating attributes file</info>');
         self::dump($event->getComposer(), $io, $filepath);
-        $io->write('<info>Generated attributes file</info>');
+        $elapsed = self::renderElapsedTime($start);
+        $io->write("<info>Generated attributes file in $elapsed</info>");
     }
 
     public static function dump(
@@ -101,22 +105,44 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         $autoloadsBuilder ??= new AutoloadsBuilder();
         $classMapBuilder ??= new ClassMapBuilder();
 
+        $start = microtime(true);
         $autoloads = $autoloadsBuilder->buildAutoloads($composer);
+        $elapsed = self::renderElapsedTime($start);
+        $io->debug("Generating attributes file: built autoloads in $elapsed");
+
+        $start = microtime(true);
         $classMap = $classMapBuilder->buildClassMap($autoloads);
+        $elapsed = self::renderElapsedTime($start);
+        $io->debug("Generating attributes file: built class map in $elapsed");
 
         self::setupAutoload($classMap);
 
+        $start = microtime(true);
         $filter = self::buildClassMapFilter($composer);
         $classMap = array_filter(
             $classMap,
             fn ($class, $filepath) => $filter->filter($class, $filepath, $io),
             ARRAY_FILTER_USE_BOTH
         );
+        $elapsed = self::renderElapsedTime($start);
+        $io->debug("Generating attributes file: filtered class map in $elapsed");
 
+        $start = microtime(true);
         $collection = self::collectAttributes($classMap, $io);
+        $elapsed = self::renderElapsedTime($start);
+        $io->debug("Generating attributes file: collected attributes in $elapsed");
+
+        $start = microtime(true);
         $code = self::render($collection);
+        $elapsed = self::renderElapsedTime($start);
+        $io->debug("Generating attributes file: rendered code in $elapsed");
 
         file_put_contents($filepath, $code);
+    }
+
+    private static function renderElapsedTime(float $start): string
+    {
+        return sprintf("%.03f ms", (microtime(true) - $start) * 1000);
     }
 
     /**
