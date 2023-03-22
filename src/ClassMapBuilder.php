@@ -26,6 +26,11 @@ use function realpath;
  */
 class ClassMapBuilder
 {
+    public function __construct(
+        private MemoizeClassMapGenerator $classMapGenerator
+    ) {
+    }
+
     /**
      * @param array{
      *     'psr-0': array<string, array<string>>,
@@ -39,10 +44,7 @@ class ClassMapBuilder
      */
     public function buildClassMap(array $autoloads): array
     {
-        $filesystem = new Filesystem();
-        // @phpstan-ignore-next-line
-        $basePath = $filesystem->normalizePath(realpath(realpath(Platform::getCwd())));
-        $classMapGenerator = new MemoizeClassMapGenerator($basePath);
+        $classMapGenerator = $this->classMapGenerator;
 
         $excluded = $autoloads['exclude-from-classmap'];
 
@@ -62,13 +64,17 @@ class ClassMapBuilder
 
         krsort($namespacesToScan);
 
+        $filesystem = new Filesystem();
+        // @phpstan-ignore-next-line
+        $basePath = $filesystem->normalizePath(realpath(realpath(Platform::getCwd())));
+
         foreach ($namespacesToScan as $namespace => $groups) {
             foreach ($groups as $group) {
                 foreach ($group['paths'] as $dir) {
                     $dir = $filesystem->normalizePath(
                         $filesystem->isAbsolutePath($dir) ? $dir : $basePath . '/' . $dir
                     );
-                    if (!is_dir($dir)) {
+                    if ($dir === '' || !is_dir($dir)) {
                         continue; // @codeCoverageIgnore
                     }
 

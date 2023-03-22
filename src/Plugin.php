@@ -15,6 +15,8 @@ use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
+use Composer\Util\Filesystem;
+use Composer\Util\Platform;
 use olvlvl\ComposerAttributeCollector\Filter\ContentFilter;
 use olvlvl\ComposerAttributeCollector\Filter\InterfaceFilter;
 use olvlvl\ComposerAttributeCollector\Filter\PathFilter;
@@ -22,16 +24,16 @@ use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 
-use function array_filter;
 use function array_merge;
 use function file_put_contents;
 use function is_string;
 use function microtime;
+use function realpath;
 use function spl_autoload_register;
 use function sprintf;
 use function var_export;
 
-use const ARRAY_FILTER_USE_BOTH;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @internal
@@ -40,7 +42,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
 {
     public const EXTRA = 'composer-attribute-collector';
     public const EXTRA_IGNORE_PATHS = 'ignore-paths';
-
+    private const CACHE_DIR = '.composer-attribute-collector';
     private const PROBLEMATIC_PATHS = [
         // https://github.com/olvlvl/composer-attribute-collector/issues/4
         'symfony/cache/Traits'
@@ -101,8 +103,11 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         AutoloadsBuilder $autoloadsBuilder = null,
         ClassMapBuilder $classMapBuilder = null
     ): void {
+        $datastore = self::buildDefaultDatastore();
         $autoloadsBuilder ??= new AutoloadsBuilder();
-        $classMapBuilder ??= new ClassMapBuilder();
+        $classMapGenerator = new MemoizeClassMapGenerator($datastore, $io);
+        $classMapBuilder ??= new ClassMapBuilder($classMapGenerator);
+        $classMapFilter = new MemoizeClassMapFilter($datastore, $io);
 
         $start = microtime(true);
         $autoloads = $autoloadsBuilder->buildAutoloads($composer);
@@ -117,11 +122,10 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         self::setupAutoload($classMap);
 
         $start = microtime(true);
-        $filter = self::buildClassMapFilter($composer);
-        $classMap = array_filter(
+        $filter = self::buildFileFilter($composer);
+        $classMap = $classMapFilter->filter(
             $classMap,
-            fn ($class, $filepath) => $filter->filter($class, $filepath, $io),
-            ARRAY_FILTER_USE_BOTH
+            fn (string $class, string $filepath): bool => $filter->filter($filepath, $class, $io)
         );
         $elapsed = self::renderElapsedTime($start);
         $io->debug("Generating attributes file: filtered class map in $elapsed");
@@ -137,6 +141,15 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         $io->debug("Generating attributes file: rendered code in $elapsed");
 
         file_put_contents($filepath, $code);
+    }
+
+    private static function buildDefaultDatastore(): Datastore
+    {
+        $filesystem = new Filesystem();
+        // @phpstan-ignore-next-line
+        $basePath = $filesystem->normalizePath(realpath(realpath(Platform::getCwd())));
+
+        return new FileDatastore($basePath . DIRECTORY_SEPARATOR . self::CACHE_DIR);
     }
 
     private static function renderElapsedTime(float $start): string
@@ -157,7 +170,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         });
     }
 
-    private static function buildClassMapFilter(Composer $composer): Filter
+    private static function buildFileFilter(Composer $composer): Filter
     {
         $extra = $composer->getPackage()->getExtra()[self::EXTRA] ?? [];
         /** @var string[] $ignore_paths */

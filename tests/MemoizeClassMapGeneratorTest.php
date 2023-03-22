@@ -2,15 +2,14 @@
 
 namespace tests\olvlvl\ComposerAttributeCollector;
 
+use Composer\IO\NullIO;
+use olvlvl\ComposerAttributeCollector\FileDatastore;
 use olvlvl\ComposerAttributeCollector\MemoizeClassMapGenerator;
 use PHPUnit\Framework\TestCase;
 
 use function file_put_contents;
-use function realpath;
-use function sleep;
 use function time;
 use function touch;
-use function var_dump;
 
 final class MemoizeClassMapGeneratorTest extends TestCase
 {
@@ -59,9 +58,6 @@ final class MemoizeClassMapGeneratorTest extends TestCase
             PHP
         );
 
-        // Because the modified time is a unix timestamp, we need the modified time to be the next second
-        touch(self::DIR, time() + 1);
-
         $map = $this->map();
         $this->assertEquals([
             'App\A' => self::DIR . 'a.php',
@@ -72,6 +68,10 @@ final class MemoizeClassMapGeneratorTest extends TestCase
     private static function write(string $name, string $data): void
     {
         file_put_contents(self::DIR . $name, $data);
+
+        // Because the modified time granularity is a second, we need the set the time to the next second,
+        // so that we don't have to use sleep().
+        touch(self::DIR, time() + 1);
     }
 
     /**
@@ -79,7 +79,11 @@ final class MemoizeClassMapGeneratorTest extends TestCase
      */
     private static function map(): array
     {
-        $generator = new MemoizeClassMapGenerator(__DIR__ . '/../.composer-attribute-collector');
+        $generator = new MemoizeClassMapGenerator(
+            new FileDatastore(get_cache_dir()),
+            new NullIO(),
+        );
+
         $generator->scanPaths(self::DIR);
 
         return $generator->getMap();

@@ -2,50 +2,41 @@
 
 namespace olvlvl\ComposerAttributeCollector;
 
-use Closure;
 use Composer\ClassMapGenerator\ClassMapGenerator;
+use Composer\IO\IOInterface;
 use RuntimeException;
 
+use function array_filter;
 use function array_merge;
-use function array_values;
-use function file_exists;
-use function file_get_contents;
-use function file_put_contents;
 use function filemtime;
-use function is_dir;
-use function is_string;
-use function mkdir;
-use function preg_replace;
-use function serialize;
-use function str_starts_with;
-use function strlen;
-use function substr;
-use function unserialize;
+use function is_int;
+use function time;
 
-use const DIRECTORY_SEPARATOR;
+use const ARRAY_FILTER_USE_KEY;
 
-/**
- * *Note:* We have to extend {@link ClassMapGenerator} because there's no interface available.
- */
 class MemoizeClassMapGenerator
 {
-    private const CACHE_DIR = '.composer-attribute-collector';
+    private const KEY = 'classmap';
 
     /**
-     * @var array<string, array<class-string, non-empty-string>>
-     *     Where _key_ is a directory and _value_ is an array where _key_ is a class and _value_ its path.
+     * @var array<non-empty-string, array{ int, array<class-string, non-empty-string> }>
+     *     Where _key_ is a directory path and _value_ an array
+     *     where `0` is a timestamp, and `1` is an array
+     *     where _key_ is a class and _value_ its pathname.
      */
-    public array $mapByDir = [];
-    private string $cachePath;
+    private array $state;
+
+    /**
+     * @var array<string, bool>
+     */
+    private array $paths;
 
     public function __construct(
-        private string $basePath
+        private Datastore $datastore,
+        private IOInterface $io,
     ) {
-        $this->cachePath = $this->basePath . DIRECTORY_SEPARATOR . self::CACHE_DIR . DIRECTORY_SEPARATOR;
-
-        if (!is_dir($this->cachePath)) {
-            mkdir($this->cachePath);
-        }
+        /** @phpstan-ignore-next-line */
+        $this->state = $this->datastore->get(self::KEY);
     }
 
     /**
@@ -54,13 +45,30 @@ class MemoizeClassMapGenerator
      */
     public function getMap(): array
     {
-        return array_merge(...array_values($this->mapByDir));
+        /**
+         * Paths might have been removed, we need to filter according to the paths provided during {@link scanPaths()}
+         */
+        $this->state = array_filter(
+            $this->state,
+            fn(string $k): bool => $this->paths[$k] ?? false,
+            ARRAY_FILTER_USE_KEY
+        );
+
+        $this->datastore->set(self::KEY, $this->state);
+
+        $maps = [];
+
+        foreach ($this->state as [ , $map ]) {
+            $maps[] = $map;
+        }
+
+        return array_merge(...$maps);
     }
 
     /**
      * Iterate over all files in the given directory searching for classes
      *
-     * @param string $path
+     * @param non-empty-string $path
      *     The path to search in.
      * @param non-empty-string|null $excluded
      *     Regex that matches file paths to be excluded from the classmap
@@ -77,97 +85,20 @@ class MemoizeClassMapGenerator
         string $autoloadType = 'classmap',
         ?string $namespace = null
     ): void {
-        $this->mapByDir[$path] = $this->get(
-            $path,
-            static function () use ($path, $excluded, $autoloadType, $namespace): array {
-                $inner = new ClassMapGenerator();
-                $inner->avoidDuplicateScans();
-                $inner->scanPaths($path, $excluded, $autoloadType, $namespace);
+        $this->paths[$path] = true;
+        [ $timestamp ] = $this->state[$path] ?? [ 0, [ ] ];
 
-                return $inner->getClassMap()->getMap();
-            }
-        );
-    }
+        $mtime = filemtime($path);
+        assert(is_int($mtime));
 
-    /**
-     * @param string $path
-     * @param Closure $scan
-     *
-     * @return array<class-string, non-empty-string>
-     *     Where _key_ is a class and _value_ its path.
-     */
-    private function get(string $path, Closure $scan): array
-    {
-        $key = $this->makeCacheKey($path);
-        $filename = $this->cachePath . $key;
-        $map = $this->cacheGet($filename, $path);
+        if ($timestamp < $mtime) {
+            $this->io->debug("Refresh class map for path '$path' ($timestamp < $mtime)");
+            $inner = new ClassMapGenerator();
+            $inner->avoidDuplicateScans();
+            $inner->scanPaths($path, $excluded, $autoloadType, $namespace);
+            $map = $inner->getClassMap()->getMap();
 
-        if ($map) {
-            return $map;
+            $this->state[$path] = [ time(), $map ];
         }
-
-        $map = $scan();
-
-        $this->cacheSet($filename, $map);
-
-        return $map;
-    }
-
-    private function makeCacheKey(string $path): string
-    {
-        $base = $this->basePath . DIRECTORY_SEPARATOR;
-
-        if (str_starts_with($path, $base)) {
-            $path = substr($path, strlen($base));
-        }
-
-        $key = preg_replace('/[^0-9A-Za-z]/', '-', $path);
-
-        assert(is_string($key));
-
-        return $key;
-    }
-
-    /**
-     * @param string $filename
-     * @param string $reference
-     *
-     * @return array<class-string, non-empty-string>|null
-     *     Where _key_ is a class and _value_ is its path.
-     */
-    private function cacheGet(string $filename, string $reference): ?array
-    {
-        if (!file_exists($filename)) {
-            return null;
-        }
-
-        $c = filemtime($filename);
-        $r = filemtime($reference);
-
-        if ($c === false || $r === false) {
-            return null;
-        }
-
-        if ($r > $c) {
-            return null;
-        }
-
-        $data = file_get_contents($filename);
-
-        if ($data) {
-            /** @phpstan-ignore-next-line */
-            return unserialize($data);
-        }
-
-        return null;
-    }
-
-    /**
-     * @param array<class-string, non-empty-string> $map
-     *     Where _key_ is a class and _value_ is its path.
-     */
-    private function cacheSet(string $filename, array $map): void
-    {
-        file_put_contents($filename, serialize($map));
     }
 }

@@ -4,6 +4,7 @@
     <file>src</file>
     <file>tests</file>
     <exclude-pattern>tests/sandbox/*</exclude-pattern>
+    <exclude-pattern>tests/sandbox-memoize-classmap/*</exclude-pattern>
 
 	<arg name="colors"/>
 
