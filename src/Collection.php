@@ -9,6 +9,9 @@
 
 namespace olvlvl\ComposerAttributeCollector;
 
+use RuntimeException;
+use Throwable;
+
 use function array_map;
 
 /**
@@ -40,9 +43,30 @@ final class Collection
     public function findTargetClasses(string $attribute): array
     {
         return array_map(
-            fn(array $a) => new TargetClass(new $attribute(...$a[0]), $a[1]),
+            fn(array $a) => new TargetClass(self::createClassAttribute($attribute, ...$a), $a[1]),
             $this->targetClasses[$attribute] ?? []
         );
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $attribute
+     * @param array<int|string, mixed> $arguments
+     * @param class-string $class
+     *
+     * @return T
+     */
+    private static function createClassAttribute(string $attribute, array $arguments, string $class): object
+    {
+        try {
+            return new $attribute(...$arguments);
+        } catch (Throwable $e) {
+            throw new RuntimeException(
+                "An error occurred while instantiating attribute $attribute on class $class",
+                previous: $e
+            );
+        }
     }
 
     /**
@@ -55,9 +79,34 @@ final class Collection
     public function findTargetMethods(string $attribute): array
     {
         return array_map(
-            fn(array $a) => new TargetMethod(new $attribute(...$a[0]), $a[1], $a[2]),
+            fn(array $a) => new TargetMethod(self::createMethodAttribute($attribute, ...$a), $a[1], $a[2]),
             $this->targetMethods[$attribute] ?? []
         );
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $attribute
+     * @param array<int|string, mixed> $arguments
+     * @param class-string $class
+     *
+     * @return T
+     */
+    private static function createMethodAttribute(
+        string $attribute,
+        array $arguments,
+        string $class,
+        string $method
+    ): object {
+        try {
+            return new $attribute(...$arguments);
+        } catch (Throwable $e) {
+            throw new RuntimeException(
+                "An error occurred while instantiating attribute $attribute on method $class::$method",
+                previous: $e
+            );
+        }
     }
 
     /**
@@ -75,7 +124,7 @@ final class Collection
                     continue;
                 }
 
-                $classAttributes[] = new $attribute(...$arguments);
+                $classAttributes[] = self::createClassAttribute($attribute, $arguments, $class);
             }
         }
 
@@ -87,7 +136,12 @@ final class Collection
                     continue;
                 }
 
-                $methodAttributes[$targetMethod][] = new $attribute(...$arguments);
+                $methodAttributes[$targetMethod][] = self::createMethodAttribute(
+                    $attribute,
+                    $arguments,
+                    $class,
+                    $targetMethod
+                );
             }
         }
 
