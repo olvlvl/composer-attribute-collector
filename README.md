@@ -301,6 +301,73 @@ final class IsAdmin implements Voter
 
 
 
+### Configure components from attributes
+
+Using attributes simplifies configuration, placing definition closer to the code, where it's used. ICanBoogie's router can be configured automatically from attributes. The following example demonstrates how the `Route` attribute can be used at the class level to define a prefix for the route attributes such as `Get` that are used to tag actions. Action identifiers can be inferred from the controller class and the method names e.g. `skills:list`.
+
+```php
+<?php
+
+// …
+
+#[Route('/skills')]
+final class SkillController extends ControllerAbstract
+{
+    #[Post]
+    private function create(): void
+    {
+        // …
+    }
+
+    #[Get('.html')]
+    private function list(): void
+    {
+        // …
+    }
+
+    #[Get('/summonable.html')]
+    private function summonable(): void
+    {
+        // …
+    }
+
+    #[Get('/learnable.html')]
+    private function learnable(): void
+    {
+        // …
+    }
+
+    #[Get('/:slug.html')]
+    private function show(string $slug): void
+    {
+        // …
+    }
+}
+```
+
+Because the `Get` and `Post` attributes extend `Route`, all action methods can be retrieved with the `filterTargetMethods()` method.
+
+```php
+/** @var TargetMethod<Route>[] $target_methods */
+$target_methods = Attributes::filterTargetMethods(
+    fn($attribute) => is_a($attribute, Route::class, true)
+);
+```
+
+Now then, configuring the router looks as simple as this:
+
+```php
+<?php
+
+use ICanBoogie\Binding\Routing\ConfigBuilder;
+
+/* @var ConfigBuilder $config */
+
+$config->from_attributes();
+```
+
+
+
 ## Using Attributes
 
 ### Filtering target methods
