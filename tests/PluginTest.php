@@ -201,7 +201,7 @@ final class PluginTest extends TestCase
     public function testFilterTargetMethods(): void
     {
         $actual = Attributes::filterTargetMethods(
-            fn($attribute) => is_a($attribute, Route::class, true)
+            Attributes::predicateForAttributeInstanceOf(Route::class)
         );
 
         $this->assertEquals([

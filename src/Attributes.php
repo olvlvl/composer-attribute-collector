@@ -12,6 +12,8 @@ namespace olvlvl\ComposerAttributeCollector;
 use Closure;
 use LogicException;
 
+use function is_a;
+
 final class Attributes
 {
     /**
@@ -72,6 +74,16 @@ final class Attributes
     public static function filterTargetMethods(callable $predicate): array
     {
         return self::getCollection()->filterTargetMethods($predicate);
+    }
+
+    /**
+     * @param class-string $class
+     *
+     * @return Closure(class-string $attribute):bool
+     */
+    public static function predicateForAttributeInstanceOf(string $class): Closure
+    {
+        return fn(string $attribute): bool => is_a($attribute, $class, true);
     }
 
     /**

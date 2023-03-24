@@ -350,7 +350,7 @@ Because the `Get` and `Post` attributes extend `Route`, all action methods can b
 ```php
 /** @var TargetMethod<Route>[] $target_methods */
 $target_methods = Attributes::filterTargetMethods(
-    fn($attribute) => is_a($attribute, Route::class, true)
+    Attributes::predicateForAttributeInstanceOf(Route::class)
 );
 ```
 
@@ -399,7 +399,7 @@ $target_methods = [
 
 /** @var TargetMethod<Route>[] $target_methods */
 $target_methods = Attributes::filterTargetMethods(
-    fn($attribute) => is_a($attribute, Route::class, true)
+    Attributes::predicateForAttributeInstanceOf(Route::class)
 );
 ```
 
