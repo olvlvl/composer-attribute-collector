@@ -2,14 +2,19 @@
 
 namespace tests\olvlvl\ComposerAttributeCollector;
 
-use Error;
+use Closure;
 use olvlvl\ComposerAttributeCollector\Collection;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 final class CollectionTest extends TestCase
 {
-    public function testInstantiationFailureIsCaptured(): void
+    /**
+     * @dataProvider provideInstantiationErrorIsDecorated
+     *
+     * @param Closure(Collection):void $act
+     */
+    public function testInstantiationErrorIsDecorated(string $expectedMessage, Closure $act): void
     {
         $collection = new Collection(
             [
@@ -24,52 +29,35 @@ final class CollectionTest extends TestCase
             ],
         );
 
-        try {
-            $collection->findTargetClasses(\Acme\Attribute\Permission::class);
-            $this->fail("Expected failure");
-        } catch (RuntimeException $e) {
-            $this->assertEquals(
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage($expectedMessage);
+        $act($collection);
+    }
+
+    /**
+     * @return array<array{ string, Closure }>
+     */
+    public static function provideInstantiationErrorIsDecorated(): array
+    {
+        return [
+
+            [
                 "An error occurred while instantiating attribute Acme\Attribute\Permission on class Acme\PSR4\DeleteMenu",
-                $e->getMessage()
-            );
-
-            $this->assertInstanceOf(Error::class, $e->getPrevious());
-        }
-
-        try {
-            $collection->findTargetMethods(\Acme\Attribute\Route::class);
-            $this->fail("Expected failure");
-        } catch (RuntimeException $e) {
-            $this->assertEquals(
+                fn(Collection $c) => $c->findTargetClasses(\Acme\Attribute\Permission::class),
+            ],
+            [
                 "An error occurred while instantiating attribute Acme\Attribute\Route on method Acme\PSR4\Presentation\ArticleController::list",
-                $e->getMessage()
-            );
-
-            $this->assertInstanceOf(Error::class, $e->getPrevious());
-        }
-
-        try {
-            $collection->forClass(\Acme\PSR4\DeleteMenu::class);
-            $this->fail("Expected failure");
-        } catch (RuntimeException $e) {
-            $this->assertEquals(
+                fn(Collection $c) => $c->findTargetMethods(\Acme\Attribute\Route::class),
+            ],
+            [
                 "An error occurred while instantiating attribute Acme\Attribute\Permission on class Acme\PSR4\DeleteMenu",
-                $e->getMessage()
-            );
-
-            $this->assertInstanceOf(Error::class, $e->getPrevious());
-        }
-
-        try {
-            $collection->forClass(\Acme\PSR4\Presentation\ArticleController::class);
-            $this->fail("Expected failure");
-        } catch (RuntimeException $e) {
-            $this->assertEquals(
+                fn(Collection $c) => $c->forClass(\Acme\PSR4\DeleteMenu::class),
+            ],
+            [
                 "An error occurred while instantiating attribute Acme\Attribute\Route on method Acme\PSR4\Presentation\ArticleController::list",
-                $e->getMessage()
-            );
+                fn(Collection $c) => $c->forClass(\Acme\PSR4\Presentation\ArticleController::class),
+            ],
 
-            $this->assertInstanceOf(Error::class, $e->getPrevious());
-        }
+        ];
     }
 }
