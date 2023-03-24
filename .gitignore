@@ -1,3 +1,4 @@
+.composer-attribute-collector
 .phpunit.result.cache
 vendor
 composer.lock

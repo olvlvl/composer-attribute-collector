@@ -4,6 +4,9 @@ namespace olvlvl\ComposerAttributeCollector;
 
 use Composer\IO\IOInterface;
 
+/**
+ * @internal
+ */
 interface Filter
 {
     /**

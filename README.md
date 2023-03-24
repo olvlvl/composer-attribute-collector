@@ -18,6 +18,7 @@ Later, these targets can be retrieved through a convenient interface.
 - No dependency (except Composer of course).
 - A single interface to get attribute targets.
 - A single interface to get class attributes.
+- 3 types of cache speed up generation by limiting updates to changed files.
 
 
 
@@ -73,21 +74,23 @@ The plugin is currently experimental and its interface subject to change. Also, 
 class and method targets. Please [contribute](CONTRIBUTING.md) if you're interested in shaping its
 future.
 
+**Note:** The plugin creates a `.composer-attribute-collector` directory to store caches, you might
+want to add it to your `.gitignore` file.
+
 
 
 ## Frequently Asked Questions
 
 **Do I need to generate an optimized autoloader?**
 
-You don't need to generate an optimized autoloader for this to work. The
-plugin uses code similar to Composer to find classes. Anything that works with Composer should work
-with the plugin.
+You don't need to generate an optimized autoloader for this to work. The plugin uses code similar
+to Composer to find classes. Anything that works with Composer should work with the plugin.
 
 **Can I use the plugin during development?**
 
 Yes, you can use the plugin during development, but keep in mind the attributes file is only
-generated after the autoloader is dumped. If you modify attributes you'll have to
-run `composer dump` to refresh the attributes file.
+generated after the autoloader is dumped. If you modify attributes you'll have to run
+`composer dump` to refresh the attributes file.
 
 As a workaround you could have watchers on the directories that contain classes with attributes to
 run `XDEBUG_MODE=off composer dump` when you make changes. [PhpStorm offers file watchers][phpstorm-watchers]. You could also use [spatie/file-system-watcher][], it only requires PHP.
@@ -295,6 +298,8 @@ final class IsAdmin implements Voter
     // ...
 }
 ```
+
+
 
 ## Using Attributes
 

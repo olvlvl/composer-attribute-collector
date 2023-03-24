@@ -9,7 +9,6 @@
 
 namespace olvlvl\ComposerAttributeCollector;
 
-use Composer\ClassMapGenerator\ClassMapGenerator;
 use Composer\Pcre\Preg;
 use Composer\Util\Filesystem;
 use Composer\Util\Platform;
@@ -27,6 +26,11 @@ use function realpath;
  */
 class ClassMapBuilder
 {
+    public function __construct(
+        private MemoizeClassMapGenerator $classMapGenerator
+    ) {
+    }
+
     /**
      * @param array{
      *     'psr-0': array<string, array<string>>,
@@ -40,9 +44,9 @@ class ClassMapBuilder
      */
     public function buildClassMap(array $autoloads): array
     {
+        $classMapGenerator = $this->classMapGenerator;
+
         $excluded = $autoloads['exclude-from-classmap'];
-        $classMapGenerator = new ClassMapGenerator();
-        $classMapGenerator->avoidDuplicateScans();
 
         foreach ($autoloads['classmap'] as $dir) {
             // @phpstan-ignore-next-line
@@ -70,7 +74,7 @@ class ClassMapBuilder
                     $dir = $filesystem->normalizePath(
                         $filesystem->isAbsolutePath($dir) ? $dir : $basePath . '/' . $dir
                     );
-                    if (!is_dir($dir)) {
+                    if ($dir === '' || !is_dir($dir)) {
                         continue; // @codeCoverageIgnore
                     }
 
@@ -85,7 +89,7 @@ class ClassMapBuilder
             }
         }
 
-        return $classMapGenerator->getClassMap()->getMap();
+        return $classMapGenerator->getMap();
     }
 
     /**

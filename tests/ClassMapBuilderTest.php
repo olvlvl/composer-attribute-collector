@@ -9,7 +9,10 @@
 
 namespace tests\olvlvl\ComposerAttributeCollector;
 
+use Composer\IO\NullIO;
 use olvlvl\ComposerAttributeCollector\ClassMapBuilder;
+use olvlvl\ComposerAttributeCollector\FileDatastore;
+use olvlvl\ComposerAttributeCollector\MemoizeClassMapGenerator;
 use PHPUnit\Framework\TestCase;
 
 use function getcwd;
@@ -18,7 +21,13 @@ final class ClassMapBuilderTest extends TestCase
 {
     public function testBuildClassMap(): void
     {
-        $sut = new ClassMapBuilder();
+        $sut = new ClassMapBuilder(
+            new MemoizeClassMapGenerator(
+                new FileDatastore(get_cache_dir()),
+                new NullIO(),
+            )
+        );
+
         $classMap = $sut->buildClassMap([
             'psr-0' => [
             ],

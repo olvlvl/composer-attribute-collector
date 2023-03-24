@@ -1,0 +1,100 @@
+<?php
+
+namespace tests\olvlvl\ComposerAttributeCollector;
+
+use Acme\PSR4\CreateMenu;
+use Acme\PSR4\CreateMenuHandler;
+use Acme\PSR4\Presentation\ArticleController;
+use Acme\PSR4\SubscriberA;
+use Attribute;
+use Composer\IO\NullIO;
+use olvlvl\ComposerAttributeCollector\ClassAttributeCollector;
+use PHPUnit\Framework\TestCase;
+use ReflectionException;
+
+final class ClassAttributeCollectorTest extends TestCase
+{
+    private ClassAttributeCollector $sut;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->sut = new ClassAttributeCollector(new NullIO());
+    }
+
+    /**
+     * @dataProvider provideCollectAttributes
+     *
+     * @param class-string $class
+     * @param array<int|string, mixed> $expected
+     *
+     * @throws ReflectionException
+     */
+    public function testCollectAttributes(string $class, array $expected): void
+    {
+        $actual = $this->sut->collectAttributes($class);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /** @phpstan-ignore-next-line */
+    public static function provideCollectAttributes(): array
+    {
+        return [
+
+            [
+                Attribute::class,
+                [
+                    [],
+                    [],
+                ]
+            ],
+
+            [
+                CreateMenu::class,
+                [
+                    [
+                        [ 'Acme\Attribute\Permission', [ 'is_admin' ] ],
+                        [ 'Acme\Attribute\Permission', [ 'can_create_menu' ] ],
+                    ],
+                    []
+                ]
+            ],
+
+            [
+                CreateMenuHandler::class,
+                [
+                    [
+                        [ 'Acme\Attribute\Handler', [ ] ]
+                    ],
+                    [],
+                ]
+            ],
+
+            [
+                ArticleController::class,
+                [
+                    [
+                        [ 'Acme\Attribute\Resource', [ "articles" ] ]
+                    ],
+                    [
+                        [ 'Acme\Attribute\Route', [ 'method' => 'GET', 'id' => 'articles:list', 'pattern' => "/articles" ], 'list' ],
+                        [ 'Acme\Attribute\Route', [ 'id' => 'articles:show', 'pattern' => "/articles/{id}", 'method' => 'GET' ], 'show' ],
+                    ],
+                ]
+            ],
+
+            [
+                SubscriberA::class,
+                [
+                    [],
+                    [
+                        [ 'Acme\Attribute\Subscribe', [], 'onEventA' ],
+                    ]
+                ]
+            ],
+
+        ];
+    }
+}
