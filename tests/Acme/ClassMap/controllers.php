@@ -9,29 +9,32 @@
 
 namespace Acme\Presentation;
 
+use Acme\Attribute\Get;
 use Acme\Attribute\Route;
 
+#[Route('/images')]
 final class ImageController
 {
-    #[Route("/images")]
+    #[Get]
     protected function list(): void
     {
     }
 
-    #[Route("/images/{id}")]
+    #[Get("/{id}")]
     private function show(int $id): void
     {
     }
 }
 
+#[Route('/files')]
 final class FileController
 {
-    #[Route("/files")]
+    #[Get]
     public function list(): void
     {
     }
 
-    #[Route("/files/{id}")]
+    #[Get('/{id}')]
     public function show(int $id): void
     {
     }

@@ -38,7 +38,7 @@ final class Collection
      *
      * @param class-string<T> $attribute
      *
-     * @return TargetClass<T>[]
+     * @return array<TargetClass<T>>
      */
     public function findTargetClasses(string $attribute): array
     {
@@ -74,7 +74,7 @@ final class Collection
      *
      * @param class-string<T> $attribute
      *
-     * @return TargetMethod<T>[]
+     * @return array<TargetMethod<T>>
      */
     public function findTargetMethods(string $attribute): array
     {
@@ -82,6 +82,51 @@ final class Collection
             fn(array $a) => new TargetMethod(self::createMethodAttribute($attribute, ...$a), $a[1], $a[2]),
             $this->targetMethods[$attribute] ?? []
         );
+    }
+
+    /**
+     * @param callable(class-string $attribute, class-string $class):bool $predicate
+     *
+     * @return array<TargetClass<object>>
+     */
+    public function filterTargetClasses(callable $predicate): array
+    {
+        $ar = [];
+
+        foreach ($this->targetClasses as $attribute => $references) {
+            foreach ($references as [ $arguments, $class ]) {
+                if ($predicate($attribute, $class)) {
+                    $ar[] = new TargetClass(self::createClassAttribute($attribute, $arguments, $class), $class);
+                }
+            }
+        }
+
+        return $ar;
+    }
+
+    /**
+     * @param callable(class-string $attribute, class-string $class, string $method):bool $predicate
+     *
+     * @return array<TargetMethod<object>>
+     */
+    public function filterTargetMethods(callable $predicate): array
+    {
+        $ar = [];
+
+        foreach ($this->targetMethods as $attribute => $references) {
+            foreach ($references as [ $arguments, $class, $method ]) {
+                if ($predicate($attribute, $class, $method)) {
+                    $ar[] = new TargetMethod(self::createMethodAttribute(
+                        $attribute,
+                        $arguments,
+                        $class,
+                        $method
+                    ), $class, $method);
+                }
+            }
+        }
+
+        return $ar;
     }
 
     /**
@@ -111,38 +156,19 @@ final class Collection
 
     /**
      * @param class-string $class
-     *
-     * @return ForClass
      */
     public function forClass(string $class): ForClass
     {
         $classAttributes = [];
 
-        foreach ($this->targetClasses as $attribute => $references) {
-            foreach ($references as [ $arguments, $targetClass ]) {
-                if ($targetClass != $class) {
-                    continue;
-                }
-
-                $classAttributes[] = self::createClassAttribute($attribute, $arguments, $class);
-            }
+        foreach ($this->filterTargetClasses(fn($a, $c): bool => $c === $class) as $targetClass) {
+            $classAttributes[] = $targetClass->attribute;
         }
 
         $methodAttributes = [];
 
-        foreach ($this->targetMethods as $attribute => $references) {
-            foreach ($references as [ $arguments, $targetClass, $targetMethod ]) {
-                if ($targetClass != $class) {
-                    continue;
-                }
-
-                $methodAttributes[$targetMethod][] = self::createMethodAttribute(
-                    $attribute,
-                    $arguments,
-                    $class,
-                    $targetMethod
-                );
-            }
+        foreach ($this->filterTargetMethods(fn($a, $c): bool => $c === $class) as $targetMethod) {
+            $methodAttributes[$targetMethod->name][] = $targetMethod->attribute;
         }
 
         return new ForClass($classAttributes, $methodAttributes);

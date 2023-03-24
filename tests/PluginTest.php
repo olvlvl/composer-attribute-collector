@@ -9,6 +9,7 @@
 
 namespace tests\olvlvl\ComposerAttributeCollector;
 
+use Acme\Attribute\Get;
 use Acme\Attribute\Handler;
 use Acme\Attribute\Permission;
 use Acme\Attribute\Resource;
@@ -25,12 +26,22 @@ use olvlvl\ComposerAttributeCollector\TargetClass;
 use olvlvl\ComposerAttributeCollector\TargetMethod;
 use PHPUnit\Framework\TestCase;
 
+use function is_a;
+use function str_contains;
 use function usort;
 
 final class PluginTest extends TestCase
 {
-    public function testDump(): void
+    private static bool $initialized = false;
+
+    protected function setUp(): void
     {
+        parent::setUp();
+
+        if (self::$initialized) {
+            return;
+        }
+
         $extra = [
             Plugin::EXTRA => [
                 Plugin::EXTRA_IGNORE_PATHS => [
@@ -81,40 +92,130 @@ final class PluginTest extends TestCase
 
         require $filepath;
 
-        $targets = Attributes::findTargetClasses(Permission::class);
+        self::$initialized = true;
+    }
+
+    /**
+     * @dataProvider provideTargetClasses
+     *
+     * @param class-string $attribute
+     * @param array<array{ object, class-string }> $expected
+     */
+    public function testTargetClasses(string $attribute, array $expected): void
+    {
+        $actual = Attributes::findTargetClasses($attribute);
+
+        $this->assertEquals($expected, $this->collectClasses($actual));
+    }
+
+    /**
+     * @return array<array{ class-string, array<array{ object, class-string }> }>
+     */
+    public static function provideTargetClasses(): array
+    {
+        return [
+
+            [
+                Permission::class,
+                [
+                    [ new Permission('is_admin'), \Acme\PSR4\CreateMenu::class ],
+                    [ new Permission('can_create_menu'), \Acme\PSR4\CreateMenu::class ],
+                    [ new Permission('is_admin'), \Acme\PSR4\DeleteMenu::class ],
+                    [ new Permission('can_delete_menu'), \Acme\PSR4\DeleteMenu::class ],
+                ]
+            ],
+            [
+                Handler::class,
+                [
+                    [ new Handler(), \Acme\PSR4\CreateMenuHandler::class ],
+                    [ new Handler(), \Acme\PSR4\DeleteMenuHandler::class ],
+                ]
+            ],
+
+        ];
+    }
+
+    /**
+     * @dataProvider provideTargetMethods
+     *
+     * @param class-string $attribute
+     * @param array<array{ object, callable-string }> $expected
+     */
+    public function testTargetMethods(string $attribute, array $expected): void
+    {
+        $actual = Attributes::findTargetMethods($attribute);
+
+        $this->assertEquals($expected, $this->collectMethods($actual));
+    }
+
+    /**
+     * @return array<array{ class-string, array<array{ object, callable-string }> }>
+     */
+    public static function provideTargetMethods(): array
+    {
+        return [
+
+            [
+                Route::class,
+                [
+                    [ new Route("/articles", 'GET', 'articles:list'), 'Acme\PSR4\Presentation\ArticleController::list' ],
+                    [ new Route("/articles/{id}", 'GET', 'articles:show'), 'Acme\PSR4\Presentation\ArticleController::show' ],
+                ]
+            ],
+            [
+                Get::class,
+                [
+                    [ new Get(), 'Acme\Presentation\FileController::list' ],
+                    [ new Get('/{id}'), 'Acme\Presentation\FileController::show' ],
+                    [ new Get(), 'Acme\Presentation\ImageController::list' ],
+                    [ new Get('/{id}'), 'Acme\Presentation\ImageController::show' ],
+                ]
+            ],
+            [
+                Subscribe::class,
+                [
+                    [ new Subscribe(), 'Acme\PSR4\SubscriberA::onEventA' ],
+                    [ new Subscribe(), 'Acme\PSR4\SubscriberB::onEventA' ],
+                ]
+            ],
+
+        ];
+    }
+
+    public function testFilterTargetClasses(): void
+    {
+        $actual = Attributes::filterTargetClasses(
+            fn($attribute, $class) => str_contains($class, 'Menu')
+        );
 
         $this->assertEquals([
             [ new Permission('is_admin'), \Acme\PSR4\CreateMenu::class ],
             [ new Permission('can_create_menu'), \Acme\PSR4\CreateMenu::class ],
+            [ new Handler(), \Acme\PSR4\CreateMenuHandler::class ],
             [ new Permission('is_admin'), \Acme\PSR4\DeleteMenu::class ],
             [ new Permission('can_delete_menu'), \Acme\PSR4\DeleteMenu::class ],
-        ], $this->collectClasses($targets));
-
-        $targets = Attributes::findTargetClasses(Handler::class);
-
-        $this->assertEquals([
-            [ new Handler(), \Acme\PSR4\CreateMenuHandler::class ],
             [ new Handler(), \Acme\PSR4\DeleteMenuHandler::class ],
-        ], $this->collectClasses($targets));
+        ], $this->collectClasses($actual));
+    }
 
-        $targets = Attributes::findTargetMethods(Route::class);
+    public function testFilterTargetMethods(): void
+    {
+        $actual = Attributes::filterTargetMethods(
+            fn($attribute) => is_a($attribute, Route::class, true)
+        );
 
         $this->assertEquals([
             [ new Route("/articles", 'GET', 'articles:list'), 'Acme\PSR4\Presentation\ArticleController::list' ],
             [ new Route("/articles/{id}", 'GET', 'articles:show'), 'Acme\PSR4\Presentation\ArticleController::show' ],
-            [ new Route("/files"), 'Acme\Presentation\FileController::list' ],
-            [ new Route("/files/{id}"), 'Acme\Presentation\FileController::show' ],
-            [ new Route("/images"), 'Acme\Presentation\ImageController::list' ],
-            [ new Route("/images/{id}"), 'Acme\Presentation\ImageController::show' ],
-        ], $this->collectMethods($targets));
+            [ new Get(), 'Acme\Presentation\FileController::list' ],
+            [ new Get('/{id}'), 'Acme\Presentation\FileController::show' ],
+            [ new Get(), 'Acme\Presentation\ImageController::list' ],
+            [ new Get('/{id}'), 'Acme\Presentation\ImageController::show' ],
+        ], $this->collectMethods($actual));
+    }
 
-        $targets = Attributes::findTargetMethods(Subscribe::class);
-
-        $this->assertEquals([
-            [ new Subscribe(), 'Acme\PSR4\SubscriberA::onEventA' ],
-            [ new Subscribe(), 'Acme\PSR4\SubscriberB::onEventA' ],
-        ], $this->collectMethods($targets));
-
+    public function testForClass(): void
+    {
         $forClass = Attributes::forClass(ArticleController::class);
 
         $this->assertEquals([

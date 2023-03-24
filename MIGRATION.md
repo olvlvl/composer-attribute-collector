@@ -1,5 +1,31 @@
 # Migration
 
+## v1.1 to v1.2
+
+### New Requirements
+
+None
+
+### New features
+
+- [#11](https://github.com/olvlvl/composer-attribute-collector/pull/11) Attribute instantiation errors are decorated to help find origin (@withinboredom @olvlvl)
+- [#12](https://github.com/olvlvl/composer-attribute-collector/pull/12) `Attributes::filterTargetClasses()` can filter target classes using a predicate (@olvlvl)
+- [#12](https://github.com/olvlvl/composer-attribute-collector/pull/12) `Attributes::filterTargetMethods()` can filter target methods using a predicate (@olvlvl)
+
+### Backward Incompatible Changes
+
+None
+
+### Deprecated Features
+
+None
+
+### Other Changes
+
+None
+
+
+
 ## v1.0 to v1.1
 
 ### New Requirements
