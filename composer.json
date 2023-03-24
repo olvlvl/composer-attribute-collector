@@ -20,7 +20,10 @@
         "psr-4": {
             "tests\\olvlvl\\ComposerAttributeCollector\\": "tests",
             "Acme\\": "tests/Acme"
-        }
+        },
+        "classmap": [
+            "tests/Acme/ClassMap"
+        ]
     },
     "config": {
         "sort-packages": true

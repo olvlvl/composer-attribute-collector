@@ -39,15 +39,22 @@ require_once 'vendor/attributes.php'; // <-- the file created by the plugin
 foreach (Attributes::findTargetClasses(AsMessageHandler::class) as $target) {
     // $target->attribute is an instance of the specified attribute
     // with the actual data.
-    var_dump($target->name, $target->attribute);
+    var_dump($target->attribute, $target->name);
 }
 
 // Find the target methods of the Route attribute.
 foreach (Attributes::findTargetMethods(Route::class) as $target) {
-    var_dump($target->class, $target->name, $target->attribute);
+    var_dump($target->attribute, $target->class, $target->name);
 }
 
-// Find attributes for the ArticleController class.
+// Filter target methods using a predicate.
+foreach (Attributes::filterTargetMethods(
+    fn($attribute) => is_a($attribute, Route::class, true)
+) as $target) {
+    var_dump($target->attribute, $target->class, $target->name);
+}
+
+// Find class and method attributes for the ArticleController class.
 $attributes = Attributes::forClass(ArticleController::class);
 
 var_dump($attributes->classAttributes);
@@ -287,6 +294,41 @@ final class IsAdmin implements Voter
 {
     // ...
 }
+```
+
+## Using Attributes
+
+### Filtering target methods
+
+`filterTargetMethods()` can filter target methods using a predicate. This can be helpful when a number of attributes extend another one, and you are interested in collecting any instance of that attribute.
+
+Let's say we have a `Route` attribute extended by `Get`, `Post`, `Put`…
+
+```php
+<?php
+
+use olvlvl\ComposerAttributeCollector\Attributes;
+
+/** @var TargetMethod<Route>[] $target_methods */
+$target_methods = [
+    ...Attributes::findTargetMethods(Get::class),
+    ...Attributes::findTargetMethods(Head::class),
+    ...Attributes::findTargetMethods(Post::class),
+    ...Attributes::findTargetMethods(Put::class),
+    ...Attributes::findTargetMethods(Delete::class),
+    ...Attributes::findTargetMethods(Connect::class),
+    ...Attributes::findTargetMethods(Options::class),
+    ...Attributes::findTargetMethods(Trace::class),
+    ...Attributes::findTargetMethods(Patch::class),
+    ...Attributes::findTargetMethods(Route::class),
+];
+
+// Can be replaced by:
+
+/** @var TargetMethod<Route>[] $target_methods */
+$target_methods = Attributes::filterTargetMethods(
+    fn($attribute) => is_a($attribute, Route::class, true)
+);
 ```
 
 

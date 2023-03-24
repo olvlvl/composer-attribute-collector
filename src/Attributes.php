@@ -55,6 +55,26 @@ final class Attributes
     }
 
     /**
+     * @param callable(class-string $attribute, class-string $class):bool $predicate
+     *
+     * @return array<TargetClass<object>>
+     */
+    public static function filterTargetClasses(callable $predicate): array
+    {
+        return self::getCollection()->filterTargetClasses($predicate);
+    }
+
+    /**
+     * @param callable(class-string $attribute, class-string $class, string $method):bool $predicate
+     *
+     * @return array<TargetMethod<object>>
+     */
+    public static function filterTargetMethods(callable $predicate): array
+    {
+        return self::getCollection()->filterTargetMethods($predicate);
+    }
+
+    /**
      * @var array<class-string, ForClass>
      */
     private static array $forClassCache = [];
