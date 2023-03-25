@@ -22,9 +22,9 @@ class ClassAttributeCollector
      * @param class-string $class
      *
      * @return array{
-     *     array<array{ class-string, array<int|string, mixed> }>,
-     *     array<array{ class-string, array<int|string, mixed>, non-empty-string }>,
-     *     array<array{ class-string, array<int|string, mixed>, non-empty-string }>,
+     *     array<TransientTargetClass>,
+     *     array<TransientTargetMethod>,
+     *     array<TransientTargetProperty>,
      * }
      *     Where `0` is an array of class attributes, `1` is an array of method attributes,
      *     and `2` is an array of property attributes.
@@ -48,7 +48,10 @@ class ClassAttributeCollector
 
             $this->io->debug("Found attribute {$attribute->getName()} on $class");
 
-            $classAttributes[] = [ $attribute->getName(), $attribute->getArguments() ];
+            $classAttributes[] = new TransientTargetClass(
+                $attribute->getName(),
+                $attribute->getArguments(),
+            );
         }
 
         $methodAttributes = [];
@@ -64,7 +67,11 @@ class ClassAttributeCollector
 
                 $this->io->debug("Found attribute {$attribute->getName()} on $class::$method");
 
-                $methodAttributes[] = [ $attribute->getName(), $attribute->getArguments(), $method ];
+                $methodAttributes[] = new TransientTargetMethod(
+                    $attribute->getName(),
+                    $attribute->getArguments(),
+                    $method,
+                );
             }
         }
 
@@ -81,7 +88,11 @@ class ClassAttributeCollector
 
                 $this->io->debug("Found attribute {$attribute->getName()} on $class::$property");
 
-                $propertyAttributes[] = [ $attribute->getName(), $attribute->getArguments(), $property ];
+                $propertyAttributes[] = new TransientTargetProperty(
+                    $attribute->getName(),
+                    $attribute->getArguments(),
+                    $property,
+                );
             }
         }
 

@@ -2,6 +2,8 @@
 
 namespace olvlvl\ComposerAttributeCollector;
 
+use function var_export;
+
 /**
  * Renders collected attribute targets as PHP code.
  *
@@ -11,9 +13,9 @@ final class CollectionRenderer
 {
     public static function render(Collector $collector): string
     {
-        $targetClassesCode = self::renderTargetClasses($collector->classes);
-        $targetMethodsCode = self::renderTargetMethods($collector->methods);
-        $targetPropertiesCode = self::renderTargetProperties($collector->properties);
+        $targetClassesCode = self::targetsToCode($collector->classes);
+        $targetMethodsCode = self::targetsToCode($collector->methods);
+        $targetPropertiesCode = self::targetsToCode($collector->properties);
 
         return <<<PHP
         <?php
@@ -23,90 +25,48 @@ final class CollectionRenderer
         namespace olvlvl\ComposerAttributeCollector;
 
         Attributes::with(fn () => new Collection(
-            targetClasses: [
-        $targetClassesCode
-            ],
-            targetMethods: [
-        $targetMethodsCode
-            ],
-            targetProperties: [
-        $targetPropertiesCode
-            ],
+            targetClasses: $targetClassesCode,
+            targetMethods: $targetMethodsCode,
+            targetProperties: $targetPropertiesCode,
         ));
         PHP;
     }
 
     /**
-     * @param array<class-string, TargetClassRaw[]> $classes
+     * //phpcs:disable Generic.Files.LineLength.TooLong
+     * @param iterable<class-string, iterable<TransientTargetClass|TransientTargetMethod|TransientTargetProperty>> $targetByClass
+     *
+     * @return string
      */
-    private static function renderTargetClasses(array $classes): string
+    private static function targetsToCode(iterable $targetByClass): string
     {
-        $code = '';
+        $array = self::targetsToArray($targetByClass);
 
-        foreach ($classes as $attribute => $targets) {
-            $code .= "        \\$attribute::class => [\n";
-            foreach ($targets as $target) {
-                $argumentsCode = self::renderArguments($target->arguments);
-                $code .= <<<PHP
-                            [ $argumentsCode, \\$target->name::class ],
-
-                PHP;
-            }
-            $code .= "        ],\n";
-        }
-
-        return $code;
-    }
-
-    /**
-     * @param array<class-string, TargetPropertyRaw[]> $properties
-     */
-    private static function renderTargetProperties(array $properties): string
-    {
-        $code = '';
-
-        foreach ($properties as $attribute => $targets) {
-            $code .= "        \\$attribute::class => [\n";
-            foreach ($targets as $target) {
-                $argumentsCode = self::renderArguments($target->arguments);
-                $code .= <<<PHP
-                            [ $argumentsCode, \\$target->class::class, '$target->name' ],
-
-                PHP;
-            }
-            $code .= "        ],\n";
-        }
-
-        return $code;
-    }
-
-    /**
-     * @param array<class-string, TargetMethodRaw[]> $methods
-     */
-    private static function renderTargetMethods(array $methods): string
-    {
-        $code = '';
-
-        foreach ($methods as $attribute => $targets) {
-            $code .= "        \\$attribute::class => [\n";
-            foreach ($targets as $target) {
-                $argumentsCode = self::renderArguments($target->arguments);
-                $code .= <<<PHP
-                            [ $argumentsCode, \\$target->class::class, '$target->name' ],
-
-                PHP;
-            }
-            $code .= "        ],\n";
-        }
-
-        return $code;
-    }
-
-    /**
-     * @param mixed[] $array
-     */
-    public static function renderArguments(array $array): string
-    {
         return var_export($array, true);
+    }
+
+    /**
+     * //phpcs:disable Generic.Files.LineLength.TooLong
+     * @param iterable<class-string, iterable<TransientTargetClass|TransientTargetMethod|TransientTargetProperty>> $targetByClass
+     *
+     * @return array<class-string, array<array{ array<int|string, mixed>, class-string, 2?:string }>>
+     */
+    private static function targetsToArray(iterable $targetByClass): array
+    {
+        $by = [];
+
+        foreach ($targetByClass as $class => $targets) {
+            foreach ($targets as $t) {
+                $a = [ $t->arguments, $class ];
+
+                if ($t instanceof TransientTargetMethod || $t instanceof TransientTargetProperty) {
+                    $a[] = $t->name;
+                }
+
+                $by[$t->attribute][] = $a;
+            }
+        }
+
+        return $by;
     }
 }

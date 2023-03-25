@@ -10,6 +10,9 @@ use Acme\PSR4\SubscriberA;
 use Attribute;
 use Composer\IO\NullIO;
 use olvlvl\ComposerAttributeCollector\ClassAttributeCollector;
+use olvlvl\ComposerAttributeCollector\TransientTargetClass;
+use olvlvl\ComposerAttributeCollector\TransientTargetMethod;
+use olvlvl\ComposerAttributeCollector\TransientTargetProperty;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 
@@ -57,8 +60,8 @@ final class ClassAttributeCollectorTest extends TestCase
                 CreateMenu::class,
                 [
                     [
-                        [ 'Acme\Attribute\Permission', [ 'is_admin' ] ],
-                        [ 'Acme\Attribute\Permission', [ 'can_create_menu' ] ],
+                        new TransientTargetClass('Acme\Attribute\Permission', [ 'is_admin' ]),
+                        new TransientTargetClass('Acme\Attribute\Permission', [ 'can_create_menu' ]),
                     ],
                     [],
                     [],
@@ -69,7 +72,7 @@ final class ClassAttributeCollectorTest extends TestCase
                 CreateMenuHandler::class,
                 [
                     [
-                        [ 'Acme\Attribute\Handler', [ ] ]
+                        new TransientTargetClass('Acme\Attribute\Handler', []),
                     ],
                     [],
                     [],
@@ -80,11 +83,19 @@ final class ClassAttributeCollectorTest extends TestCase
                 ArticleController::class,
                 [
                     [
-                        [ 'Acme\Attribute\Resource', [ "articles" ] ]
+                        new TransientTargetClass('Acme\Attribute\Resource', [ "articles" ]),
                     ],
                     [
-                        [ 'Acme\Attribute\Route', [ 'method' => 'GET', 'id' => 'articles:list', 'pattern' => "/articles" ], 'list' ],
-                        [ 'Acme\Attribute\Route', [ 'id' => 'articles:show', 'pattern' => "/articles/{id}", 'method' => 'GET' ], 'show' ],
+                        new TransientTargetMethod(
+                            'Acme\Attribute\Route',
+                            [ 'method' => 'GET', 'id' => 'articles:list', 'pattern' => "/articles" ],
+                            'list',
+                        ),
+                        new TransientTargetMethod(
+                            'Acme\Attribute\Route',
+                            [ 'id' => 'articles:show', 'pattern' => "/articles/{id}", 'method' => 'GET' ],
+                            'show',
+                        ),
                     ],
                     [],
                 ]
@@ -95,7 +106,7 @@ final class ClassAttributeCollectorTest extends TestCase
                 [
                     [],
                     [
-                        [ 'Acme\Attribute\Subscribe', [], 'onEventA' ],
+                        new TransientTargetMethod('Acme\Attribute\Subscribe', [], 'onEventA'),
                     ],
                     [],
                 ]
@@ -105,15 +116,15 @@ final class ClassAttributeCollectorTest extends TestCase
                 Article::class,
                 [
                     [
-                        [ 'Acme\Attribute\ActiveRecord\Index', [ 'slug', 'unique' => true ] ],
+                        new TransientTargetClass('Acme\Attribute\ActiveRecord\Index', [ 'slug', 'unique' => true ]),
                     ],
                     [
                     ],
                     [
-                        [ 'Acme\Attribute\ActiveRecord\Serial', [ 'primary' => true ], 'id' ],
-                        [ 'Acme\Attribute\ActiveRecord\Varchar', [ 80 ], 'title' ],
-                        [ 'Acme\Attribute\ActiveRecord\Varchar', [ 80 ], 'slug' ],
-                        [ 'Acme\Attribute\ActiveRecord\Text', [ ], 'body' ],
+                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Serial', [ 'primary' => true ], 'id'),
+                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Varchar', [ 80 ], 'title'),
+                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Varchar', [ 80 ], 'slug'),
+                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Text', [], 'body'),
                     ],
                 ]
             ],

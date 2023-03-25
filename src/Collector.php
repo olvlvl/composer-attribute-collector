@@ -17,58 +17,48 @@ namespace olvlvl\ComposerAttributeCollector;
 final class Collector
 {
     /**
-     * @var array<class-string, TargetClassRaw[]>
+     * @var array<class-string, iterable<TransientTargetClass>>
      */
     public array $classes = [];
 
     /**
-     * @var array<class-string, TargetMethodRaw[]>
+     * @var array<class-string, iterable<TransientTargetMethod>>
      */
     public array $methods = [];
 
     /**
-     * @var array<class-string, TargetPropertyRaw[]>
+     * @var array<class-string, iterable<TransientTargetProperty>>
+     *     Where _key_ is a target class.
      */
     public array $properties = [];
 
     /**
-     * @param array<array{ class-string, array<int|string, mixed> }> $attributes
-     *     An array of method attributes, where `0` is an attribute class, `1` the attributes arguments.
      * @param class-string $class
+     * @param iterable<TransientTargetClass> $targets
      *     The target class.
      */
-    public function addClassAttributes(array $attributes, string $class): void
+    public function addClassAttributes(string $class, iterable $targets): void
     {
-        foreach ($attributes as [ $attribute, $arguments ]) {
-            $this->classes[$attribute][] = new TargetClassRaw($arguments, $class);
-        }
+        $this->classes[$class] = $targets;
     }
 
     /**
-     * @param array<array{ class-string, array<int|string, mixed>, string }> $attributes
-     *     An array of method attributes, where `0` is an attribute class, `1` the attributes arguments,
-     *     and `2` the method.
      * @param class-string $class
+     * @param iterable<TransientTargetMethod> $targets
      *     The target class.
      */
-    public function addMethodAttributes(array $attributes, string $class): void
+    public function addMethodAttributes(string $class, iterable $targets): void
     {
-        foreach ($attributes as [ $attribute, $arguments, $method ]) {
-            $this->methods[$attribute][] = new TargetMethodRaw($arguments, $class, $method);
-        }
+        $this->methods[$class] = $targets;
     }
 
     /**
-     * @param array<array{ class-string, array<int|string, mixed>, string }> $attributes
-     *     An array of property attributes, where `0` is an attribute class, `1` the attributes arguments,
-     *     and `2` the property.
      * @param class-string $class
+     * @param iterable<TransientTargetProperty> $targets
      *     The target class.
      */
-    public function addPropertyAttributes(array $attributes, string $class): void
+    public function addTargetProperties(string $class, iterable $targets): void
     {
-        foreach ($attributes as [ $attribute, $arguments, $property ]) {
-            $this->properties[$attribute][] = new TargetPropertyRaw($arguments, $class, $property);
-        }
+        $this->properties[$class] = $targets;
     }
 }

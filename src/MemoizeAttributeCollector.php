@@ -20,9 +20,9 @@ class MemoizeAttributeCollector
     /**
      * @var array<class-string, array{
      *     int,
-     *     array<array{ class-string, array<int|string, mixed> }>,
-     *     array<array{ class-string, array<int|string, mixed>, non-empty-string }>,
-     *     array<array{ class-string, array<int|string, mixed>, non-empty-string }>,
+     *     array<TransientTargetClass>,
+     *     array<TransientTargetMethod>,
+     *     array<TransientTargetProperty>,
      * }>
      *     Where _key_ is a class and _value is an array where:
      *     - `0` is a timestamp
@@ -76,9 +76,9 @@ class MemoizeAttributeCollector
                 $this->state[$class] = [ time(), $classAttributes, $methodAttributes, $propertyAttributes ];
             }
 
-            $collector->addClassAttributes($classAttributes, $class);
-            $collector->addMethodAttributes($methodAttributes, $class);
-            $collector->addPropertyAttributes($propertyAttributes, $class);
+            $collector->addClassAttributes($class, $classAttributes);
+            $collector->addMethodAttributes($class, $methodAttributes);
+            $collector->addTargetProperties($class, $propertyAttributes);
         }
 
         /**
