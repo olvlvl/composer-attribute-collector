@@ -21,10 +21,14 @@ class MemoizeAttributeCollector
      * @var array<class-string, array{
      *     int,
      *     array<array{ class-string, array<int|string, mixed> }>,
-     *     array<array{ class-string, array<int|string, mixed>, non-empty-string }>
+     *     array<array{ class-string, array<int|string, mixed>, non-empty-string }>,
+     *     array<array{ class-string, array<int|string, mixed>, non-empty-string }>,
      * }>
-     *     Where _key_ is a class and _value is an array where `0` is a timestamp, `1` is an array of class attributes,
-     *     and `2` is an array of method attributes.
+     *     Where _key_ is a class and _value is an array where:
+     *     - `0` is a timestamp
+     *     - `1` is an array of class attributes
+     *     - `2` is an array of method attributes
+     *     - `3` is an array of property attributes
      */
     private array $state;
 
@@ -51,18 +55,30 @@ class MemoizeAttributeCollector
 
         foreach ($classMap as $class => $filepath) {
             $filterClasses[$class] = true;
-            [ $timestamp, $classAttributes, $methodAttributes ] = $this->state[$class] ?? [ 0, [], [] ];
+
+            [
+                $timestamp,
+                $classAttributes,
+                $methodAttributes,
+                $propertyAttributes
+            ] = $this->state[$class] ?? [ 0, [], [], [] ];
 
             $mtime = filemtime($filepath);
 
             if ($timestamp < $mtime) {
                 $this->io->debug("Refresh attributes of class '$class' in '$filepath' ($timestamp < $mtime)");
-                [ $classAttributes, $methodAttributes ] = $classAttributeCollector->collectAttributes($class);
-                $this->state[$class] = [ time(), $classAttributes, $methodAttributes ];
+
+                [
+                    $classAttributes,
+                    $methodAttributes,
+                    $propertyAttributes
+                ] = $classAttributeCollector->collectAttributes($class);
+                $this->state[$class] = [ time(), $classAttributes, $methodAttributes, $propertyAttributes ];
             }
 
             $collector->addClassAttributes($classAttributes, $class);
             $collector->addMethodAttributes($methodAttributes, $class);
+            $collector->addPropertyAttributes($propertyAttributes, $class);
         }
 
         /**

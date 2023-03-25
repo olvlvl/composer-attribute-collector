@@ -57,6 +57,18 @@ final class Attributes
     }
 
     /**
+     * @template T of object
+     *
+     * @param class-string<T> $attribute
+     *
+     * @return TargetProperty<T>[]
+     */
+    public static function findTargetProperties(string $attribute): array
+    {
+        return self::getCollection()->findTargetProperties($attribute);
+    }
+
+    /**
      * @param callable(class-string $attribute, class-string $class):bool $predicate
      *
      * @return array<TargetClass<object>>

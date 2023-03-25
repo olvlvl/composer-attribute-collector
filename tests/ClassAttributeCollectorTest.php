@@ -2,6 +2,7 @@
 
 namespace tests\olvlvl\ComposerAttributeCollector;
 
+use Acme\PSR4\ActiveRecord\Article;
 use Acme\PSR4\CreateMenu;
 use Acme\PSR4\CreateMenuHandler;
 use Acme\PSR4\Presentation\ArticleController;
@@ -48,6 +49,7 @@ final class ClassAttributeCollectorTest extends TestCase
                 [
                     [],
                     [],
+                    [],
                 ]
             ],
 
@@ -58,7 +60,8 @@ final class ClassAttributeCollectorTest extends TestCase
                         [ 'Acme\Attribute\Permission', [ 'is_admin' ] ],
                         [ 'Acme\Attribute\Permission', [ 'can_create_menu' ] ],
                     ],
-                    []
+                    [],
+                    [],
                 ]
             ],
 
@@ -68,6 +71,7 @@ final class ClassAttributeCollectorTest extends TestCase
                     [
                         [ 'Acme\Attribute\Handler', [ ] ]
                     ],
+                    [],
                     [],
                 ]
             ],
@@ -82,6 +86,7 @@ final class ClassAttributeCollectorTest extends TestCase
                         [ 'Acme\Attribute\Route', [ 'method' => 'GET', 'id' => 'articles:list', 'pattern' => "/articles" ], 'list' ],
                         [ 'Acme\Attribute\Route', [ 'id' => 'articles:show', 'pattern' => "/articles/{id}", 'method' => 'GET' ], 'show' ],
                     ],
+                    [],
                 ]
             ],
 
@@ -91,7 +96,25 @@ final class ClassAttributeCollectorTest extends TestCase
                     [],
                     [
                         [ 'Acme\Attribute\Subscribe', [], 'onEventA' ],
-                    ]
+                    ],
+                    [],
+                ]
+            ],
+
+            [
+                Article::class,
+                [
+                    [
+                        [ 'Acme\Attribute\ActiveRecord\Index', [ 'slug', 'unique' => true ] ],
+                    ],
+                    [
+                    ],
+                    [
+                        [ 'Acme\Attribute\ActiveRecord\Serial', [ 'primary' => true ], 'id' ],
+                        [ 'Acme\Attribute\ActiveRecord\Varchar', [ 80 ], 'title' ],
+                        [ 'Acme\Attribute\ActiveRecord\Varchar', [ 80 ], 'slug' ],
+                        [ 'Acme\Attribute\ActiveRecord\Text', [ ], 'body' ],
+                    ],
                 ]
             ],
 

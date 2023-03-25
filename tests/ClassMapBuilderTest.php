@@ -46,6 +46,7 @@ final class ClassMapBuilderTest extends TestCase
         $cwd = getcwd();
 
         $expected = [
+            'Acme\PSR4\ActiveRecord\Article' => "$cwd/tests/Acme/PSR4/ActiveRecord/Article.php",
             'Acme\PSR4\CreateMenu' => "$cwd/tests/Acme/PSR4/CreateMenu.php",
             'Acme\PSR4\CreateMenuHandler' => "$cwd/tests/Acme/PSR4/CreateMenuHandler.php",
             'Acme\PSR4\DeleteMenu' => "$cwd/tests/Acme/PSR4/DeleteMenu.php",

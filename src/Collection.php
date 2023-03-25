@@ -26,10 +26,14 @@ final class Collection
      * @param array<class-string, array<array{ mixed[], class-string, string }>> $targetMethods
      *     Where _key_ is an attribute class and _value_ an array of arrays
      *     where 0 are the attribute arguments, 1 is a target class, and 2 is the target method.
+     * @param array<class-string, array<array{ mixed[], class-string, string }>> $targetProperties
+     *     Where _key_ is an attribute class and _value_ an array of arrays
+     *     where 0 are the attribute arguments, 1 is a target class, and 2 is the target property.
      */
     public function __construct(
         private array $targetClasses,
         private array $targetMethods,
+        private array $targetProperties,
     ) {
     }
 
@@ -85,6 +89,71 @@ final class Collection
     }
 
     /**
+     * @template T of object
+     *
+     * @param class-string<T> $attribute
+     * @param array<int|string, mixed> $arguments
+     * @param class-string $class
+     *
+     * @return T
+     */
+    private static function createMethodAttribute(
+        string $attribute,
+        array $arguments,
+        string $class,
+        string $method
+    ): object {
+        try {
+            return new $attribute(...$arguments);
+        } catch (Throwable $e) {
+            throw new RuntimeException(
+                "An error occurred while instantiating attribute $attribute on method $class::$method",
+                previous: $e
+            );
+        }
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $attribute
+     *
+     * @return array<TargetProperty<T>>
+     */
+    public function findTargetProperties(string $attribute): array
+    {
+        return array_map(
+            fn(array $a) => new TargetProperty(self::createPropertyAttribute($attribute, ...$a), $a[1], $a[2]),
+            $this->targetProperties[$attribute] ?? []
+        );
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $attribute
+     * @param array<int|string, mixed> $arguments
+     * @param class-string $class
+     *
+     * @return T
+     */
+    private static function createPropertyAttribute(
+        string $attribute,
+        array $arguments,
+        string $class,
+        string $property
+    ): object {
+        try {
+            return new $attribute(...$arguments);
+        } catch (Throwable $e) {
+            throw new RuntimeException(
+                "An error occurred while instantiating attribute $attribute on property $class::$property",
+                previous: $e
+            );
+        }
+    }
+
+    /**
      * @param callable(class-string $attribute, class-string $class):bool $predicate
      *
      * @return array<TargetClass<object>>
@@ -130,28 +199,28 @@ final class Collection
     }
 
     /**
-     * @template T of object
+     * @param callable(class-string $attribute, class-string $class, string $property):bool $predicate
      *
-     * @param class-string<T> $attribute
-     * @param array<int|string, mixed> $arguments
-     * @param class-string $class
-     *
-     * @return T
+     * @return array<TargetProperty<object>>
      */
-    private static function createMethodAttribute(
-        string $attribute,
-        array $arguments,
-        string $class,
-        string $method
-    ): object {
-        try {
-            return new $attribute(...$arguments);
-        } catch (Throwable $e) {
-            throw new RuntimeException(
-                "An error occurred while instantiating attribute $attribute on method $class::$method",
-                previous: $e
-            );
+    public function filterTargetProperties(callable $predicate): array
+    {
+        $ar = [];
+
+        foreach ($this->targetProperties as $attribute => $references) {
+            foreach ($references as [ $arguments, $class, $property ]) {
+                if ($predicate($attribute, $class, $property)) {
+                    $ar[] = new TargetProperty(self::createPropertyAttribute(
+                        $attribute,
+                        $arguments,
+                        $class,
+                        $property
+                    ), $class, $property);
+                }
+            }
         }
+
+        return $ar;
     }
 
     /**
@@ -171,6 +240,16 @@ final class Collection
             $methodAttributes[$targetMethod->name][] = $targetMethod->attribute;
         }
 
-        return new ForClass($classAttributes, $methodAttributes);
+        $propertyAttributes = [];
+
+        foreach ($this->filterTargetProperties(fn($a, $c): bool => $c === $class) as $targetProperty) {
+            $propertyAttributes[$targetProperty->name][] = $targetProperty->attribute;
+        }
+
+        return new ForClass(
+            $classAttributes,
+            $methodAttributes,
+            $propertyAttributes,
+        );
     }
 }

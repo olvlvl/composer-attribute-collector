@@ -23,9 +23,11 @@ class ClassAttributeCollector
      *
      * @return array{
      *     array<array{ class-string, array<int|string, mixed> }>,
-     *     array<array{ class-string, array<int|string, mixed>, non-empty-string }>
+     *     array<array{ class-string, array<int|string, mixed>, non-empty-string }>,
+     *     array<array{ class-string, array<int|string, mixed>, non-empty-string }>,
      * }
-     *     Where `0` is an array of class attributes, and `1` is an array of method attributes.
+     *     Where `0` is an array of class attributes, `1` is an array of method attributes,
+     *     and `2` is an array of property attributes.
      * @throws ReflectionException
      */
     public function collectAttributes(string $class): array
@@ -33,7 +35,7 @@ class ClassAttributeCollector
         $classReflection = new ReflectionClass($class);
 
         if (self::isAttribute($classReflection)) {
-            return [ [], [] ];
+            return [ [], [], [] ];
         }
 
         $classAttributes = [];
@@ -66,7 +68,24 @@ class ClassAttributeCollector
             }
         }
 
-        return [ $classAttributes, $methodAttributes ];
+        $propertyAttributes = [];
+
+        foreach ($classReflection->getProperties() as $propertyReflection) {
+            foreach ($propertyReflection->getAttributes() as $attribute) {
+                if (self::isAttributeIgnored($attribute)) {
+                    continue;
+                }
+
+                $property = $propertyReflection->name;
+                assert($property !== '');
+
+                $this->io->debug("Found attribute {$attribute->getName()} on $class::$property");
+
+                $propertyAttributes[] = [ $attribute->getName(), $attribute->getArguments(), $property ];
+            }
+        }
+
+        return [ $classAttributes, $methodAttributes, $propertyAttributes ];
     }
 
     /**

@@ -27,6 +27,11 @@ final class Collector
     public array $methods = [];
 
     /**
+     * @var array<class-string, TargetPropertyRaw[]>
+     */
+    public array $properties = [];
+
+    /**
      * @param array<array{ class-string, array<int|string, mixed> }> $attributes
      *     An array of method attributes, where `0` is an attribute class, `1` the attributes arguments.
      * @param class-string $class
@@ -50,6 +55,20 @@ final class Collector
     {
         foreach ($attributes as [ $attribute, $arguments, $method ]) {
             $this->methods[$attribute][] = new TargetMethodRaw($arguments, $class, $method);
+        }
+    }
+
+    /**
+     * @param array<array{ class-string, array<int|string, mixed>, string }> $attributes
+     *     An array of property attributes, where `0` is an attribute class, `1` the attributes arguments,
+     *     and `2` the property.
+     * @param class-string $class
+     *     The target class.
+     */
+    public function addPropertyAttributes(array $attributes, string $class): void
+    {
+        foreach ($attributes as [ $attribute, $arguments, $property ]) {
+            $this->properties[$attribute][] = new TargetPropertyRaw($arguments, $class, $property);
         }
     }
 }

@@ -14,17 +14,16 @@ use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
-use Composer\Util\Filesystem;
 use Composer\Util\Platform;
 use olvlvl\ComposerAttributeCollector\Filter\ContentFilter;
 use olvlvl\ComposerAttributeCollector\Filter\InterfaceFilter;
 use olvlvl\ComposerAttributeCollector\Filter\PathFilter;
+use ReflectionException;
 
 use function array_merge;
 use function file_put_contents;
 use function is_string;
 use function microtime;
-use function realpath;
 use function spl_autoload_register;
 use function sprintf;
 use function var_export;
@@ -92,6 +91,9 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         $io->write("<info>Generated attributes file in $elapsed</info>");
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public static function dump(
         Composer $composer,
         IOInterface $io,
@@ -188,6 +190,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
     {
         $targetClassesCode = self::renderTargetClasses($collector->classes);
         $targetMethodsCode = self::renderTargetMethods($collector->methods);
+        $targetPropertiesCode = self::renderTargetProperties($collector->properties);
 
         return <<<PHP
         <?php
@@ -202,6 +205,9 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
             ],
             targetMethods: [
         $targetMethodsCode
+            ],
+            targetProperties: [
+        $targetPropertiesCode
             ],
         ));
         PHP;
@@ -237,6 +243,28 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         $code = '';
 
         foreach ($methods as $attribute => $targets) {
+            $code .= "        \\$attribute::class => [\n";
+            foreach ($targets as $target) {
+                $argumentsCode = self::renderArguments($target->arguments);
+                $code .= <<<PHP
+                            [ $argumentsCode, \\$target->class::class, '$target->name' ],
+
+                PHP;
+            }
+            $code .= "        ],\n";
+        }
+
+        return $code;
+    }
+
+    /**
+     * @param array<class-string, TargetPropertyRaw[]> $properties
+     */
+    private static function renderTargetProperties(array $properties): string
+    {
+        $code = '';
+
+        foreach ($properties as $attribute => $targets) {
             $code .= "        \\$attribute::class => [\n";
             foreach ($targets as $target) {
                 $argumentsCode = self::renderArguments($target->arguments);

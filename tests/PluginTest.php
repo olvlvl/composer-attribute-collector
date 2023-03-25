@@ -9,6 +9,10 @@
 
 namespace tests\olvlvl\ComposerAttributeCollector;
 
+use Acme\Attribute\ActiveRecord\Index;
+use Acme\Attribute\ActiveRecord\Serial;
+use Acme\Attribute\ActiveRecord\Text;
+use Acme\Attribute\ActiveRecord\Varchar;
 use Acme\Attribute\Get;
 use Acme\Attribute\Handler;
 use Acme\Attribute\Permission;
@@ -24,9 +28,9 @@ use olvlvl\ComposerAttributeCollector\AutoloadsBuilder;
 use olvlvl\ComposerAttributeCollector\Plugin;
 use olvlvl\ComposerAttributeCollector\TargetClass;
 use olvlvl\ComposerAttributeCollector\TargetMethod;
+use olvlvl\ComposerAttributeCollector\TargetProperty;
 use PHPUnit\Framework\TestCase;
 
-use function is_a;
 use function str_contains;
 use function usort;
 
@@ -131,6 +135,12 @@ final class PluginTest extends TestCase
                     [ new Handler(), \Acme\PSR4\DeleteMenuHandler::class ],
                 ]
             ],
+            [
+                Index::class,
+                [
+                    [ new Index('slug', unique: true), \Acme\PSR4\ActiveRecord\Article::class ],
+                ]
+            ]
 
         ];
     }
@@ -176,6 +186,51 @@ final class PluginTest extends TestCase
                 [
                     [ new Subscribe(), 'Acme\PSR4\SubscriberA::onEventA' ],
                     [ new Subscribe(), 'Acme\PSR4\SubscriberB::onEventA' ],
+                ]
+            ],
+
+        ];
+    }
+
+    /**
+     * @dataProvider provideTargetProperties
+     *
+     * @param class-string $attribute
+     * @param array<array{ object, callable-string }> $expected
+     */
+    public function testTargetProperties(string $attribute, array $expected): void
+    {
+        $actual = Attributes::findTargetProperties($attribute);
+
+        $this->assertEquals($expected, $this->collectProperties($actual));
+    }
+
+    /**
+     * @return array<array{ class-string, array<array{ object, callable-string }> }>
+     */
+    public static function provideTargetProperties(): array
+    {
+        return [
+
+            [
+                Serial::class,
+                [
+                    [ new Serial(primary: true), 'Acme\PSR4\ActiveRecord\Article::id' ],
+                ]
+            ],
+
+            [
+                Varchar::class,
+                [
+                    [ new Varchar(80), 'Acme\PSR4\ActiveRecord\Article::slug' ],
+                    [ new Varchar(80), 'Acme\PSR4\ActiveRecord\Article::title' ],
+                ]
+            ],
+
+            [
+                Text::class,
+                [
+                    [ new Text(), 'Acme\PSR4\ActiveRecord\Article::body' ],
                 ]
             ],
 
@@ -266,5 +321,25 @@ final class PluginTest extends TestCase
         usort($methods, fn ($a, $b) => $a[1] <=> $b[1]);
 
         return $methods;
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param TargetProperty<T>[] $targets
+     *
+     * @return array<array{T, string}>
+     */
+    private function collectProperties(array $targets): array
+    {
+        $properties = [];
+
+        foreach ($targets as $target) {
+            $properties[] = [ $target->attribute, "$target->class::$target->name" ];
+        }
+
+        usort($properties, fn ($a, $b) => $a[1] <=> $b[1]);
+
+        return $properties;
     }
 }
