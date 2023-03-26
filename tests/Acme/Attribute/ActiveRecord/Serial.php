@@ -4,9 +4,6 @@ namespace Acme\Attribute\ActiveRecord;
 
 use Attribute;
 
-/**
- * @readonly
- */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Serial extends Column
 {
