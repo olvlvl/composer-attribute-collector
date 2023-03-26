@@ -13,6 +13,9 @@ use function unlink;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+/**
+ * @return non-empty-string
+ */
 function get_cache_dir(): string
 {
     $dir = dirname(__DIR__) . '/.composer-attribute-collector';
@@ -24,8 +27,10 @@ function get_cache_dir(): string
     return $dir;
 }
 
-/*
+/**
  * Clean up cache
+ *
+ * @param non-empty-string $dir
  */
 function clear_directory(string $dir): void
 {

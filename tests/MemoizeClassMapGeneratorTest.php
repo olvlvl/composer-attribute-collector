@@ -7,9 +7,11 @@ use olvlvl\ComposerAttributeCollector\FileDatastore;
 use olvlvl\ComposerAttributeCollector\MemoizeClassMapGenerator;
 use PHPUnit\Framework\TestCase;
 
+use function file_exists;
 use function file_put_contents;
 use function time;
 use function touch;
+use function unlink;
 
 final class MemoizeClassMapGeneratorTest extends TestCase
 {
@@ -19,7 +21,16 @@ final class MemoizeClassMapGeneratorTest extends TestCase
     {
         parent::setUp();
 
-        clear_directory(self::DIR);
+        $remove = [
+            self::DIR . 'a.php',
+            self::DIR . 'a/b/c/b.php',
+        ];
+
+        foreach ($remove as $filename) {
+            if (file_exists($filename)) {
+                unlink($filename);
+            }
+        }
     }
 
     public function testMemoize(): void
@@ -27,6 +38,7 @@ final class MemoizeClassMapGeneratorTest extends TestCase
         $map = $this->map();
         $this->assertEmpty($map);
 
+        // check changes in the directory are detected
         self::write(
             "a.php",
             <<<PHP
@@ -45,8 +57,9 @@ final class MemoizeClassMapGeneratorTest extends TestCase
             'App\A' => self::DIR . 'a.php',
         ], $map);
 
+        // check changes in subdirectories are detected
         self::write(
-            "b.php",
+            "a/b/c/b.php",
             <<<PHP
             <?php
 
@@ -61,7 +74,7 @@ final class MemoizeClassMapGeneratorTest extends TestCase
         $map = $this->map();
         $this->assertEquals([
             'App\A' => self::DIR . 'a.php',
-            'App\B' => self::DIR . 'b.php',
+            'App\B' => self::DIR . 'a/b/c/b.php',
         ], $map);
     }
 

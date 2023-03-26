@@ -4,6 +4,7 @@ namespace olvlvl\ComposerAttributeCollector;
 
 use Composer\ClassMapGenerator\ClassMapGenerator;
 use Composer\IO\IOInterface;
+use DirectoryIterator;
 use RuntimeException;
 
 use function array_filter;
@@ -89,13 +90,9 @@ class MemoizeClassMapGenerator
         ?string $namespace = null
     ): void {
         $this->paths[$path] = true;
-        [ $timestamp ] = $this->state[$path] ?? [ 0, [ ] ];
+        [ $timestamp ] = $this->state[$path] ?? [ 0 ];
 
-        $mtime = filemtime($path);
-        assert(is_int($mtime));
-
-        if ($timestamp < $mtime) {
-            $this->io->debug("Refresh class map for path '$path' ($timestamp < $mtime)");
+        if ($this->should_update($timestamp, $path)) {
             $inner = new ClassMapGenerator();
             $inner->avoidDuplicateScans();
             $inner->scanPaths($path, $excluded, $autoloadType, $namespace);
@@ -103,5 +100,33 @@ class MemoizeClassMapGenerator
 
             $this->state[$path] = [ time(), $map ];
         }
+    }
+
+    private function should_update(int $timestamp, string $path): bool
+    {
+        if (!$timestamp) {
+            return true;
+        }
+
+        $mtime = filemtime($path);
+
+        assert(is_int($mtime));
+
+        if ($timestamp < $mtime) {
+            $diff = $mtime - $timestamp;
+            $this->io->debug("Refresh class map for path '$path' ($diff sec ago)");
+
+            return true;
+        }
+
+        foreach (new DirectoryIterator($path) as $di) {
+            if ($di->isDir() && !$di->isDot()) {
+                if ($this->should_update($timestamp, $di->getPathname())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
