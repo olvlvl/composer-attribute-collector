@@ -33,7 +33,7 @@ test-cleanup:
 	@rm -rf tests/sandbox/*
 
 .PHONY: test-container
-test-container: test-container82
+test-container: test-container80
 
 .PHONY: test-container80
 test-container80:
