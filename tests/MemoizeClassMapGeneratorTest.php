@@ -35,7 +35,7 @@ final class MemoizeClassMapGeneratorTest extends TestCase
 
     public function testMemoize(): void
     {
-        $map = $this->map();
+        $map = $this->map(self::DIR);
         $this->assertEmpty($map);
 
         // check changes in the directory are detected
@@ -52,7 +52,13 @@ final class MemoizeClassMapGeneratorTest extends TestCase
             PHP
         );
 
-        $map = $this->map();
+        $map = $this->map(self::DIR . 'a.php');
+        $this->assertEquals([
+            'App\A' => self::DIR . 'a.php',
+        ], $map);
+
+        // map again to test the code is not trying to iterate over the file like it's a directory
+        $map = $this->map(self::DIR . 'a.php');
         $this->assertEquals([
             'App\A' => self::DIR . 'a.php',
         ], $map);
@@ -71,7 +77,7 @@ final class MemoizeClassMapGeneratorTest extends TestCase
             PHP
         );
 
-        $map = $this->map();
+        $map = $this->map(self::DIR);
         $this->assertEquals([
             'App\A' => self::DIR . 'a.php',
             'App\B' => self::DIR . 'a/b/c/b.php',
@@ -90,14 +96,14 @@ final class MemoizeClassMapGeneratorTest extends TestCase
     /**
      * @return array<class-string, string>
      */
-    private static function map(): array
+    private static function map(string $path): array
     {
         $generator = new MemoizeClassMapGenerator(
             new FileDatastore(get_cache_dir()),
             new NullIO(),
         );
 
-        $generator->scanPaths(self::DIR);
+        $generator->scanPaths($path);
 
         return $generator->getMap();
     }

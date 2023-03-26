@@ -10,6 +10,7 @@ use RuntimeException;
 use function array_filter;
 use function array_merge;
 use function filemtime;
+use function is_dir;
 use function is_int;
 use function time;
 
@@ -117,6 +118,11 @@ class MemoizeClassMapGenerator
             $this->io->debug("Refresh class map for path '$path' ($diff sec ago)");
 
             return true;
+        }
+
+        // Could be a file referenced as class map, we don't want to iterate over that.
+        if (!is_dir($path)) {
+            return false;
         }
 
         foreach (new DirectoryIterator($path) as $di) {
