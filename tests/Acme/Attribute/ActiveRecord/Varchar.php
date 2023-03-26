@@ -5,24 +5,13 @@ namespace Acme\Attribute\ActiveRecord;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Varchar extends Column
+final class Varchar implements SchemaAttribute
 {
     public function __construct(
-        int $size = 255,
-        bool $null = false,
-        bool $unique = false,
-        bool $primary = false,
-        ?string $comment = null,
-        ?string $collate = null,
+        public int $size = 255,
+        public bool $null = false,
+        public bool $unique = false,
+        public ?string $collate = null,
     ) {
-        parent::__construct(
-            type: self::TYPE_VARCHAR,
-            size: $size,
-            null: $null,
-            unique: $unique,
-            primary: $primary,
-            comment: $comment,
-            collate: $collate,
-        );
     }
 }

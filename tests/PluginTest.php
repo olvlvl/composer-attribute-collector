@@ -9,7 +9,10 @@
 
 namespace tests\olvlvl\ComposerAttributeCollector;
 
+use Acme\Attribute\ActiveRecord\Boolean;
+use Acme\Attribute\ActiveRecord\Id;
 use Acme\Attribute\ActiveRecord\Index;
+use Acme\Attribute\ActiveRecord\SchemaAttribute;
 use Acme\Attribute\ActiveRecord\Serial;
 use Acme\Attribute\ActiveRecord\Text;
 use Acme\Attribute\ActiveRecord\Varchar;
@@ -138,7 +141,7 @@ final class PluginTest extends TestCase
             [
                 Index::class,
                 [
-                    [ new Index('slug', unique: true), \Acme\PSR4\ActiveRecord\Article::class ],
+                    [ new Index('active'), \Acme\PSR4\ActiveRecord\Article::class ],
                 ]
             ]
 
@@ -196,7 +199,7 @@ final class PluginTest extends TestCase
      * @dataProvider provideTargetProperties
      *
      * @param class-string $attribute
-     * @param array<array{ object, callable-string }> $expected
+     * @param array<array{ object, string }> $expected
      */
     public function testTargetProperties(string $attribute, array $expected): void
     {
@@ -206,7 +209,7 @@ final class PluginTest extends TestCase
     }
 
     /**
-     * @return array<array{ class-string, array<array{ object, callable-string }> }>
+     * @return array<array{ class-string, array<array{ object, string }> }>
      */
     public static function provideTargetProperties(): array
     {
@@ -215,14 +218,14 @@ final class PluginTest extends TestCase
             [
                 Serial::class,
                 [
-                    [ new Serial(primary: true), 'Acme\PSR4\ActiveRecord\Article::id' ],
+                    [ new Serial(), 'Acme\PSR4\ActiveRecord\Article::id' ],
                 ]
             ],
 
             [
                 Varchar::class,
                 [
-                    [ new Varchar(80), 'Acme\PSR4\ActiveRecord\Article::slug' ],
+                    [ new Varchar(80, unique: true), 'Acme\PSR4\ActiveRecord\Article::slug' ],
                     [ new Varchar(80), 'Acme\PSR4\ActiveRecord\Article::title' ],
                 ]
             ],
@@ -267,6 +270,22 @@ final class PluginTest extends TestCase
             [ new Get(), 'Acme\Presentation\ImageController::list' ],
             [ new Get('/{id}'), 'Acme\Presentation\ImageController::show' ],
         ], $this->collectMethods($actual));
+    }
+
+    public function testFilterTargetProperties(): void
+    {
+        $actual = Attributes::filterTargetProperties(
+            Attributes::predicateForAttributeInstanceOf(SchemaAttribute::class)
+        );
+
+        $this->assertEquals([
+            [ new Boolean(), 'Acme\PSR4\ActiveRecord\Article::active'],
+            [ new Text(), 'Acme\PSR4\ActiveRecord\Article::body'],
+            [ new Id(), 'Acme\PSR4\ActiveRecord\Article::id'],
+            [ new Serial(), 'Acme\PSR4\ActiveRecord\Article::id'],
+            [ new Varchar(80, unique: true), 'Acme\PSR4\ActiveRecord\Article::slug'],
+            [ new Varchar(80), 'Acme\PSR4\ActiveRecord\Article::title'],
+        ], $this->collectProperties($actual));
     }
 
     public function testForClass(): void

@@ -26,7 +26,6 @@ use function is_string;
 use function microtime;
 use function spl_autoload_register;
 use function sprintf;
-use function var_export;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -37,7 +36,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
 {
     public const EXTRA = 'composer-attribute-collector';
     public const EXTRA_IGNORE_PATHS = 'ignore-paths';
-    private const CACHE_DIR = '.composer-attribute-collector';
+    public const CACHE_DIR = '.composer-attribute-collector';
     private const PROBLEMATIC_PATHS = [
         // https://github.com/olvlvl/composer-attribute-collector/issues/4
         'symfony/cache/Traits'

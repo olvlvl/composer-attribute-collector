@@ -2,8 +2,9 @@
 
 namespace tests\olvlvl\ComposerAttributeCollector;
 
-use Acme\Attribute\ActiveRecord\Column;
+use Acme\Attribute\ActiveRecord\Id;
 use Acme\Attribute\ActiveRecord\Index;
+use Acme\Attribute\ActiveRecord\SchemaAttribute;
 use Acme\Attribute\ActiveRecord\Serial;
 use Acme\Attribute\ActiveRecord\Text;
 use Acme\Attribute\ActiveRecord\Varchar;
@@ -17,6 +18,7 @@ use Acme\PSR4\ActiveRecord\Article;
 use Acme\PSR4\DeleteMenu;
 use Acme\PSR4\Presentation\ArticleController;
 use Closure;
+use olvlvl\ComposerAttributeCollector\Attributes;
 use olvlvl\ComposerAttributeCollector\Collection;
 use olvlvl\ComposerAttributeCollector\TargetClass;
 use olvlvl\ComposerAttributeCollector\TargetMethod;
@@ -161,8 +163,11 @@ final class CollectionTest extends TestCase
                 ],
             ],
             targetProperties: [
+                Id::class => [
+                    [ [ ], Article::class, 'id' ],
+                ],
                 Serial::class => [
-                    [ [ 'primary' => true ], Article::class, 'id' ],
+                    [ [ ], Article::class, 'id' ],
                 ],
                 Varchar::class => [
                     [ [ 'size' => 80 ], Article::class, 'title' ],
@@ -173,10 +178,13 @@ final class CollectionTest extends TestCase
             ]
         );
 
-        $actual = $collection->filterTargetProperties(fn($a) => is_a($a, Column::class, true));
+        $actual = $collection->filterTargetProperties(
+            Attributes::predicateForAttributeInstanceOf(SchemaAttribute::class)
+        );
 
         $this->assertEquals([
-            new TargetProperty(new Serial(primary: true), Article::class, 'id'),
+            new TargetProperty(new Id(), Article::class, 'id'),
+            new TargetProperty(new Serial(), Article::class, 'id'),
             new TargetProperty(new Varchar(size: 80), Article::class, 'title'),
             new TargetProperty(new Text(), Article::class, 'body'),
         ], $actual);
@@ -199,8 +207,11 @@ final class CollectionTest extends TestCase
                 ],
             ],
             targetProperties: [
+                Id::class => [
+                    [ [ ], Article::class, 'id' ],
+                ],
                 Serial::class => [
-                    [ [ 'primary' => true ], Article::class, 'id' ],
+                    [ [ ], Article::class, 'id' ],
                 ],
                 Varchar::class => [
                     [ [ 'size' => 80 ], Article::class, 'title' ],
@@ -222,7 +233,8 @@ final class CollectionTest extends TestCase
 
         $this->assertEquals([
             'id' => [
-                new Serial(primary: true),
+                new Id(),
+                new Serial(),
             ],
             'title' => [
                 new Varchar(size: 80),

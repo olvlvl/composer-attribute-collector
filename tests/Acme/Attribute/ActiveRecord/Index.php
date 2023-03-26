@@ -10,7 +10,7 @@ use Attribute;
  * @readonly
  */
 #[Attribute(Attribute::TARGET_CLASS)]
-class Index
+final class Index implements SchemaAttribute
 {
     /**
      * @param string|array<string> $columns

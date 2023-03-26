@@ -23,10 +23,10 @@ final class Collection
      * @param array<class-string, array<array{ mixed[], class-string }>> $targetClasses
      *     Where _key_ is an attribute class and _value_ an array of arrays
      *     where 0 are the attribute arguments and 1 is a target class.
-     * @param array<class-string, array<array{ mixed[], class-string, string }>> $targetMethods
+     * @param array<class-string, array<array{ mixed[], class-string, non-empty-string }>> $targetMethods
      *     Where _key_ is an attribute class and _value_ an array of arrays
      *     where 0 are the attribute arguments, 1 is a target class, and 2 is the target method.
-     * @param array<class-string, array<array{ mixed[], class-string, string }>> $targetProperties
+     * @param array<class-string, array<array{ mixed[], class-string, non-empty-string }>> $targetProperties
      *     Where _key_ is an attribute class and _value_ an array of arrays
      *     where 0 are the attribute arguments, 1 is a target class, and 2 is the target property.
      */
@@ -174,7 +174,7 @@ final class Collection
     }
 
     /**
-     * @param callable(class-string $attribute, class-string $class, string $method):bool $predicate
+     * @param callable(class-string $attribute, class-string $class, non-empty-string $method):bool $predicate
      *
      * @return array<TargetMethod<object>>
      */
@@ -199,7 +199,7 @@ final class Collection
     }
 
     /**
-     * @param callable(class-string $attribute, class-string $class, string $property):bool $predicate
+     * @param callable(class-string $attribute, class-string $class, non-empty-string $property):bool $predicate
      *
      * @return array<TargetProperty<object>>
      */

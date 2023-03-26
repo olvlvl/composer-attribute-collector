@@ -49,7 +49,7 @@ final class CollectionRenderer
      * //phpcs:disable Generic.Files.LineLength.TooLong
      * @param iterable<class-string, iterable<TransientTargetClass|TransientTargetMethod|TransientTargetProperty>> $targetByClass
      *
-     * @return array<class-string, array<array{ array<int|string, mixed>, class-string, 2?:string }>>
+     * @return array<class-string, array<array{ array<int|string, mixed>, class-string, 2?:non-empty-string }>>
      */
     private static function targetsToArray(iterable $targetByClass): array
     {

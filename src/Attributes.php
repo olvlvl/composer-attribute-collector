@@ -89,6 +89,16 @@ final class Attributes
     }
 
     /**
+     * @param callable(class-string $attribute, class-string $class, string $property):bool $predicate
+     *
+     * @return array<TargetProperty<object>>
+     */
+    public static function filterTargetProperties(callable $predicate): array
+    {
+        return self::getCollection()->filterTargetProperties($predicate);
+    }
+
+    /**
      * @param class-string $class
      *
      * @return Closure(class-string $attribute):bool
