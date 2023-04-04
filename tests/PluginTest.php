@@ -26,7 +26,6 @@ use olvlvl\ComposerAttributeCollector\TargetClass;
 use olvlvl\ComposerAttributeCollector\TargetMethod;
 use PHPUnit\Framework\TestCase;
 
-use function is_a;
 use function str_contains;
 use function usort;
 
@@ -43,10 +42,14 @@ final class PluginTest extends TestCase
         }
 
         $extra = [
-            Plugin::EXTRA => [
-                Plugin::EXTRA_IGNORE_PATHS => [
-                    'IncompatibleSignature'
-                ]
+            'composer-attribute-collector' => [
+                'ignore-paths' => [
+                    'tests/Acme/PSR4/IncompatibleSignature',
+                    'CreateMenu', // should not match anything because it is not relative to project root
+                ],
+                'include-paths' => [
+                    'tests/Acme/',
+                ],
             ]
         ];
 

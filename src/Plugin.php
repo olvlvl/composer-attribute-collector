@@ -14,17 +14,16 @@ use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
-use Composer\Util\Filesystem;
 use Composer\Util\Platform;
 use olvlvl\ComposerAttributeCollector\Filter\ContentFilter;
+use olvlvl\ComposerAttributeCollector\Filter\IncludePathFilter;
 use olvlvl\ComposerAttributeCollector\Filter\InterfaceFilter;
-use olvlvl\ComposerAttributeCollector\Filter\PathFilter;
+use olvlvl\ComposerAttributeCollector\Filter\IgnorePathFilter;
 
 use function array_merge;
 use function file_put_contents;
 use function is_string;
 use function microtime;
-use function realpath;
 use function spl_autoload_register;
 use function sprintf;
 use function var_export;
@@ -38,10 +37,11 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
 {
     public const EXTRA = 'composer-attribute-collector';
     public const EXTRA_IGNORE_PATHS = 'ignore-paths';
+    public const EXTRA_INCLUDE_PATHS = 'include-paths';
     private const CACHE_DIR = '.composer-attribute-collector';
     private const PROBLEMATIC_PATHS = [
         // https://github.com/olvlvl/composer-attribute-collector/issues/4
-        'symfony/cache/Traits'
+        'vendor/symfony/cache/Traits'
     ];
 
     /**
@@ -169,6 +169,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
 
     private static function buildFileFilter(Composer $composer): Filter
     {
+        $basePath = Platform::getCwd();
         $extra = $composer->getPackage()->getExtra()[self::EXTRA] ?? [];
         /** @var string[] $ignore_paths */
         $ignore_paths = array_merge(
@@ -177,8 +178,12 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
             self::PROBLEMATIC_PATHS
         );
 
+        // @phpstan-ignore-next-line
+        $include_paths = (array) ($extra[self::EXTRA_INCLUDE_PATHS] ?? []);
+
         return new Filter\Chain([
-            new PathFilter($ignore_paths),
+            new IncludePathFilter($basePath, $include_paths),
+            new IgnorePathFilter($basePath, $ignore_paths),
             new ContentFilter(),
             new InterfaceFilter()
         ]);
