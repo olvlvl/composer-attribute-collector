@@ -47,7 +47,7 @@ final class PluginTest extends TestCase
                     'tests/Acme/PSR4/IncompatibleSignature',
                     'CreateMenu', // should not match anything because it is not relative to project root
                 ],
-                'include-paths' => [
+                'only-paths' => [
                     'tests/Acme/',
                 ],
             ]

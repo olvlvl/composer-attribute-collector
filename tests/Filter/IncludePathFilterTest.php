@@ -18,14 +18,14 @@ final class IncludePathFilterTest extends TestCase
     /**
      * @dataProvider provideFilterMatching
      */
-    public function testFilterMatching(string $filepath, string $class, array $paths): void
+    public function testFilterMatching(string $filepath, string $class, string $cwd, array $paths): void
     {
         $io = $this->createMock(IOInterface::class);
         $io
             ->expects($this->never())
             ->method('debug');
 
-        $filter = new IncludePathFilter('/app', $paths);
+        $filter = new IncludePathFilter($cwd, $paths);
 
         $actual = $filter->filter($filepath, $class, $io);
 
@@ -34,20 +34,21 @@ final class IncludePathFilterTest extends TestCase
 
     public function provideFilterMatching(): array
     {
+        $cwd = '/path/to/project/root';
         return [
             // special case if no include paths provided, include all
-            ['/app/tests/Test.php', 'Test', []],
+            ["$cwd/tests/Test.php", 'Test', $cwd, []],
 
             // otherwide only included paths are allowed
-            ['/app/src/Test.php', 'Test', ['src/']],
-            ['/app/src/Test.php', 'Test', ['/app/src/']],
+            ["$cwd/src/Test.php", 'Test', $cwd, ['src/']],
+            ["/some/absolute/path/src/Test.php", 'Test', $cwd, ['/some/absolute/path/src/']],
         ];
     }
 
     /**
      * @dataProvider provideFilterNotMatching
      */
-    public function testFilterNotMatching(string $filepath, string $class, array $paths): void
+    public function testFilterNotMatching(string $filepath, string $class, string $cwd, array $paths): void
     {
         $io = $this->createMock(IOInterface::class);
         $io
@@ -55,7 +56,7 @@ final class IncludePathFilterTest extends TestCase
             ->method('debug')
             ->with($this->stringStartsWith("Discarding '$class' because its path is not on include list"));
 
-        $filter = new IncludePathFilter('/app', $paths);
+        $filter = new IncludePathFilter($cwd, $paths);
 
         $actual = $filter->filter($filepath, $class, $io);
 
@@ -64,9 +65,10 @@ final class IncludePathFilterTest extends TestCase
 
     public function provideFilterNotMatching(): array
     {
+        $cwd = '/path/to/project/root';
         return [
-            ['/app/tests/Test.php', 'Test', ['src/']],
-            ['/app/tests/src/Test.php', 'Test', ['src/']],
+            ["$cwd/tests/Test.php", 'Test', $cwd, ['src/']],
+            ["$cwd/tests/src/Test.php", 'Test', $cwd, ['src/']],
         ];
     }
 }

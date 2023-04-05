@@ -17,20 +17,20 @@ use function str_starts_with;
 final class IgnorePathFilter implements Filter
 {
     /**
-     * @param string[] $matches
+     * @param string[] $paths
      */
     public function __construct(
         private string $basePath,
-        private array $matches,
+        private array  $paths,
     ) {
     }
 
     public function filter(string $filepath, string $class, IOInterface $io): bool
     {
-        foreach ($this->matches as $match) {
-            $basePath = str_starts_with($match, '/') ? $match : "{$this->basePath}/$match";
+        foreach ($this->paths as $ignoredPath) {
+            $basePath = str_starts_with($ignoredPath, '/') ? $ignoredPath : "{$this->basePath}/$ignoredPath";
             if (str_starts_with($filepath, $basePath)) {
-                $io->debug("Discarding '$class' because its path matches '$match'");
+                $io->debug("Discarding '$class' because its path matches '$ignoredPath'");
 
                 return false;
             }

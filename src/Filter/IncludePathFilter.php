@@ -17,22 +17,22 @@ use function str_starts_with;
 final class IncludePathFilter implements Filter
 {
     /**
-     * @param string[] $matches
+     * @param string[] $paths
      */
     public function __construct(
         private string $basePath,
-        private array $matches,
+        private array  $paths,
     ) {
     }
 
     public function filter(string $filepath, string $class, IOInterface $io): bool
     {
-        if (\count($this->matches) === 0) {
+        if (\count($this->paths) === 0) {
             return true;
         }
 
-        foreach ($this->matches as $match) {
-            $basePath = str_starts_with($match, '/') ? $match : "{$this->basePath}/$match";
+        foreach ($this->paths as $includedPath) {
+            $basePath = str_starts_with($includedPath, '/') ? $includedPath : "{$this->basePath}/$includedPath";
             if (str_starts_with($filepath, $basePath)) {
                 return true;
             }

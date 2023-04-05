@@ -18,14 +18,14 @@ final class IgnorePathFilterTest extends TestCase
     /**
      * @dataProvider provideFilterMatching
      */
-    public function testFilterMatching(string $filepath, string $class, array  $paths): void
+    public function testFilterMatching(string $filepath, string $class, string $cwd, array $paths): void
     {
         $io = $this->createMock(IOInterface::class);
         $io
             ->expects($this->never())
             ->method('debug');
 
-        $filter = new IgnorePathFilter('/app', $paths);
+        $filter = new IgnorePathFilter($cwd, $paths);
 
         $actual = $filter->filter($filepath, $class, $io);
 
@@ -34,16 +34,17 @@ final class IgnorePathFilterTest extends TestCase
 
     public function provideFilterMatching(): array
     {
+        $cwd = '/path/to/project/root';
         return [
-            [ "/app/not-vendor/symfony/cache/Traits/RedisCluster5Proxy.php", "RedisCluster5Proxy", ['vendor/symfony/cache/Traits'] ],
-            [ "/app/vendor/symfony/routing/Route.php", "Route", ['vendor/symfony/cache/Traits'] ],
+            [ "$cwd/not-vendor/symfony/cache/Traits/RedisCluster5Proxy.php", "RedisCluster5Proxy", $cwd, ['vendor/symfony/cache/Traits'] ],
+            [ "$cwd/vendor/symfony/routing/Route.php", "Route", $cwd, ['vendor/symfony/cache/Traits'] ],
         ];
     }
 
     /**
      * @dataProvider provideFilterNotMatching
      */
-    public function testFilterNotMatching(string $filepath, string $class, array $paths): void
+    public function testFilterNotMatching(string $filepath, string $class, string $cwd, array $paths): void
     {
         $io = $this->getMockBuilder(IOInterface::class)->getMock();
         $io
@@ -51,7 +52,7 @@ final class IgnorePathFilterTest extends TestCase
             ->method('debug')
             ->with($this->stringStartsWith("Discarding '$class' because its path matches"));
 
-        $filter = new IgnorePathFilter('/app', $paths);
+        $filter = new IgnorePathFilter($cwd, $paths);
 
         $actual = $filter->filter($filepath, $class, $io);
 
@@ -60,9 +61,13 @@ final class IgnorePathFilterTest extends TestCase
 
     public function provideFilterNotMatching(): array
     {
+        $cwd = '/path/to/project/root';
         return [
-            [ "/app/vendor/symfony/cache/Traits/RedisCluster5Proxy.php", "RedisCluster5Proxy", ['vendor/symfony/cache/Traits'] ],
-            [ "/app/absolute/Test.php", "Test", ['/app/absolute'] ],
+            // problematic path
+            [ "$cwd/vendor/symfony/cache/Traits/RedisCluster5Proxy.php", "RedisCluster5Proxy", $cwd, ['vendor/symfony/cache/Traits'] ],
+
+            // absolute path
+            [ "/some/absolute/path/Test.php", "Test", $cwd, ['/some/absolute/path'] ],
         ];
     }
 }

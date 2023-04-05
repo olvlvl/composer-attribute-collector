@@ -35,9 +35,9 @@ use const DIRECTORY_SEPARATOR;
  */
 final class Plugin implements PluginInterface, EventSubscriberInterface
 {
-    public const EXTRA = 'composer-attribute-collector';
-    public const EXTRA_IGNORE_PATHS = 'ignore-paths';
-    public const EXTRA_INCLUDE_PATHS = 'include-paths';
+    private const EXTRA = 'composer-attribute-collector';
+    private const EXTRA_IGNORE_PATHS = 'ignore-paths';
+    private const EXTRA_ONLY_PATHS = 'only-paths';
     private const CACHE_DIR = '.composer-attribute-collector';
     private const PROBLEMATIC_PATHS = [
         // https://github.com/olvlvl/composer-attribute-collector/issues/4
@@ -179,7 +179,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         );
 
         // @phpstan-ignore-next-line
-        $include_paths = (array) ($extra[self::EXTRA_INCLUDE_PATHS] ?? []);
+        $include_paths = (array) ($extra[self::EXTRA_ONLY_PATHS] ?? []);
 
         return new Filter\Chain([
             new IncludePathFilter($basePath, $include_paths),
