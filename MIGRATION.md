@@ -1,5 +1,29 @@
 # Migration
 
+## v1.2 to v1.3
+
+### New Requirements
+
+None
+
+### New features
+
+- The plugin now collects attributes on properties. `Attributes::findTargetProperties()` returns target properties, and `filterTargetProperties()` filters properties with a predicate.
+
+### Backward Incompatible Changes
+
+None
+
+### Deprecated Features
+
+None
+
+### Other Changes
+
+None
+
+
+
 ## v1.1 to v1.2
 
 ### New Requirements
