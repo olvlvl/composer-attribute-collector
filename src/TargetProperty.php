@@ -11,19 +11,20 @@ namespace olvlvl\ComposerAttributeCollector;
 
 /**
  * @readonly
- * @internal
+ *
+ * @template T of object
  */
-final class TargetMethodRaw
+final class TargetProperty
 {
     /**
-     * @param array<int|string, mixed> $arguments
+     * @param T $attribute
      * @param class-string $class
-     * @param string $name
+     * @param non-empty-string $name
      */
     public function __construct(
-        public array $arguments,
+        public object $attribute,
         public string $class,
-        public string $name
+        public string $name,
     ) {
     }
 }

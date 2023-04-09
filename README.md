@@ -12,13 +12,12 @@ Later, these targets can be retrieved through a convenient interface.
 
 #### Features
 
-- Zero configuration.
-- No reflection in the generated file.
-- No impact on performance.
-- No dependency (except Composer of course).
-- A single interface to get attribute targets.
-- A single interface to get class attributes.
-- 3 types of cache speed up generation by limiting updates to changed files.
+- Zero configuration
+- No reflection in the generated file
+- No impact on performance
+- No dependency (except Composer of course)
+- A single interface to get attribute targets: classes, methods, and properties
+- 3 types of cache speed up generation by limiting updates to changed files
 
 
 
@@ -32,6 +31,7 @@ The following example demonstrates how targets and their attributes can be retri
 use olvlvl\ComposerAttributeCollector\Attributes;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\ORM\Mapping\Column;
 
 require_once 'vendor/autoload.php';
 require_once 'vendor/attributes.php'; // <-- the file created by the plugin
@@ -48,18 +48,25 @@ foreach (Attributes::findTargetMethods(Route::class) as $target) {
     var_dump($target->attribute, $target->class, $target->name);
 }
 
+// Find the target properties of the Column attribute.
+foreach (Attributes::findTargetProperties(Column::class) as $target) {
+    var_dump($target->attribute, $target->class, $target->name);
+}
+
 // Filter target methods using a predicate.
+// This is also available for classes and properties.
 foreach (Attributes::filterTargetMethods(
     fn($attribute) => is_a($attribute, Route::class, true)
 ) as $target) {
     var_dump($target->attribute, $target->class, $target->name);
 }
 
-// Find class and method attributes for the ArticleController class.
+// Find class, method, and property attributes for the ArticleController class.
 $attributes = Attributes::forClass(ArticleController::class);
 
 var_dump($attributes->classAttributes);
 var_dump($attributes->methodsAttributes);
+var_dump($attributes->propertyAttributes);
 ```
 
 
@@ -204,6 +211,7 @@ $attributes = Attributes::forClass(ArticleController::class);
 
 var_dump($attributes->classAttributes);
 var_dump($attributes->methodsAttributes);
+var_dump($attributes->propertyAttributes);
 ```
 
 
@@ -372,7 +380,7 @@ $config->from_attributes();
 
 ### Filtering target methods
 
-`filterTargetMethods()` can filter target methods using a predicate. This can be helpful when a number of attributes extend another one, and you are interested in collecting any instance of that attribute.
+`filterTargetMethods()` can filter target methods using a predicate. This can be helpful when a number of attributes extend another one, and you are interested in collecting any instance of that attribute. The `filerTargetClasses()` and `filterTargetProperties()` methods provide similar feature for classes and properties.
 
 Let's say we have a `Route` attribute extended by `Get`, `Post`, `Put`…
 

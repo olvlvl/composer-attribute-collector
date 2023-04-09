@@ -57,6 +57,18 @@ final class Attributes
     }
 
     /**
+     * @template T of object
+     *
+     * @param class-string<T> $attribute
+     *
+     * @return TargetProperty<T>[]
+     */
+    public static function findTargetProperties(string $attribute): array
+    {
+        return self::getCollection()->findTargetProperties($attribute);
+    }
+
+    /**
      * @param callable(class-string $attribute, class-string $class):bool $predicate
      *
      * @return array<TargetClass<object>>
@@ -74,6 +86,16 @@ final class Attributes
     public static function filterTargetMethods(callable $predicate): array
     {
         return self::getCollection()->filterTargetMethods($predicate);
+    }
+
+    /**
+     * @param callable(class-string $attribute, class-string $class, string $property):bool $predicate
+     *
+     * @return array<TargetProperty<object>>
+     */
+    public static function filterTargetProperties(callable $predicate): array
+    {
+        return self::getCollection()->filterTargetProperties($predicate);
     }
 
     /**

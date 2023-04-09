@@ -19,7 +19,7 @@ final class TargetMethod
     /**
      * @param T $attribute
      * @param class-string $class
-     * @param string $name
+     * @param non-empty-string $name
      */
     public function __construct(
         public object $attribute,
