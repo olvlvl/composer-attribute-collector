@@ -12,8 +12,11 @@ namespace olvlvl\ComposerAttributeCollector\Filter;
 use Composer\IO\IOInterface;
 use olvlvl\ComposerAttributeCollector\Filter;
 
-use function str_contains;
+use function str_starts_with;
 
+/**
+ * @internal
+ */
 final class PathFilter implements Filter
 {
     /**
@@ -27,7 +30,7 @@ final class PathFilter implements Filter
     public function filter(string $filepath, string $class, IOInterface $io): bool
     {
         foreach ($this->matches as $match) {
-            if (str_contains($filepath, $match)) {
+            if (str_starts_with($filepath, $match)) {
                 $io->debug("Discarding '$class' because its path matches '$match'");
 
                 return false;

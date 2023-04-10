@@ -25,15 +25,18 @@ use Acme\Attribute\Subscribe;
 use Acme\PSR4\Presentation\ArticleController;
 use Composer\Composer;
 use Composer\IO\NullIO;
-use Composer\Package\RootPackageInterface;
 use olvlvl\ComposerAttributeCollector\Attributes;
 use olvlvl\ComposerAttributeCollector\AutoloadsBuilder;
+use olvlvl\ComposerAttributeCollector\Config;
 use olvlvl\ComposerAttributeCollector\Plugin;
 use olvlvl\ComposerAttributeCollector\TargetClass;
 use olvlvl\ComposerAttributeCollector\TargetMethod;
 use olvlvl\ComposerAttributeCollector\TargetProperty;
 use PHPUnit\Framework\TestCase;
+use ReflectionException;
 
+use function getcwd;
+use function is_string;
 use function str_contains;
 use function usort;
 
@@ -41,6 +44,9 @@ final class PluginTest extends TestCase
 {
     private static bool $initialized = false;
 
+    /**
+     * @throws ReflectionException
+     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -49,23 +55,7 @@ final class PluginTest extends TestCase
             return;
         }
 
-        $extra = [
-            Plugin::EXTRA => [
-                Plugin::EXTRA_IGNORE_PATHS => [
-                    'IncompatibleSignature'
-                ]
-            ]
-        ];
-
-        $package = $this->getMockBuilder(RootPackageInterface::class)->getMock();
-        $package
-            ->method('getExtra')
-            ->willReturn($extra);
-
         $composer = $this->getMockBuilder(Composer::class)->getMock();
-        $composer
-            ->method('getPackage')
-            ->willReturn($package);
 
         $autoloadsBuilder = $this->getMockBuilder(AutoloadsBuilder::class)->getMock();
         $autoloadsBuilder
@@ -86,12 +76,21 @@ final class PluginTest extends TestCase
                 ]
             );
 
+        $cwd = getcwd();
+        assert(is_string($cwd));
         $filepath = __DIR__ . '/sandbox/attributes.php';
+
+        $config = new Config(
+            $filepath,
+            [
+                "$cwd/tests/Acme/PSR4/IncompatibleSignature.php"
+            ]
+        );
 
         Plugin::dump(
             $composer,
+            $config,
             new NullIO(),
-            $filepath,
             $autoloadsBuilder
         );
 
