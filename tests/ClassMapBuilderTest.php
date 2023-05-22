@@ -21,10 +21,11 @@ final class ClassMapBuilderTest extends TestCase
 {
     public function testBuildClassMap(): void
     {
+        $io = new NullIO();
         $sut = new ClassMapBuilder(
             new MemoizeClassMapGenerator(
-                new FileDatastore(get_cache_dir()),
-                new NullIO(),
+                new FileDatastore(get_cache_dir(), $io),
+                $io,
             )
         );
 

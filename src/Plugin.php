@@ -100,7 +100,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         AutoloadsBuilder $autoloadsBuilder = null,
         ClassMapBuilder $classMapBuilder = null
     ): void {
-        $datastore = self::buildDefaultDatastore();
+        $datastore = self::buildDefaultDatastore($io);
         $autoloadsBuilder ??= new AutoloadsBuilder();
         $classMapGenerator = new MemoizeClassMapGenerator($datastore, $io);
         $classMapBuilder ??= new ClassMapBuilder($classMapGenerator);
@@ -141,13 +141,13 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         file_put_contents($filepath, $code);
     }
 
-    private static function buildDefaultDatastore(): Datastore
+    private static function buildDefaultDatastore(IOInterface $io): Datastore
     {
         $basePath = Platform::getCwd();
 
         assert($basePath !== '');
 
-        return new FileDatastore($basePath . DIRECTORY_SEPARATOR . self::CACHE_DIR);
+        return new FileDatastore($basePath . DIRECTORY_SEPARATOR . self::CACHE_DIR, $io);
     }
 
     private static function renderElapsedTime(float $start): string
