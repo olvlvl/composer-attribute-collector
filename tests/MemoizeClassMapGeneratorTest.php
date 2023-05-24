@@ -98,9 +98,10 @@ final class MemoizeClassMapGeneratorTest extends TestCase
      */
     private static function map(string $path): array
     {
+        $io = new NullIO();
         $generator = new MemoizeClassMapGenerator(
-            new FileDatastore(get_cache_dir()),
-            new NullIO(),
+            new FileDatastore(get_cache_dir(), $io),
+            $io,
         );
 
         $generator->scanPaths($path);
