@@ -31,15 +31,24 @@ final class ClassAttributeCollectorTest extends TestCase
      * @dataProvider provideCollectAttributes
      *
      * @param class-string $class
-     * @param array<int|string, mixed> $expected
+     * @param array<TransientTargetClass> $expectedClassAttributes
+     * @param array<TransientTargetMethod> $expectedMethodAttributes
+     * @param array<TransientTargetProperty> $expectedPropertyAttributes
      *
      * @throws ReflectionException
      */
-    public function testCollectAttributes(string $class, array $expected): void
+    public function testCollectAttributes(
+        string $class,
+        array $expectedClassAttributes,
+        array $expectedMethodAttributes,
+        array $expectedPropertyAttributes,
+    ): void
     {
         $actual = $this->sut->collectAttributes($class);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expectedClassAttributes, $actual->classAttributes);
+        $this->assertEquals($expectedMethodAttributes, $actual->methodAttributes);
+        $this->assertEquals($expectedPropertyAttributes, $actual->propertyAttributes);
     }
 
     /** @phpstan-ignore-next-line */
@@ -49,86 +58,74 @@ final class ClassAttributeCollectorTest extends TestCase
 
             [
                 Attribute::class,
-                [
-                    [],
-                    [],
-                    [],
-                ]
+                [],
+                [],
+                [],
             ],
 
             [
                 CreateMenu::class,
                 [
-                    [
-                        new TransientTargetClass('Acme\Attribute\Permission', [ 'is_admin' ]),
-                        new TransientTargetClass('Acme\Attribute\Permission', [ 'can_create_menu' ]),
-                    ],
-                    [],
-                    [],
-                ]
+                    new TransientTargetClass('Acme\Attribute\Permission', [ 'is_admin' ]),
+                    new TransientTargetClass('Acme\Attribute\Permission', [ 'can_create_menu' ]),
+                ],
+                [],
+                [],
             ],
 
             [
                 CreateMenuHandler::class,
                 [
-                    [
-                        new TransientTargetClass('Acme\Attribute\Handler', []),
-                    ],
-                    [],
-                    [],
-                ]
+                    new TransientTargetClass('Acme\Attribute\Handler', []),
+                ],
+                [],
+                [],
             ],
 
             [
                 ArticleController::class,
                 [
-                    [
-                        new TransientTargetClass('Acme\Attribute\Resource', [ "articles" ]),
-                    ],
-                    [
-                        new TransientTargetMethod(
-                            'Acme\Attribute\Route',
-                            [ 'method' => 'GET', 'id' => 'articles:list', 'pattern' => "/articles" ],
-                            'list',
-                        ),
-                        new TransientTargetMethod(
-                            'Acme\Attribute\Route',
-                            [ 'id' => 'articles:show', 'pattern' => "/articles/{id}", 'method' => 'GET' ],
-                            'show',
-                        ),
-                    ],
-                    [],
-                ]
+                    new TransientTargetClass('Acme\Attribute\Resource', [ "articles" ]),
+                ],
+                [
+                    new TransientTargetMethod(
+                        'Acme\Attribute\Route',
+                        [ 'method' => 'GET', 'id' => 'articles:list', 'pattern' => "/articles" ],
+                        'list',
+                    ),
+                    new TransientTargetMethod(
+                        'Acme\Attribute\Route',
+                        [ 'id' => 'articles:show', 'pattern' => "/articles/{id}", 'method' => 'GET' ],
+                        'show',
+                    ),
+                ],
+                [],
             ],
 
             [
                 SubscriberA::class,
+                [],
                 [
-                    [],
-                    [
-                        new TransientTargetMethod('Acme\Attribute\Subscribe', [], 'onEventA'),
-                    ],
-                    [],
-                ]
+                    new TransientTargetMethod('Acme\Attribute\Subscribe', [], 'onEventA'),
+                ],
+                [],
             ],
 
             [
                 Article::class,
                 [
-                    [
-                        new TransientTargetClass('Acme\Attribute\ActiveRecord\Index', [ 'active' ]),
-                    ],
-                    [
-                    ],
-                    [
-                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Id', [], 'id'),
-                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Serial', [], 'id'),
-                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Varchar', [ 80 ], 'title'),
-                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Varchar', [ 80, 'unique' => true ], 'slug'),
-                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Text', [], 'body'),
-                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Boolean', [], 'active'),
-                    ],
-                ]
+                    new TransientTargetClass('Acme\Attribute\ActiveRecord\Index', [ 'active' ]),
+                ],
+                [
+                ],
+                [
+                    new TransientTargetProperty('Acme\Attribute\ActiveRecord\Id', [], 'id'),
+                    new TransientTargetProperty('Acme\Attribute\ActiveRecord\Serial', [], 'id'),
+                    new TransientTargetProperty('Acme\Attribute\ActiveRecord\Varchar', [ 80 ], 'title'),
+                    new TransientTargetProperty('Acme\Attribute\ActiveRecord\Varchar', [ 80, 'unique' => true ], 'slug'),
+                    new TransientTargetProperty('Acme\Attribute\ActiveRecord\Text', [], 'body'),
+                    new TransientTargetProperty('Acme\Attribute\ActiveRecord\Boolean', [], 'active'),
+                ],
             ],
 
         ];

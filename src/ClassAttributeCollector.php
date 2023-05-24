@@ -20,22 +20,15 @@ class ClassAttributeCollector
 
     /**
      * @param class-string $class
-     *
-     * @return array{
-     *     array<TransientTargetClass>,
-     *     array<TransientTargetMethod>,
-     *     array<TransientTargetProperty>,
-     * }
-     *     Where `0` is an array of class attributes, `1` is an array of method attributes,
-     *     and `2` is an array of property attributes.
+     * @return TransientClass
      * @throws ReflectionException
      */
-    public function collectAttributes(string $class): array
+    public function collectAttributes(string $class): TransientClass
     {
         $classReflection = new ReflectionClass($class);
 
         if (self::isAttribute($classReflection)) {
-            return [ [], [], [] ];
+            return new TransientClass([], [], []);
         }
 
         $classAttributes = [];
@@ -96,7 +89,11 @@ class ClassAttributeCollector
             }
         }
 
-        return [ $classAttributes, $methodAttributes, $propertyAttributes ];
+        return new TransientClass(
+            classAttributes: $classAttributes,
+            methodAttributes: $methodAttributes,
+            propertyAttributes: $propertyAttributes,
+        );
     }
 
     /**

@@ -17,28 +17,12 @@ class MemoizeAttributeCollector
 {
     private const KEY = 'attributes';
 
-    /**
-     * @var array<class-string, array{
-     *     int,
-     *     array<TransientTargetClass>,
-     *     array<TransientTargetMethod>,
-     *     array<TransientTargetProperty>,
-     * }>
-     *     Where _key_ is a class and _value is an array where:
-     *     - `0` is a timestamp
-     *     - `1` is an array of class attributes
-     *     - `2` is an array of method attributes
-     *     - `3` is an array of property attributes
-     */
-    private array $state;
-
     public function __construct(
         private ClassAttributeCollector $classAttributeCollector,
         private Datastore $datastore,
         private IOInterface $io,
-    ) {
-        /** @phpstan-ignore-next-line */
-        $this->state = $this->datastore->get(self::KEY);
+    )
+    {
     }
 
     /**
@@ -53,45 +37,80 @@ class MemoizeAttributeCollector
         $classAttributeCollector = $this->classAttributeCollector;
         $collector = new Collector();
 
+        $cacheState = $this->datastore->get(self::KEY);
+
         foreach ($classMap as $class => $filepath) {
             $filterClasses[$class] = true;
 
-            [
-                $timestamp,
-                $classAttributes,
-                $methodAttributes,
-                $propertyAttributes
-            ] = $this->state[$class] ?? [ 0, [], [], [] ];
+            $classCacheState = $cacheState[$class] ?? [];
+            $timestamp = $classCacheState[0] ?? 0;
+            $transientClass = self::classCacheStateToTransientClass($classCacheState);
 
-            $mtime = filemtime($filepath);
+            $mtime = $transientClass !== null ? filemtime($filepath) : 0;
 
-            if ($timestamp < $mtime) {
+            if ($transientClass === null || $timestamp < $mtime) {
                 $this->io->debug("Refresh attributes of class '$class' in '$filepath' ($timestamp < $mtime)");
 
-                [
-                    $classAttributes,
-                    $methodAttributes,
-                    $propertyAttributes
-                ] = $classAttributeCollector->collectAttributes($class);
-                $this->state[$class] = [ time(), $classAttributes, $methodAttributes, $propertyAttributes ];
+                $timestamp = time();
+                $transientClass = $classAttributeCollector->collectAttributes($class);
             }
 
-            $collector->addClassAttributes($class, $classAttributes);
-            $collector->addMethodAttributes($class, $methodAttributes);
-            $collector->addTargetProperties($class, $propertyAttributes);
+            $cacheState[$class] = [
+                $timestamp,
+                $transientClass->classAttributes,
+                $transientClass->methodAttributes,
+                $transientClass->propertyAttributes,
+            ];
+
+            $collector->addClassAttributes($class, $transientClass->classAttributes);
+            $collector->addMethodAttributes($class, $transientClass->methodAttributes);
+            $collector->addTargetProperties($class, $transientClass->propertyAttributes);
         }
 
         /**
          * Classes might have been removed, we need to filter according to the classes found.
          */
-        $this->state = array_filter(
-            $this->state,
+        $cacheState = array_filter(
+            $cacheState,
             static fn(string $k): bool => $filterClasses[$k] ?? false,
             ARRAY_FILTER_USE_KEY
         );
 
-        $this->datastore->set(self::KEY, $this->state);
+        $this->datastore->set(self::KEY, $cacheState);
 
         return $collector;
+    }
+
+
+    /**
+     * @param array{
+     *     0?: int,
+     *     1?: array<TransientTargetClass>,
+     *     2?: array<TransientTargetMethod>,
+     *     3?: array<TransientTargetProperty>,
+     * } $classCacheState
+     *     Where _key_ is a class and _value is an array where:
+     *     - `0` is a timestamp
+     *     - `1` is an array of class attributes
+     *     - `2` is an array of method attributes
+     *     - `3` is an array of property attributes
+     * @return TransientClass|null
+     */
+    private static function classCacheStateToTransientClass(array $classCacheState): ?TransientClass
+    {
+        // if any collection is missing in the cache entry, throw away the entry as a whole
+        if (!isset(
+            $classCacheState[1],
+            $classCacheState[2],
+            $classCacheState[3],
+        )) {
+            return null;
+        }
+
+        return new TransientClass(
+            classAttributes: $classCacheState[1],
+            methodAttributes: $classCacheState[2],
+            propertyAttributes: $classCacheState[3],
+        );
     }
 }
