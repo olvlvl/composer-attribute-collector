@@ -1,6 +1,6 @@
 # Migration
 
-## v1.2 to v1.3
+## v1.2 to v2.0
 
 ### New Requirements
 
@@ -12,7 +12,7 @@ None
 
 ### Backward Incompatible Changes
 
-None
+- The value of `ignore-paths` is no longer a pattern, it is now relative to the `composer.json` file. The `{vendor}` placeholder can be used as a placeholder for the absolute path to the vendor directory.
 
 ### Deprecated Features
 

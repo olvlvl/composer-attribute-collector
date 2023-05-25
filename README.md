@@ -126,8 +126,9 @@ You can require the attributes file as shown in the usage example, but it's pref
 
 composer-attribute-collector inspects files that participate in the autoload process. This can cause
 issues with files that have side effects. For instance, `symfony/cache` is known to cause issues, so
-we're excluding paths matching `symfony/cache/Traits` from inspection. Additional paths can be
-specified using the `extra` section of `composer.json`:
+we're excluding paths matching `{vendor}/symfony/cache/Traits` from inspection. Additional paths can
+be specified using the `extra` section of `composer.json`. The specified paths are relative to the
+`composer.json` file, and the `{vendor}` placeholder is replaced with the path to the vendor folder.
 
 ```json
 {

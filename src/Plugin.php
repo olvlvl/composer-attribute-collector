@@ -34,13 +34,7 @@ use const DIRECTORY_SEPARATOR;
  */
 final class Plugin implements PluginInterface, EventSubscriberInterface
 {
-    public const EXTRA = 'composer-attribute-collector';
-    public const EXTRA_IGNORE_PATHS = 'ignore-paths';
     public const CACHE_DIR = '.composer-attribute-collector';
-    private const PROBLEMATIC_PATHS = [
-        // https://github.com/olvlvl/composer-attribute-collector/issues/4
-        'symfony/cache/Traits'
-    ];
 
     /**
      * @uses onPostAutoloadDump
@@ -78,14 +72,12 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
     public static function onPostAutoloadDump(Event $event): void
     {
         $composer = $event->getComposer();
+        $config = Config::from($composer);
         $io = $event->getIO();
-        $vendorDir = $composer->getConfig()->get('vendor-dir');
-        assert(is_string($vendorDir));
-        $filepath = "$vendorDir/attributes.php";
 
         $start = microtime(true);
         $io->write('<info>Generating attributes file</info>');
-        self::dump($event->getComposer(), $io, $filepath);
+        self::dump($event->getComposer(), $config, $io);
         $elapsed = self::renderElapsedTime($start);
         $io->write("<info>Generated attributes file in $elapsed</info>");
     }
@@ -95,8 +87,8 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public static function dump(
         Composer $composer,
+        Config $config,
         IOInterface $io,
-        string $filepath,
         AutoloadsBuilder $autoloadsBuilder = null,
         ClassMapBuilder $classMapBuilder = null
     ): void {
@@ -120,7 +112,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         self::setupAutoload($classMap);
 
         $start = microtime(true);
-        $filter = self::buildFileFilter($composer);
+        $filter = self::buildFileFilter($config);
         $classMap = $classMapFilter->filter(
             $classMap,
             fn (string $class, string $filepath): bool => $filter->filter($filepath, $class, $io)
@@ -138,7 +130,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         $elapsed = self::renderElapsedTime($start);
         $io->debug("Generating attributes file: rendered code in $elapsed");
 
-        file_put_contents($filepath, $code);
+        file_put_contents($config->attributesFile, $code);
     }
 
     private static function buildDefaultDatastore(IOInterface $io): Datastore
@@ -168,18 +160,10 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         });
     }
 
-    private static function buildFileFilter(Composer $composer): Filter
+    private static function buildFileFilter(Config $config): Filter
     {
-        $extra = $composer->getPackage()->getExtra()[self::EXTRA] ?? [];
-        /** @var string[] $ignore_paths */
-        $ignore_paths = array_merge(
-            // @phpstan-ignore-next-line
-            $extra[self::EXTRA_IGNORE_PATHS] ?? [],
-            self::PROBLEMATIC_PATHS
-        );
-
         return new Filter\Chain([
-            new PathFilter($ignore_paths),
+            new PathFilter($config->ignorePaths),
             new ContentFilter(),
             new InterfaceFilter()
         ]);

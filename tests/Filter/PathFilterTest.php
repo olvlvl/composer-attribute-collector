@@ -22,12 +22,14 @@ final class PathFilterTest extends TestCase
         parent::setUp();
 
         $this->filter = new PathFilter([
-            "symfony/cache/Traits"
+            "/absolute/path/to/symfony/cache/Traits"
         ]);
     }
 
     /**
      * @dataProvider provideFilter
+     *
+     * @param class-string $class
      */
     public function testFilter(string $filepath, string $class, bool $expected): void
     {
@@ -49,12 +51,17 @@ final class PathFilterTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * @return array<array{ non-empty-string, string, bool }>
+     */
     public function provideFilter(): array
     {
         return [
 
-            [ "vendor/symfony/cache/Traits/RedisCluster5Proxy.php", "RedisCluster5Proxy", false ],
-            [ "vendor/symfony/routing/Route.php", "Route", true ],
+            [ "/absolute/path/to/symfony/cache/Traits/RedisCluster5Proxy.php", "RedisCluster5Proxy", false ],
+            [ "some/prefix/absolute/path/to/symfony/cache/Traits/RedisCluster5Proxy.php", "RedisCluster5Proxy", true ],
+            [ "symfony/cache/Traits/RedisCluster5Proxy.php", "RedisCluster5Proxy", true ],
+            [ "/absolute/path/to/symfony/routing/Route.php", "Route", true ],
 
         ];
     }
