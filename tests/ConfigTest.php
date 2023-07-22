@@ -18,10 +18,14 @@ final class ConfigTest extends TestCase
     {
         $extra = [
             Config::EXTRA => [
-                Config::EXTRA_IGNORE_PATHS => [
+                Config::EXTRA_INCLUDE => [
+                    'tests',
                     '{vendor}/vendor1/package1',
-                    'tests/Acme/PSR4/IncompatibleSignature.php'
-                ]
+                ],
+                Config::EXTRA_EXCLUDE => [
+                    'tests/Acme/PSR4/IncompatibleSignature.php',
+                    '{vendor}/vendor1/package1/file.php',
+                ],
             ]
         ];
 
@@ -44,11 +48,14 @@ final class ConfigTest extends TestCase
 
         $expected = new Config(
             attributesFile: "$cwd/vendor/attributes.php",
-            ignorePaths: [
+            include: [
+                "$cwd/tests",
                 "$cwd/vendor/vendor1/package1",
+            ],
+            exclude: [
                 "$cwd/tests/Acme/PSR4/IncompatibleSignature.php",
-                "$cwd/vendor/symfony/cache/Traits",
-            ]
+                "$cwd/vendor/vendor1/package1/file.php",
+            ],
         );
 
         $actual = Config::from($composer);

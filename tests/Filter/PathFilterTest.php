@@ -21,9 +21,16 @@ final class PathFilterTest extends TestCase
     {
         parent::setUp();
 
-        $this->filter = new PathFilter([
-            "/absolute/path/to/symfony/cache/Traits"
-        ]);
+        $this->filter = new PathFilter(
+            include: [
+                "/app/src",
+                "/app/vendor",
+            ],
+            exclude: [
+                "/app/src/Excluded.php",
+                "/app/vendor/symfony/cache/Traits",
+            ],
+        );
     }
 
     /**
@@ -43,7 +50,7 @@ final class PathFilterTest extends TestCase
             $io
                 ->expects($this->once())
                 ->method('debug')
-                ->with($this->stringStartsWith("Discarding '$class' because its path matches"));
+                ->with($this->stringStartsWith("Discarding '$class'"));
         }
 
         $actual = $this->filter->filter($filepath, $class, $io);
@@ -58,10 +65,13 @@ final class PathFilterTest extends TestCase
     {
         return [
 
-            [ "/absolute/path/to/symfony/cache/Traits/RedisCluster5Proxy.php", "RedisCluster5Proxy", false ],
-            [ "some/prefix/absolute/path/to/symfony/cache/Traits/RedisCluster5Proxy.php", "RedisCluster5Proxy", true ],
-            [ "symfony/cache/Traits/RedisCluster5Proxy.php", "RedisCluster5Proxy", true ],
-            [ "/absolute/path/to/symfony/routing/Route.php", "Route", true ],
+            [ "/app/src/some/file.php", "SampleClass", true ],
+            [ "/app/src/Excluded.php", "SampleClass", false ],
+            [ "/app/vendor/symfony/routing/Route.php", "Route", true ],
+            [ "/app/vendor/symfony/cache/Traits/RedisCluster5Proxy.php", "RedisCluster5Proxy", false ],
+            [ "vendor/symfony/cache/Traits/RedisCluster5Proxy.php", "RedisCluster5Proxy", false ],
+            [ "symfony/cache/Traits/RedisCluster5Proxy.php", "RedisCluster5Proxy", false ],
+            [ "/vendor/symfony/routing/Route.php", "Route", false ],
 
         ];
     }

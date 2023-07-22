@@ -12,7 +12,7 @@ Later, these targets can be retrieved through a convenient interface.
 
 #### Features
 
-- Zero configuration
+- Little configuration
 - No reflection in the generated file
 - No impact on performance
 - No dependency (except Composer of course)
@@ -85,6 +85,28 @@ future.
 want to add it to your `.gitignore` file.
 
 
+#### Sample configuration
+
+The plugin only inspects paths and files specified in the configuration, that's usually your "src"
+directory. Add this section to your `composer.json` file to enable the generation of the attributes
+file on autoload dump.
+
+Check the [Configuration options](#configuration) for more details.
+
+```json
+{
+  "extra": {
+    "composer-attribute-collector": {
+      "include": [
+        "src"
+      ]
+    }
+  }
+}
+```
+
+
+
 
 ## Frequently Asked Questions
 
@@ -122,34 +144,40 @@ You can require the attributes file as shown in the usage example, but it's pref
 
 ## Configuration
 
-### Ignoring paths ([root-only][])
+### Excluding paths or files ([root-only][])
 
-composer-attribute-collector inspects files that participate in the autoload process. This can cause
-issues with files that have side effects. For instance, `symfony/cache` is known to cause issues, so
-we're excluding paths matching `{vendor}/symfony/cache/Traits` from inspection. Additional paths can
-be specified using the `extra` section of `composer.json`. The specified paths are relative to the
-`composer.json` file, and the `{vendor}` placeholder is replaced with the path to the vendor folder.
+Use the `include` property to define the paths or files to inspect for attributes. Without this
+property, the attributes file will be empty.
+
+The specified paths are relative to the `composer.json` file, and the `{vendor}` placeholder is
+replaced with the path to the vendor folder.
 
 ```json
 {
   "extra": {
     "composer-attribute-collector": {
-      "ignore-paths": [
-        "path/to/ignore"
+      "include": [
+        "path-or-file/to/include"
       ]
     }
   }
 }
 ```
 
-For instance, if you are only concerned about the attributes of your own project, you could ignore the vendor directory:
+### Excluding paths or files ([root-only][])
+
+Use the `exclude` property to excluded paths or files from inspection. This is handy when files
+cause issues or have side effects.
+
+The specified paths are relative to the `composer.json` file, and the `{vendor}` placeholder is
+replaced with the path to the vendor folder.
 
 ```json
 {
   "extra": {
     "composer-attribute-collector": {
-      "ignore-paths": [
-        "vendor"
+      "exclude": [
+        "path-or-file/to/ignore"
       ]
     }
   }
@@ -166,6 +194,20 @@ Use the `symfony` command to create a new project. If you don't have it yet, you
 
 ```bash
 symfony new --webapp my_project
+```
+
+Add the `composer-attribute-collector` node to `extra` in the `composer.json` file:
+
+```json
+{
+  "extra": {
+    "composer-attribute-collector": {
+      "include": [
+        "src"
+      ]
+    }
+  }
+}
 ```
 
 Now get into that project and install the plugin. You'll be asked if you trust the plugin and wish

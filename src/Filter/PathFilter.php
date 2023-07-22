@@ -1,12 +1,5 @@
 <?php
 
-/*
- * (c) Olivier Laviale <olivier.laviale@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace olvlvl\ComposerAttributeCollector\Filter;
 
 use Composer\IO\IOInterface;
@@ -20,16 +13,18 @@ use function str_starts_with;
 final class PathFilter implements Filter
 {
     /**
-     * @param string[] $matches
+     * @param string[] $include
+     * @param string[] $exclude
      */
     public function __construct(
-        private array $matches
+        private array $include,
+        private array $exclude,
     ) {
     }
 
     public function filter(string $filepath, string $class, IOInterface $io): bool
     {
-        foreach ($this->matches as $match) {
+        foreach ($this->exclude as $match) {
             if (str_starts_with($filepath, $match)) {
                 $io->debug("Discarding '$class' because its path matches '$match'");
 
@@ -37,6 +32,15 @@ final class PathFilter implements Filter
             }
         }
 
-        return true;
+        foreach ($this->include as $match) {
+            if (str_starts_with($filepath, $match)) {
+
+                return true;
+            }
+        }
+
+        $io->debug("Discarding '$class' because it does not match any included path");
+
+        return false;
     }
 }

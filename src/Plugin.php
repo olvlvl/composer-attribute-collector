@@ -1,12 +1,5 @@
 <?php
 
-/*
- * (c) Olivier Laviale <olivier.laviale@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace olvlvl\ComposerAttributeCollector;
 
 use Composer\Composer;
@@ -20,9 +13,7 @@ use olvlvl\ComposerAttributeCollector\Filter\InterfaceFilter;
 use olvlvl\ComposerAttributeCollector\Filter\PathFilter;
 use ReflectionException;
 
-use function array_merge;
 use function file_put_contents;
-use function is_string;
 use function microtime;
 use function spl_autoload_register;
 use function sprintf;
@@ -163,7 +154,10 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
     private static function buildFileFilter(Config $config): Filter
     {
         return new Filter\Chain([
-            new PathFilter($config->ignorePaths),
+            new PathFilter(
+                include: $config->include,
+                exclude: $config->exclude
+            ),
             new ContentFilter(),
             new InterfaceFilter()
         ]);

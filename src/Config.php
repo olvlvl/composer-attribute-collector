@@ -7,7 +7,6 @@ use Composer\PartialComposer;
 use InvalidArgumentException;
 use RuntimeException;
 
-use function array_merge;
 use function dirname;
 use function is_string;
 use function realpath;
@@ -24,14 +23,8 @@ use const DIRECTORY_SEPARATOR;
 final class Config
 {
     public const EXTRA = 'composer-attribute-collector';
-    public const EXTRA_IGNORE_PATHS = 'ignore-paths';
-
-    public const BUILTIN_IGNORE_PATHS = [
-
-        // https://github.com/olvlvl/composer-attribute-collector/issues/4
-        "{vendor}/symfony/cache/Traits"
-
-    ];
+    public const EXTRA_INCLUDE = 'include';
+    public const EXTRA_EXCLUDE = 'exclude';
 
     /**
      * If a path starts with this placeholder, it is replaced with the absolute path to the vendor directory.
@@ -55,30 +48,31 @@ final class Config
 
         $rootDir .= DIRECTORY_SEPARATOR;
 
-        /** @var array{ ignore-paths?: non-empty-string[] } $extra */
+        /** @var array{ include?: non-empty-string[], exclude?: non-empty-string[] } $extra */
         $extra = $composer->getPackage()->getExtra()[self::EXTRA] ?? [];
 
-        $ignorePaths = self::expandPaths(
-            array_merge($extra[self::EXTRA_IGNORE_PATHS] ?? [], self::BUILTIN_IGNORE_PATHS),
-            $vendorDir,
-            $rootDir
-        );
+        $include = self::expandPaths($extra[self::EXTRA_INCLUDE] ?? [], $vendorDir, $rootDir);
+        $exclude = self::expandPaths($extra[self::EXTRA_EXCLUDE] ?? [], $vendorDir, $rootDir);
 
         return new self(
             attributesFile: "$vendorDir/attributes.php",
-            ignorePaths: $ignorePaths,
+            include: $include,
+            exclude: $exclude,
         );
     }
 
     /**
      * @param non-empty-string $attributesFile
      *     Absolute path to the `attributes.php` file.
-     * @param string[] $ignorePaths
-     *     Paths that should be ignored for attributes collection.
+     * @param string[] $include
+     *     Paths that should be included to attributes collection.
+     * @param string[] $exclude
+     *     Paths that should be excluded from attributes collection.
      */
     public function __construct(
         public string $attributesFile,
-        public array $ignorePaths,
+        public array $include,
+        public array $exclude,
     ) {
     }
 

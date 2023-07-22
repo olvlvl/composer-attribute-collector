@@ -82,7 +82,10 @@ final class PluginTest extends TestCase
 
         $config = new Config(
             $filepath,
-            [
+            include: [
+               "$cwd/tests"
+            ],
+            exclude: [
                 "$cwd/tests/Acme/PSR4/IncompatibleSignature.php"
             ]
         );
