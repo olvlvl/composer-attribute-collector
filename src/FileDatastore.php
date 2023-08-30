@@ -38,7 +38,7 @@ final class FileDatastore implements Datastore
 
     public function get(string $key): array
     {
-        $filename = $this->dir . DIRECTORY_SEPARATOR . $key;
+        $filename = $this->formatFilename($key);
 
         if (!file_exists($filename)) {
             return [];
@@ -49,7 +49,7 @@ final class FileDatastore implements Datastore
 
     public function set(string $key, array $data): void
     {
-        $filename = $this->dir . DIRECTORY_SEPARATOR . $key;
+        $filename = $this->formatFilename($key);
 
         file_put_contents($filename, serialize($data));
     }
@@ -84,5 +84,13 @@ final class FileDatastore implements Datastore
         }
 
         return $ar;
+    }
+
+    private function formatFilename(string $key): string
+    {
+        $major = Plugin::VERSION_MAJOR;
+        $minor = Plugin::VERSION_MINOR;
+
+        return $this->dir . DIRECTORY_SEPARATOR . "v$major-$minor-$key";
     }
 }

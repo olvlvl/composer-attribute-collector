@@ -23,10 +23,8 @@ use Acme\Attribute\Resource;
 use Acme\Attribute\Route;
 use Acme\Attribute\Subscribe;
 use Acme\PSR4\Presentation\ArticleController;
-use Composer\Composer;
 use Composer\IO\NullIO;
 use olvlvl\ComposerAttributeCollector\Attributes;
-use olvlvl\ComposerAttributeCollector\AutoloadsBuilder;
 use olvlvl\ComposerAttributeCollector\Config;
 use olvlvl\ComposerAttributeCollector\Plugin;
 use olvlvl\ComposerAttributeCollector\TargetClass;
@@ -55,35 +53,16 @@ final class PluginTest extends TestCase
             return;
         }
 
-        $composer = $this->getMockBuilder(Composer::class)->getMock();
-
-        $autoloadsBuilder = $this->getMockBuilder(AutoloadsBuilder::class)->getMock();
-        $autoloadsBuilder
-            ->method('buildAutoloads')
-            ->with($composer)
-            ->willReturn(
-                [
-                    'psr-0' => [],
-                    'psr-4' => [
-                        "Acme\\PSR4\\" => [
-                            __DIR__ . '/Acme/PSR4'
-                        ],
-                    ],
-                    'classmap' => [
-                        __DIR__ . '/Acme/ClassMap'
-                    ],
-                    'exclude-from-classmap' => []
-                ]
-            );
-
         $cwd = getcwd();
         assert(is_string($cwd));
-        $filepath = __DIR__ . '/sandbox/attributes.php';
+        $vendorDir = __DIR__ . '/sandbox';
+        $filepath = "$vendorDir/attributes.php";
 
         $config = new Config(
-            $filepath,
+            vendorDir: $vendorDir,
+            attributesFile: $filepath,
             include: [
-               "$cwd/tests"
+                "$cwd/tests"
             ],
             exclude: [
                 "$cwd/tests/Acme/PSR4/IncompatibleSignature.php"
@@ -91,10 +70,8 @@ final class PluginTest extends TestCase
         );
 
         Plugin::dump(
-            $composer,
             $config,
             new NullIO(),
-            $autoloadsBuilder
         );
 
         $this->assertFileExists($filepath);
@@ -173,8 +150,14 @@ final class PluginTest extends TestCase
             [
                 Route::class,
                 [
-                    [ new Route("/articles", 'GET', 'articles:list'), 'Acme\PSR4\Presentation\ArticleController::list' ],
-                    [ new Route("/articles/{id}", 'GET', 'articles:show'), 'Acme\PSR4\Presentation\ArticleController::show' ],
+                    [
+                        new Route("/articles", 'GET', 'articles:list'),
+                        'Acme\PSR4\Presentation\ArticleController::list'
+                    ],
+                    [
+                        new Route("/articles/{id}", 'GET', 'articles:show'),
+                        'Acme\PSR4\Presentation\ArticleController::show'
+                    ],
                 ]
             ],
             [
@@ -281,12 +264,12 @@ final class PluginTest extends TestCase
         );
 
         $this->assertEquals([
-            [ new Boolean(), 'Acme\PSR4\ActiveRecord\Article::active'],
-            [ new Text(), 'Acme\PSR4\ActiveRecord\Article::body'],
-            [ new Id(), 'Acme\PSR4\ActiveRecord\Article::id'],
-            [ new Serial(), 'Acme\PSR4\ActiveRecord\Article::id'],
-            [ new Varchar(80, unique: true), 'Acme\PSR4\ActiveRecord\Article::slug'],
-            [ new Varchar(80), 'Acme\PSR4\ActiveRecord\Article::title'],
+            [ new Boolean(), 'Acme\PSR4\ActiveRecord\Article::active' ],
+            [ new Text(), 'Acme\PSR4\ActiveRecord\Article::body' ],
+            [ new Id(), 'Acme\PSR4\ActiveRecord\Article::id' ],
+            [ new Serial(), 'Acme\PSR4\ActiveRecord\Article::id' ],
+            [ new Varchar(80, unique: true), 'Acme\PSR4\ActiveRecord\Article::slug' ],
+            [ new Varchar(80), 'Acme\PSR4\ActiveRecord\Article::title' ],
         ], $this->collectProperties($actual));
     }
 
@@ -319,7 +302,7 @@ final class PluginTest extends TestCase
             $methods[] = [ $target->attribute, $target->name ];
         }
 
-        usort($methods, fn ($a, $b) => $a[1] <=> $b[1]);
+        usort($methods, fn($a, $b) => $a[1] <=> $b[1]);
 
         return $methods;
     }
@@ -339,7 +322,7 @@ final class PluginTest extends TestCase
             $methods[] = [ $target->attribute, "$target->class::$target->name" ];
         }
 
-        usort($methods, fn ($a, $b) => $a[1] <=> $b[1]);
+        usort($methods, fn($a, $b) => $a[1] <=> $b[1]);
 
         return $methods;
     }
@@ -359,7 +342,7 @@ final class PluginTest extends TestCase
             $properties[] = [ $target->attribute, "$target->class::$target->name" ];
         }
 
-        usort($properties, fn ($a, $b) => $a[1] <=> $b[1]);
+        usort($properties, fn($a, $b) => $a[1] <=> $b[1]);
 
         return $properties;
     }

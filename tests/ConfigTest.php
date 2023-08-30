@@ -47,6 +47,7 @@ final class ConfigTest extends TestCase
         $composer->setPackage($package);
 
         $expected = new Config(
+            vendorDir: "$cwd/vendor",
             attributesFile: "$cwd/vendor/attributes.php",
             include: [
                 "$cwd/tests",

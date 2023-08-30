@@ -4,6 +4,7 @@ namespace tests\olvlvl\ComposerAttributeCollector;
 
 use Composer\IO\IOInterface;
 use olvlvl\ComposerAttributeCollector\FileDatastore;
+use olvlvl\ComposerAttributeCollector\Plugin;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -80,6 +81,8 @@ final class FileDatastoreTest extends TestCase
 
     private static function write(string $str): void
     {
-        file_put_contents(self::DIR . self::KEY, $str);
+        $filename = self::DIR . 'v' . Plugin::VERSION_MAJOR . '-' . Plugin::VERSION_MINOR . '-' . self::KEY;
+
+        file_put_contents($filename, $str);
     }
 }

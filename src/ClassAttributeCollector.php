@@ -6,7 +6,7 @@ use Attribute;
 use Composer\IO\IOInterface;
 use ReflectionAttribute;
 use ReflectionClass;
-use ReflectionException;
+use Throwable;
 
 /**
  * @internal
@@ -28,11 +28,16 @@ class ClassAttributeCollector
      * }
      *     Where `0` is an array of class attributes, `1` is an array of method attributes,
      *     and `2` is an array of property attributes.
-     * @throws ReflectionException
      */
     public function collectAttributes(string $class): array
     {
-        $classReflection = new ReflectionClass($class);
+        try {
+            $classReflection = new ReflectionClass($class);
+        } catch (Throwable $e) { // @phpstan-ignore-line
+            $this->io->error("Unable to collection attribute from class $class: {$e->getMessage()}");
+
+            return [ [], [], [] ];
+        }
 
         if (self::isAttribute($classReflection)) {
             return [ [], [], [] ];

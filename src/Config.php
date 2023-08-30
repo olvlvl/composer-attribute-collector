@@ -7,8 +7,11 @@ use Composer\PartialComposer;
 use InvalidArgumentException;
 use RuntimeException;
 
+use function array_map;
 use function dirname;
+use function implode;
 use function is_string;
+use function preg_quote;
 use function realpath;
 use function str_ends_with;
 use function str_starts_with;
@@ -55,6 +58,7 @@ final class Config
         $exclude = self::expandPaths($extra[self::EXTRA_EXCLUDE] ?? [], $vendorDir, $rootDir);
 
         return new self(
+            $vendorDir,
             attributesFile: "$vendorDir/attributes.php",
             include: $include,
             exclude: $exclude,
@@ -62,18 +66,38 @@ final class Config
     }
 
     /**
+     * @readonly
+     * @var non-empty-string|null
+     */
+    public ?string $excludeRegExp;
+
+    /**
      * @param non-empty-string $attributesFile
      *     Absolute path to the `attributes.php` file.
-     * @param string[] $include
+     * @param non-empty-string[] $include
      *     Paths that should be included to attributes collection.
-     * @param string[] $exclude
+     * @param non-empty-string[] $exclude
      *     Paths that should be excluded from attributes collection.
      */
     public function __construct(
+        public string $vendorDir,
         public string $attributesFile,
         public array $include,
         public array $exclude,
     ) {
+        $this->excludeRegExp = count($exclude) ? self::compileExclude($this->exclude) : null;
+    }
+
+    /**
+     * @param non-empty-string[] $exclude
+     *
+     * @return non-empty-string
+     */
+    private static function compileExclude(array $exclude): string
+    {
+        $regexp = implode('|', array_map(fn (string $path) => preg_quote($path), $exclude));
+
+        return "($regexp)";
     }
 
     /**
