@@ -47,11 +47,11 @@ class MemoizeAttributeCollector
      *
      * @throws ReflectionException
      */
-    public function collectAttributes(array $classMap): Collector
+    public function collectAttributes(array $classMap): TransientCollection
     {
         $filterClasses = [];
         $classAttributeCollector = $this->classAttributeCollector;
-        $collector = new Collector();
+        $collector = new TransientCollection();
 
         foreach ($classMap as $class => $filepath) {
             $filterClasses[$class] = true;
@@ -66,7 +66,12 @@ class MemoizeAttributeCollector
             $mtime = filemtime($filepath);
 
             if ($timestamp < $mtime) {
-                $this->io->debug("Refresh attributes of class '$class' in '$filepath' ($timestamp < $mtime)");
+                if ($timestamp) {
+                    $diff = $mtime - $timestamp;
+                    $this->io->debug("Refresh attributes of class '$class' in '$filepath' ($diff sec ago)");
+                } else {
+                    $this->io->debug("Collect attributes of class '$class' in '$filepath'");
+                }
 
                 [
                     $classAttributes,

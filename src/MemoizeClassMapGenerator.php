@@ -63,7 +63,7 @@ class MemoizeClassMapGenerator
 
         $maps = [];
 
-        foreach ($this->state as [ , $map ]) {
+        foreach ($this->state as [, $map]) {
             $maps[] = $map;
         }
 
@@ -77,33 +77,25 @@ class MemoizeClassMapGenerator
      *     The path to search in.
      * @param non-empty-string|null $excluded
      *     Regex that matches file paths to be excluded from the classmap
-     * @param 'classmap'|'psr-0'|'psr-4' $autoloadType
-     *     Optional autoload standard to use mapping rules with the namespace instead of purely doing a classmap
-     * @param string|null $namespace
-     *     Optional namespace prefix to filter by, only for psr-0/psr-4 autoloading
      *
      * @throws RuntimeException When the path is neither an existing file nor directory
      */
-    public function scanPaths(
-        string $path,
-        string $excluded = null,
-        string $autoloadType = 'classmap',
-        ?string $namespace = null
-    ): void {
+    public function scanPaths(string $path, string $excluded = null): void
+    {
         $this->paths[$path] = true;
         [ $timestamp ] = $this->state[$path] ?? [ 0 ];
 
-        if ($this->should_update($timestamp, $path)) {
+        if ($this->shouldUpdate($timestamp, $path)) {
             $inner = new ClassMapGenerator();
             $inner->avoidDuplicateScans();
-            $inner->scanPaths($path, $excluded, $autoloadType, $namespace);
+            $inner->scanPaths($path, $excluded);
             $map = $inner->getClassMap()->getMap();
 
             $this->state[$path] = [ time(), $map ];
         }
     }
 
-    private function should_update(int $timestamp, string $path): bool
+    private function shouldUpdate(int $timestamp, string $path): bool
     {
         if (!$timestamp) {
             return true;
@@ -127,7 +119,7 @@ class MemoizeClassMapGenerator
 
         foreach (new DirectoryIterator($path) as $di) {
             if ($di->isDir() && !$di->isDot()) {
-                if ($this->should_update($timestamp, $di->getPathname())) {
+                if ($this->shouldUpdate($timestamp, $di->getPathname())) {
                     return true;
                 }
             }

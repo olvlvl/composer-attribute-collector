@@ -9,9 +9,9 @@ use function var_export;
  *
  * @internal
  */
-final class CollectionRenderer
+final class TransientCollectionRenderer
 {
-    public static function render(Collector $collector): string
+    public static function render(TransientCollection $collector): string
     {
         $targetClassesCode = self::targetsToCode($collector->classes);
         $targetMethodsCode = self::targetsToCode($collector->methods);

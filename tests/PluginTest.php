@@ -66,7 +66,8 @@ final class PluginTest extends TestCase
             ],
             exclude: [
                 "$cwd/tests/Acme/PSR4/IncompatibleSignature.php"
-            ]
+            ],
+            useCache: false,
         );
 
         Plugin::dump(

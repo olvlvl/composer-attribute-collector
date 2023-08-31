@@ -10,11 +10,11 @@
 namespace olvlvl\ComposerAttributeCollector;
 
 /**
- * Collects classes and methods with attributes.
+ * A collection of attributes used during the collection process.
  *
  * @internal
  */
-final class Collector
+final class TransientCollection
 {
     /**
      * @var array<class-string, iterable<TransientTargetClass>>

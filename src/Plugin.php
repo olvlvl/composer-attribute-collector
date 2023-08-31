@@ -149,8 +149,8 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         ]);
     }
 
-    private static function render(Collector $collector): string
+    private static function render(TransientCollection $collector): string
     {
-        return CollectionRenderer::render($collector);
+        return TransientCollectionRenderer::render($collector);
     }
 }

@@ -94,7 +94,9 @@ final class MemoizeClassMapGeneratorTest extends TestCase
     }
 
     /**
-     * @return array<class-string, string>
+     * @param non-empty-string $path
+     *
+     * @return array<class-string, non-empty-string>
      */
     private static function map(string $path): array
     {

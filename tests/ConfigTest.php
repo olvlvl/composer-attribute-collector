@@ -29,14 +29,14 @@ final class ConfigTest extends TestCase
             ]
         ];
 
-        $package = $this->getMockBuilder(RootPackageInterface::class)->getMock();
+        $package = $this->createMock(RootPackageInterface::class);
         $package
             ->method('getExtra')
             ->willReturn($extra);
 
         $cwd = getcwd();
         assert(is_string($cwd));
-        $config = $this->getMockBuilder(\Composer\Config::class)->getMock();
+        $config = $this->createMock(\Composer\Config::class);
         $config
             ->method('get')
             ->with('vendor-dir')
@@ -57,6 +57,7 @@ final class ConfigTest extends TestCase
                 "$cwd/tests/Acme/PSR4/IncompatibleSignature.php",
                 "$cwd/vendor/vendor1/package1/file.php",
             ],
+            useCache: false,
         );
 
         $actual = Config::from($composer);
@@ -66,7 +67,7 @@ final class ConfigTest extends TestCase
 
     public function testFromFailsOnMissingVendorDir(): void
     {
-        $config = $this->getMockBuilder(\Composer\Config::class)->getMock();
+        $config = $this->createMock(\Composer\Config::class);
         $config
             ->method('get')
             ->with('vendor-dir')
