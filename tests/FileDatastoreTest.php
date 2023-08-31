@@ -3,7 +3,7 @@
 namespace tests\olvlvl\ComposerAttributeCollector;
 
 use Composer\IO\IOInterface;
-use olvlvl\ComposerAttributeCollector\FileDatastore;
+use olvlvl\ComposerAttributeCollector\Datastore\FileDatastore;
 use olvlvl\ComposerAttributeCollector\Plugin;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

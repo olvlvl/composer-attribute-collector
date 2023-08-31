@@ -8,7 +8,8 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
 use Composer\Util\Platform;
-
+use olvlvl\ComposerAttributeCollector\Datastore\FileDatastore;
+use olvlvl\ComposerAttributeCollector\Datastore\RuntimeDatastore;
 use olvlvl\ComposerAttributeCollector\Filter\ContentFilter;
 use olvlvl\ComposerAttributeCollector\Filter\InterfaceFilter;
 
@@ -75,15 +76,13 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         $io->write("<info>Generated attributes file in $elapsed</info>");
     }
 
-    public static function dump(
-        Config $config,
-        IOInterface $io
-    ): void {
+    public static function dump(Config $config, IOInterface $io): void
+    {
         //
         // Scan include paths
         //
         $start = microtime(true);
-        $datastore = self::buildDefaultDatastore($io);
+        $datastore = self::buildDefaultDatastore($config, $io);
         $classMapGenerator = new MemoizeClassMapGenerator($datastore, $io);
         foreach ($config->include as $include) {
             $classMapGenerator->scanPaths($include, $config->excludeRegExp);
@@ -124,8 +123,12 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         $io->debug("Generating attributes file: rendered code in $elapsed");
     }
 
-    private static function buildDefaultDatastore(IOInterface $io): Datastore
+    private static function buildDefaultDatastore(Config $config, IOInterface $io): Datastore
     {
+        if (!$config->useCache) {
+            return new RuntimeDatastore();
+        }
+
         $basePath = Platform::getCwd();
 
         assert($basePath !== '');
@@ -137,6 +140,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
     {
         return sprintf("%.03f ms", (microtime(true) - $start) * 1000);
     }
+
     private static function buildFileFilter(): Filter
     {
         return new Filter\Chain([

@@ -4,11 +4,13 @@ namespace olvlvl\ComposerAttributeCollector;
 
 use Composer\Factory;
 use Composer\PartialComposer;
+use Composer\Util\Platform;
 use InvalidArgumentException;
 use RuntimeException;
 
 use function array_map;
 use function dirname;
+use function filter_var;
 use function implode;
 use function is_string;
 use function preg_quote;
@@ -28,6 +30,7 @@ final class Config
     public const EXTRA = 'composer-attribute-collector';
     public const EXTRA_INCLUDE = 'include';
     public const EXTRA_EXCLUDE = 'exclude';
+    public const ENV_USE_CACHE = 'COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE';
 
     /**
      * If a path starts with this placeholder, it is replaced with the absolute path to the vendor directory.
@@ -57,11 +60,14 @@ final class Config
         $include = self::expandPaths($extra[self::EXTRA_INCLUDE] ?? [], $vendorDir, $rootDir);
         $exclude = self::expandPaths($extra[self::EXTRA_EXCLUDE] ?? [], $vendorDir, $rootDir);
 
+        $useCache = filter_var(Platform::getEnv(self::ENV_USE_CACHE), FILTER_VALIDATE_BOOL);
+
         return new self(
             $vendorDir,
             attributesFile: "$vendorDir/attributes.php",
             include: $include,
             exclude: $exclude,
+            useCache: $useCache,
         );
     }
 
@@ -78,12 +84,15 @@ final class Config
      *     Paths that should be included to attributes collection.
      * @param non-empty-string[] $exclude
      *     Paths that should be excluded from attributes collection.
+     * @param bool $useCache
+     *     Whether a cache should be used during the process.
      */
     public function __construct(
         public string $vendorDir,
         public string $attributesFile,
         public array $include,
         public array $exclude,
+        public bool $useCache,
     ) {
         $this->excludeRegExp = count($exclude) ? self::compileExclude($this->exclude) : null;
     }

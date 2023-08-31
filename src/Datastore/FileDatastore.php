@@ -1,8 +1,10 @@
 <?php
 
-namespace olvlvl\ComposerAttributeCollector;
+namespace olvlvl\ComposerAttributeCollector\Datastore;
 
 use Composer\IO\IOInterface;
+use olvlvl\ComposerAttributeCollector\Datastore;
+use olvlvl\ComposerAttributeCollector\Plugin;
 
 use function file_exists;
 use function file_get_contents;

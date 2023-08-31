@@ -3,7 +3,7 @@
 namespace tests\olvlvl\ComposerAttributeCollector;
 
 use Composer\IO\NullIO;
-use olvlvl\ComposerAttributeCollector\FileDatastore;
+use olvlvl\ComposerAttributeCollector\Datastore\FileDatastore;
 use olvlvl\ComposerAttributeCollector\MemoizeClassMapGenerator;
 use PHPUnit\Framework\TestCase;
 
