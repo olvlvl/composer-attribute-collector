@@ -12,15 +12,15 @@ None
 
 ### Backward Incompatible Changes
 
-- The value of `ignore-paths` is no longer a pattern, it is now relative to the `composer.json` file. The `{vendor}` placeholder can be used as a placeholder for the absolute path to the vendor directory.
+- The paths defined by the `include` and `exclude` directives are relative to the `composer.json` file. The `{vendor}` placeholder is replaced by the absolute path to the vendor directory.
 
 ### Deprecated Features
 
-None
+- The `ignore-paths` directive has been replaced by `exclude`.
 
 ### Other Changes
 
-None
+- The plugin no longer use a file cache by default. To persist a cache between runs, set the environment variable `COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE` to `1`, `yes`, or `true`.
 
 
 

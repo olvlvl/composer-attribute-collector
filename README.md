@@ -6,9 +6,11 @@
 [![Downloads](https://img.shields.io/packagist/dt/olvlvl/composer-attribute-collector.svg)](https://packagist.org/packages/olvlvl/composer-attribute-collector)
 
 composer-attribute-collector is a plugin for [Composer][]. Its ambition is to provide a convenient
-and near zero-cost way to retrieve targets of PHP 8 attributes. In order to do that, after the
-autoloader has been dumped, the plugin collects attribute targets and generates a static file.
-Later, these targets can be retrieved through a convenient interface.
+and near zero-cost way to retrieve targets of PHP 8 attributes. After the autoloader has been
+dumped, the plugin collects attribute targets and generates a static file. Later, these targets can
+be retrieved through a convenient interface, without involving reflexion.
+
+
 
 #### Features
 
@@ -17,7 +19,7 @@ Later, these targets can be retrieved through a convenient interface.
 - No impact on performance
 - No dependency (except Composer of course)
 - A single interface to get attribute targets: classes, methods, and properties
-- 3 types of cache speed up generation by limiting updates to changed files
+- Can cache discoveries to speed up consecutive runs.
 
 
 
@@ -71,25 +73,26 @@ var_dump($attributes->propertyAttributes);
 
 
 
-#### Installation
+## Getting started
 
-```bash
+
+### Installation
+
+```shell
 composer require olvlvl/composer-attribute-collector
 ```
 
-The plugin is currently experimental and its interface subject to change. Also, it only supports
-class and method targets. Please [contribute](CONTRIBUTING.md) if you're interested in shaping its
-future.
-
-**Note:** The plugin creates a `.composer-attribute-collector` directory to store caches, you might
-want to add it to your `.gitignore` file.
+The plugin is currently experimental and its interface subject to change. At the moment, it only
+supports class, method, and property targets. Please [contribute](CONTRIBUTING.md) if you're interested in
+shaping its future.
 
 
-#### Sample configuration
 
-The plugin only inspects paths and files specified in the configuration, that's usually your "src"
-directory. Add this section to your `composer.json` file to enable the generation of the attributes
-file on autoload dump.
+### Sample configuration
+
+The plugin only inspects paths and files specified in the configuration with the direction
+`include`. That's usually your "src" directory. Add this section to your `composer.json` file to
+enable the generation of the attributes file on autoload dump.
 
 Check the [Configuration options](#configuration) for more details.
 
@@ -107,28 +110,10 @@ Check the [Configuration options](#configuration) for more details.
 
 
 
+### Autoloading
 
-## Frequently Asked Questions
-
-**Do I need to generate an optimized autoloader?**
-
-You don't need to generate an optimized autoloader for this to work. The plugin uses code similar
-to Composer to find classes. Anything that works with Composer should work with the plugin.
-
-**Can I use the plugin during development?**
-
-Yes, you can use the plugin during development, but keep in mind the attributes file is only
-generated after the autoloader is dumped. If you modify attributes you'll have to run
-`composer dump` to refresh the attributes file.
-
-As a workaround you could have watchers on the directories that contain classes with attributes to
-run `XDEBUG_MODE=off composer dump` when you make changes. [PhpStorm offers file watchers][phpstorm-watchers]. You could also use [spatie/file-system-watcher][], it only requires PHP.
-
-
-
-## Autoloading
-
-You can require the attributes file as shown in the usage example, but it's preferable to use Composer's autoloading feature:
+You can require the attributes file using `require_once 'vendor/attributes.php';` but you might
+prefer using Composer's autoloading feature:
 
 ```json
 {
@@ -144,7 +129,7 @@ You can require the attributes file as shown in the usage example, but it's pref
 
 ## Configuration
 
-### Excluding paths or files ([root-only][])
+### Including paths or files ([root-only][])
 
 Use the `include` property to define the paths or files to inspect for attributes. Without this
 property, the attributes file will be empty.
@@ -177,29 +162,61 @@ replaced with the path to the vendor folder.
   "extra": {
     "composer-attribute-collector": {
       "exclude": [
-        "path-or-file/to/ignore"
+        "path-or-file/to/exclude"
       ]
     }
   }
 }
 ```
 
+### Cache discoveries between runs
+
+The plugin is able to maintain a cache to reuse discoveries between runs. To enable the cache,
+set the environment variable `COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE` to `1`, `yes`, or `true`.
+Cache items are persisted in the `.composer-attribute-collector` directory, you might want to add
+it to your `.gitignore` file.
 
 
-## Test drive with a Symfony app
 
-You can try the plugin with a fresh installation of Symfony.
+## Frequently Asked Questions
 
-Use the `symfony` command to create a new project. If you don't have it yet, you can [download it](https://symfony.com/download).
+**Do I need to generate an optimized autoloader?**
 
-```bash
-symfony new --webapp my_project
+You don't need to generate an optimized autoloader for this to work. The plugin uses code similar
+to Composer to find classes. Anything that works with Composer should work with the plugin.
+
+**Can I use the plugin during development?**
+
+Yes, you can use the plugin during development, but keep in mind the attributes file is only
+generated after the autoloader is dumped. If you modify attributes you'll have to run
+`composer dump` to refresh the attributes file.
+
+As a workaround you could have watchers on the directories that contain classes with attributes to
+run `XDEBUG_MODE=off composer dump` when you make changes. [PhpStorm offers file watchers][phpstorm-watchers]. You could also use [spatie/file-system-watcher][], it only requires PHP. If the plugin is too slow for your liking,
+try running the command with `COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE=yes`, it will enable caching
+and speed up consecutive runs.
+
+
+
+## Test drive with the Symfony Demo
+
+You can try the plugin with a fresh installation of the [Symfony Demo Application](https://github.com/symfony/demo).
+
+After you followed the instruction to install the demo, get into the project's directory and install the plugin. You'll be asked if you trust the plugin and wish to activate it. If you wish to continue, choose `y`.
+
+```shell
+composer require olvlvl/composer-attribute-collector
 ```
 
-Add the `composer-attribute-collector` node to `extra` in the `composer.json` file:
+Add the `composer-attribute-collector` node to `extra` and the autoload item to the `composer.json` file:
 
 ```json
 {
+  "autoload": {
+    "files": [
+        "vendor/attributes.php"
+    ]
+  },
   "extra": {
     "composer-attribute-collector": {
       "include": [
@@ -210,34 +227,52 @@ Add the `composer-attribute-collector` node to `extra` in the `composer.json` fi
 }
 ```
 
-Now get into that project and install the plugin. You'll be asked if you trust the plugin and wish
-to activate it. If you wish to continue, choose `y`.
+Now dump the autoload:
 
-```bash
-cd my_project
-composer require olvlvl/composer-attribute-collector
+```shell
+composer dump
 ```
 
-The plugin should have generated the file `vendor/attributes.php`. It should look something like
-this excerpt:
+You should see log messages similar to this:
+
+```
+Generating autoload files
+Generating attributes file
+Generated attributes file in 9.137 ms
+Generated autoload files
+```
+
+The plugin should have generated the file `vendor/attributes.php`. Let's see if we can get the controller methods tagged as routes. Create a PHP file with the following content and run it:
 
 ```php
 <?php
 
-// attributes.php @generated by https://github.com/olvlvl/composer-attribute-collector
+use olvlvl\ComposerAttributeCollector\Attributes;
+use Symfony\Component\Routing\Annotation\Route;
 
-namespace olvlvl\ComposerAttributeCollector;
+require_once 'vendor/autoload.php';
 
-Attributes::with(fn () => new Collection(
-    targetClasses: [
-        \Symfony\Component\Console\Attribute\AsCommand::class => [
-            [ ['lint:yaml', 'Lint a YAML file and outputs encountered errors'], \Symfony\Component\Yaml\Command\LintCommand::class ],
-            [ ['server:dump', 'Start a dump server that collects and displays dumps in a single place'], \Symfony\Component\VarDumper\Command\ServerDumpCommand::class ],
-            [ ['debug:validator', 'Display validation constraints for classes'], \Symfony\Component\Validator\Command\DebugCommand::class ],
-            [ ['translation:pull', 'Pull translations from a given provider.'], \Symfony\Component\Translation\Command\TranslationPullCommand::class ],
+$targets = Attributes::filterTargetMethods(
+    Attributes::predicateForAttributeInstanceOf(Route::class)
+);
+
+foreach ($targets as $target) {
+    echo "action: $target->class#$target->name, path: {$target->attribute->getPath()}\n";
+}
 ```
 
-We also have [a repository to test the Symfony usecase](https://github.com/olvlvl/composer-attribute-collector-usecase-symfony).
+You should see an output similar to the following excerpt:
+
+```
+action: App\Controller\BlogController#index, path: /
+action: App\Controller\BlogController#index, path: /rss.xml
+action: App\Controller\BlogController#index, path: /page/{page<[1-9]\d{0,8}>}
+action: App\Controller\BlogController#postShow, path: /posts/{slug}
+action: App\Controller\BlogController#commentNew, path: /comment/{postSlug}/new
+action: App\Controller\BlogController#search, path: /search
+```
+
+The demo application configured with the plugin is [available on GitHub](https://github.com/olvlvl/composer-attribute-collector-usecase-symfony).
 
 
 
