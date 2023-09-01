@@ -40,8 +40,11 @@
     "extra": {
         "class": "olvlvl\\ComposerAttributeCollector\\Plugin",
         "composer-attribute-collector": {
-            "ignore-paths": [
-                "IncompatibleSignature"
+            "include": [
+                "tests"
+            ],
+            "exclude": [
+                "tests/Acme/PSR4/IncompatibleSignature.php"
             ]
         }
     }

@@ -55,9 +55,9 @@ class MemoizeClassMapFilter
             if ($timestamp < $mtime) {
                 if ($timestamp) {
                     $diff = $mtime - $timestamp;
-                    $this->io->debug("Refresh filtered files in '$pathname' ($diff sec ago)");
+                    $this->io->debug("Refresh filtered file '$pathname' ($diff sec ago)");
                 } else {
-                    $this->io->debug("Filter files in '$pathname'");
+                    $this->io->debug("Filter '$pathname'");
                 }
 
                 $keep = $filter($class, $pathname);

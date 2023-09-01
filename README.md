@@ -56,10 +56,12 @@ foreach (Attributes::findTargetProperties(Column::class) as $target) {
 }
 
 // Filter target methods using a predicate.
-// This is also available for classes and properties.
-foreach (Attributes::filterTargetMethods(
-    fn($attribute) => is_a($attribute, Route::class, true)
-) as $target) {
+// You can also filter target classes and properties.
+$predicate = fn($attribute) => is_a($attribute, Route::class, true);
+# or
+$predicate = Attributes::predicateForAttributeInstanceOf(Route::class);
+
+foreach (Attributes::filterTargetMethods($predicate) as $target) {
     var_dump($target->attribute, $target->class, $target->name);
 }
 
@@ -178,35 +180,9 @@ it to your `.gitignore` file.
 
 
 
-## Frequently Asked Questions
-
-**Do I need to generate an optimized autoloader?**
-
-You don't need to generate an optimized autoloader for this to work. The plugin uses code similar
-to Composer to find classes. Anything that works with Composer should work with the plugin.
-
-**Can I use the plugin during development?**
-
-Yes, you can use the plugin during development, but keep in mind the attributes file is only
-generated after the autoloader is dumped. If you modify attributes you'll have to run
-`composer dump` to refresh the attributes file.
-
-As a workaround you could have watchers on the directories that contain classes with attributes to
-run `XDEBUG_MODE=off composer dump` when you make changes. [PhpStorm offers file watchers][phpstorm-watchers]. You could also use [spatie/file-system-watcher][], it only requires PHP. If the plugin is too slow for your liking,
-try running the command with `COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE=yes`, it will enable caching
-and speed up consecutive runs.
-
-
-
 ## Test drive with the Symfony Demo
 
 You can try the plugin with a fresh installation of the [Symfony Demo Application](https://github.com/symfony/demo).
-
-After you followed the instruction to install the demo, get into the project's directory and install the plugin. You'll be asked if you trust the plugin and wish to activate it. If you wish to continue, choose `y`.
-
-```shell
-composer require olvlvl/composer-attribute-collector
-```
 
 Add the `composer-attribute-collector` node to `extra` and the autoload item to the `composer.json` file:
 
@@ -227,10 +203,11 @@ Add the `composer-attribute-collector` node to `extra` and the autoload item to 
 }
 ```
 
-Now dump the autoload:
+Use Composer to install the plugin. You'll be asked if you trust the plugin and wish to activate it.
+If you wish to continue, choose `y`.
 
 ```shell
-composer dump
+composer require olvlvl/composer-attribute-collector
 ```
 
 You should see log messages similar to this:
@@ -252,9 +229,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 require_once 'vendor/autoload.php';
 
-$targets = Attributes::filterTargetMethods(
-    Attributes::predicateForAttributeInstanceOf(Route::class)
-);
+$predicate = Attributes::predicateForAttributeInstanceOf(Route::class);
+$targets = Attributes::filterTargetMethods($predicate);
 
 foreach ($targets as $target) {
     echo "action: $target->class#$target->name, path: {$target->attribute->getPath()}\n";
@@ -276,218 +252,24 @@ The demo application configured with the plugin is [available on GitHub](https:/
 
 
 
-## Use cases
+## Frequently Asked Questions
 
-### Get attributes without using reflection
+**Do I need to generate an optimized autoloader?**
 
-The method `forClass()` returns the attributes attached to a class, without using reflection. This
-can improve the performance of your application if it relies on reflection on hot paths.
+You don't need to generate an optimized autoloader for this to work. The plugin uses code similar
+to Composer to find classes. Anything that works with Composer should work with the plugin.
 
-```php
-// Find attributes for the ArticleController class.
-$attributes = Attributes::forClass(ArticleController::class);
+**Can I use the plugin during development?**
 
-var_dump($attributes->classAttributes);
-var_dump($attributes->methodsAttributes);
-var_dump($attributes->propertyAttributes);
-```
+Yes, you can use the plugin during development, but keep in mind the attributes file is only
+generated after the autoloader is dumped. If you modify attributes you'll have to run
+`composer dump` to refresh the attributes file.
 
-
-
-### A simpler way to configure your Dependency Injection Container
-
-composer-attribute-collector can help simplify DIC (Dependency Injection Container) configuration.
-Long error-prone YAML can be completely replaced with attributes and a compiler pass to use them.
-You can still support both YAML and attributes, the "attribute" compiler pass would just configure
-the services and tag them automatically.
-
-For example, the package [ICanBoogie/MessageBus][] offers [PHP 8 attributes as an alternative to YAML](https://github.com/ICanBoogie/MessageBus#using-php-8-attributes-instead-of-yaml).
-
-```yaml
-services:
-  Acme\MenuService\Application\MessageBus\CreateMenuHandler:
-    tags:
-    - name: message_bus.handler
-      message: Acme\MenuService\Application\MessageBus\CreateMenu
-    - name: message_bus.permission
-      permission: is_admin
-    - name: message_bus.permission
-      permission: can_write_menu
-
-  Acme\MenuService\Application\MessageBus\DeleteMenuHandler:
-    tags:
-    - name: message_bus.handler
-      message: Acme\MenuService\Application\MessageBus\DeleteMenu
-    - name: message_bus.permission
-      permission: is_admin
-    - name: message_bus.permission
-      permission: can_manage_menu
-
-  Acme\MenuService\Presentation\Security\Voters\IsAdmin:
-      tags:
-      - name: message_bus.voter
-        permission: is_admin
-
-  Acme\MenuService\Presentation\Security\Voters\CanWriteMenu:
-      tags:
-      - name: message_bus.voter
-        permission: can_write_menu
-
-  Acme\MenuService\Presentation\Security\Voters\CanManageMenu:
-      tags:
-      - name: message_bus.voter
-        permission: can_manage_menu
-```
-
-```php
-<?php
-
-// ...
-
-final class Permissions
-{
-    public const IS_ADMIN = 'is_admin';
-    public const CAN_WRITE_MENU = 'can_write_menu';
-    public const CAN_MANAGE_MENU = 'can_manage_menu';
-}
-
-// ...
-
-use ICanBoogie\MessageBus\Attribute\Permission;
-
-#[Permission(Permissions::IS_ADMIN)]
-#[Permission(Permissions::CAN_WRITE_MENU)]
-final class CreateMenu
-{
-    public function __construct(
-        public readonly array $payload
-    )// ...
-}
-
-// ...
-
-use ICanBoogie\MessageBus\Attribute\Handler;
-
-#[Handler]
-final class CreateMenuHandler
-{
-    public function __invoke(CreateMenu $message)// ...
-}
-
-// ...
-
-use ICanBoogie\MessageBus\Attribute\Vote;
-
-#[Vote(Permissions::IS_ADMIN)]
-final class IsAdmin implements Voter
-{
-    // ...
-}
-```
-
-
-
-### Configure components from attributes
-
-Using attributes simplifies configuration, placing definition closer to the code, where it's used. ICanBoogie's router can be configured automatically from attributes. The following example demonstrates how the `Route` attribute can be used at the class level to define a prefix for the route attributes such as `Get` that are used to tag actions. Action identifiers can be inferred from the controller class and the method names e.g. `skills:list`.
-
-```php
-<?php
-
-// …
-
-#[Route('/skills')]
-final class SkillController extends ControllerAbstract
-{
-    #[Post]
-    private function create(): void
-    {
-        // …
-    }
-
-    #[Get('.html')]
-    private function list(): void
-    {
-        // …
-    }
-
-    #[Get('/summonable.html')]
-    private function summonable(): void
-    {
-        // …
-    }
-
-    #[Get('/learnable.html')]
-    private function learnable(): void
-    {
-        // …
-    }
-
-    #[Get('/:slug.html')]
-    private function show(string $slug): void
-    {
-        // …
-    }
-}
-```
-
-Because the `Get` and `Post` attributes extend `Route`, all action methods can be retrieved with the `filterTargetMethods()` method.
-
-```php
-/** @var TargetMethod<Route>[] $target_methods */
-$target_methods = Attributes::filterTargetMethods(
-    Attributes::predicateForAttributeInstanceOf(Route::class)
-);
-```
-
-Now then, configuring the router looks as simple as this:
-
-```php
-<?php
-
-use ICanBoogie\Binding\Routing\ConfigBuilder;
-
-/* @var ConfigBuilder $config */
-
-$config->from_attributes();
-```
-
-
-
-## Using Attributes
-
-### Filtering target methods
-
-`filterTargetMethods()` can filter target methods using a predicate. This can be helpful when a number of attributes extend another one, and you are interested in collecting any instance of that attribute. The `filerTargetClasses()` and `filterTargetProperties()` methods provide similar feature for classes and properties.
-
-Let's say we have a `Route` attribute extended by `Get`, `Post`, `Put`…
-
-```php
-<?php
-
-use olvlvl\ComposerAttributeCollector\Attributes;
-
-/** @var TargetMethod<Route>[] $target_methods */
-$target_methods = [
-    ...Attributes::findTargetMethods(Get::class),
-    ...Attributes::findTargetMethods(Head::class),
-    ...Attributes::findTargetMethods(Post::class),
-    ...Attributes::findTargetMethods(Put::class),
-    ...Attributes::findTargetMethods(Delete::class),
-    ...Attributes::findTargetMethods(Connect::class),
-    ...Attributes::findTargetMethods(Options::class),
-    ...Attributes::findTargetMethods(Trace::class),
-    ...Attributes::findTargetMethods(Patch::class),
-    ...Attributes::findTargetMethods(Route::class),
-];
-
-// Can be replaced by:
-
-/** @var TargetMethod<Route>[] $target_methods */
-$target_methods = Attributes::filterTargetMethods(
-    Attributes::predicateForAttributeInstanceOf(Route::class)
-);
-```
+As a workaround you could have watchers on the directories that contain classes with attributes to
+run `XDEBUG_MODE=off composer dump` when you make changes. [PhpStorm offers file watchers][phpstorm-watchers].
+You could also use [spatie/file-system-watcher][], it only requires PHP. If the plugin is too slow
+for your liking, try running the command with `COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE=yes`, it will
+enable caching and speed up consecutive runs.
 
 
 
@@ -526,6 +308,5 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 [Composer]:  https://getcomposer.org/
 [root-only]: https://getcomposer.org/doc/04-schema.md#root-package
-[ICanBoogie/MessageBus]: https://github.com/ICanBoogie/MessageBus
 [spatie/file-system-watcher]: https://github.com/spatie/file-system-watcher
 [phpstorm-watchers]: https://www.jetbrains.com/help/phpstorm/using-file-watchers.html

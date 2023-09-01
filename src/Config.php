@@ -2,6 +2,7 @@
 
 namespace olvlvl\ComposerAttributeCollector;
 
+use Composer\Composer;
 use Composer\Factory;
 use Composer\PartialComposer;
 use Composer\Util\Platform;
@@ -39,12 +40,7 @@ final class Config
 
     public static function from(PartialComposer $composer): self
     {
-        $vendorDir = $composer->getConfig()->get('vendor-dir');
-
-        if (!is_string($vendorDir) || !$vendorDir) {
-            throw new RuntimeException("Unable to determine vendor directory");
-        }
-
+        $vendorDir = self::resolveVendorDir($composer);
         $composerFile = Factory::getComposerFile();
         $rootDir = realpath(dirname($composerFile));
 
@@ -69,6 +65,20 @@ final class Config
             exclude: $exclude,
             useCache: $useCache,
         );
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    public static function resolveVendorDir(PartialComposer $composer): string
+    {
+        $vendorDir = $composer->getConfig()->get('vendor-dir');
+
+        if (!is_string($vendorDir) || !$vendorDir) {
+            throw new RuntimeException("Unable to determine vendor directory");
+        }
+
+        return $vendorDir;
     }
 
     /**
