@@ -5,6 +5,9 @@ namespace olvlvl\ComposerAttributeCollector;
 use Composer\IO\IOInterface;
 use ReflectionException;
 
+use RuntimeException;
+use Throwable;
+
 use function array_filter;
 use function filemtime;
 
@@ -73,11 +76,18 @@ class MemoizeAttributeCollector
                     $this->io->debug("Collect attributes of class '$class' in '$filepath'");
                 }
 
-                [
-                    $classAttributes,
-                    $methodAttributes,
-                    $propertyAttributes
-                ] = $classAttributeCollector->collectAttributes($class);
+                try {
+                    [
+                        $classAttributes,
+                        $methodAttributes,
+                        $propertyAttributes
+                    ] = $classAttributeCollector->collectAttributes($class);
+                } catch (Throwable $e) {
+                    $this->io->error(
+                        "Attribute collection failed for $class: {$e->getMessage()}"
+                    );
+                }
+
                 $this->state[$class] = [ time(), $classAttributes, $methodAttributes, $propertyAttributes ];
             }
 
