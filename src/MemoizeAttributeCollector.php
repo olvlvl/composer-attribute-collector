@@ -4,8 +4,6 @@ namespace olvlvl\ComposerAttributeCollector;
 
 use Composer\IO\IOInterface;
 use ReflectionException;
-
-use RuntimeException;
 use Throwable;
 
 use function array_filter;

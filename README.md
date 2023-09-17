@@ -6,9 +6,10 @@
 [![Downloads](https://img.shields.io/packagist/dt/olvlvl/composer-attribute-collector.svg)](https://packagist.org/packages/olvlvl/composer-attribute-collector)
 
 composer-attribute-collector is a plugin for [Composer][]. Its ambition is to provide a convenient
-and near zero-cost way to retrieve targets of PHP 8 attributes. After the autoloader has been
+way—and near zero-cost—to retrieve targets of PHP 8 attributes. After the autoloader has been
 dumped, the plugin collects attribute targets and generates a static file. Later, these targets can
-be retrieved through a convenient interface, without involving reflexion.
+be retrieved through a convenient interface, without involving reflection. The plugin is useful when
+you need to _discover_ attributes in a codebase—for known classes you can use reflection.
 
 
 
