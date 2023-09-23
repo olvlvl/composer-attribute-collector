@@ -6,10 +6,10 @@
 [![Downloads](https://img.shields.io/packagist/dt/olvlvl/composer-attribute-collector.svg)](https://packagist.org/packages/olvlvl/composer-attribute-collector)
 
 composer-attribute-collector is a plugin for [Composer][]. Its ambition is to provide a convenient
-way—and near zero-cost—to retrieve targets of PHP 8 attributes. After the autoloader has been
+way—and near zero cost—to retrieve targets of PHP 8 attributes. After the autoloader has been
 dumped, the plugin collects attribute targets and generates a static file. Later, these targets can
-be retrieved through a convenient interface, without involving reflection. The plugin is useful when
-you need to _discover_ attribute targets in a codebase—for known targets you can use reflection.
+be retrieved through a convenient interface, without reflection. The plugin is useful when you need
+to _discover_ attribute targets in a codebase—for known targets you can use reflection.
 
 
 
@@ -154,7 +154,7 @@ replaced with the path to the vendor folder.
 
 ### Excluding paths or files ([root-only][])
 
-Use the `exclude` property to excluded paths or files from inspection. This is handy when files
+Use the `exclude` property to exclude paths or files from inspection. This is handy when files
 cause issues or have side effects.
 
 The specified paths are relative to the `composer.json` file, and the `{vendor}` placeholder is
