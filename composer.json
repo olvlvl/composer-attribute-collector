@@ -19,7 +19,8 @@
     "autoload-dev": {
         "psr-4": {
             "tests\\olvlvl\\ComposerAttributeCollector\\": "tests",
-            "Acme\\": "tests/Acme"
+            "Acme\\": "tests/Acme",
+            "Acme81\\": "tests/Acme81"
         },
         "classmap": [
             "tests/Acme/ClassMap"

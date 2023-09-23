@@ -9,7 +9,7 @@ composer-attribute-collector is a plugin for [Composer][]. Its ambition is to pr
 way—and near zero-cost—to retrieve targets of PHP 8 attributes. After the autoloader has been
 dumped, the plugin collects attribute targets and generates a static file. Later, these targets can
 be retrieved through a convenient interface, without involving reflection. The plugin is useful when
-you need to _discover_ attributes in a codebase—for known classes you can use reflection.
+you need to _discover_ attribute targets in a codebase—for known targets you can use reflection.
 
 
 

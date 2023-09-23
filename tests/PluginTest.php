@@ -38,6 +38,8 @@ use function is_string;
 use function str_contains;
 use function usort;
 
+use const PHP_VERSION_ID;
+
 final class PluginTest extends TestCase
 {
     private static bool $initialized = false;
@@ -57,6 +59,13 @@ final class PluginTest extends TestCase
         assert(is_string($cwd));
         $vendorDir = __DIR__ . '/sandbox';
         $filepath = "$vendorDir/attributes.php";
+        $exclude = [
+            "$cwd/tests/Acme/PSR4/IncompatibleSignature.php"
+        ];
+
+        if (PHP_VERSION_ID < 80100) {
+            $exclude[] = "$cwd/tests/Acme81";
+        }
 
         $config = new Config(
             vendorDir: $vendorDir,
@@ -64,9 +73,7 @@ final class PluginTest extends TestCase
             include: [
                 "$cwd/tests"
             ],
-            exclude: [
-                "$cwd/tests/Acme/PSR4/IncompatibleSignature.php"
-            ],
+            exclude: $exclude,
             useCache: false,
         );
 
@@ -256,6 +263,36 @@ final class PluginTest extends TestCase
             [ new Get(), 'Acme\Presentation\ImageController::list' ],
             [ new Get('/{id}'), 'Acme\Presentation\ImageController::show' ],
         ], $this->collectMethods($actual));
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testFilterTargetMethods81(): void
+    {
+        $expected = [
+            new TargetMethod(
+                new \Acme81\Attribute\Route('/:id', method: \Acme81\Attribute\Method::GET),
+                \Acme81\PSR4\Presentation\ArticleController::class,
+                'show'
+            ),
+            new TargetMethod(
+                new \Acme81\Attribute\Get(),
+                \Acme81\PSR4\Presentation\ArticleController::class,
+                'list'
+            ),
+            new TargetMethod(
+                new \Acme81\Attribute\Post(),
+                \Acme81\PSR4\Presentation\ArticleController::class,
+                'new'
+            ),
+        ];
+
+        $actual = Attributes::filterTargetMethods(
+            Attributes::predicateForAttributeInstanceOf(\Acme81\Attribute\Route::class)
+        );
+
+        $this->assertEquals($expected, $actual);
     }
 
     public function testFilterTargetProperties(): void
