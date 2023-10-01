@@ -116,6 +116,7 @@ class ClassAttributeCollector
         static $ignored = [
             \ReturnTypeWillChange::class => true,
             \SensitiveParameter::class => true,
+            InheritsAttributes::class => true,
         ];
 
         return isset($ignored[$attribute->getName()]); // @phpstan-ignore offsetAccess.nonOffsetAccessible

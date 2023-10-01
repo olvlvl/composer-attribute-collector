@@ -8,11 +8,28 @@ None
 
 ### New features
 
-Attributes are now collected from interfaces and traits as well as classes.
+- [#38](https://github.com/olvlvl/composer-attribute-collector/pull/38) Attributes are now collected from interfaces as well as classes.
 
-Parameter attributes are now collected. Use the method `findTargetParameters()`
-to find target parameters, and the method `filterTargetParameters()` to filter
-target parameters according to a predicate.
+- [#37](https://github.com/olvlvl/composer-attribute-collector/pull/37) Parameter attributes are now collected. Use the method `findTargetParameters()` to find target parameters, and the method `filterTargetParameters()` to filter target parameters according to a predicate. (@staabm @olvlvl)
+
+- [#39](https://github.com/olvlvl/composer-attribute-collector/pull/39) The `InheritsAttributes` attribute can be used on classes that inherit their attributes from traits, properties, or methods, and were previously ignored by the collection process.
+
+    ```php
+    trait UrlTrait
+    {
+        #[UrlGetter]
+        public function get_url(): string
+        {
+            return '/url';
+        }
+    }
+
+    #[InheritsAttributes]
+    class InheritedAttributeSample
+    {
+        use UrlTrait;
+    }
+    ```
 
 ### Deprecated Features
 
@@ -73,10 +90,11 @@ None
 
 ### Other Changes
 
-- #26 Fix enum support on PHP < 8.2.0 – @mnavarrocarter
+- #26 Fix enum support on PHP < 8.2.0 (@mnavarrocarter)
 
 
-## v1.2 to v2.0
+
+## v2.0.0
 
 ### New Requirements
 
@@ -100,7 +118,7 @@ None
 
 
 
-## v1.1 to v1.2
+## v1.2.0
 
 ### New Requirements
 
@@ -127,7 +145,7 @@ None
 
 
 
-## v1.0 to v1.1
+## v1.1.0
 
 ### New Requirements
 
