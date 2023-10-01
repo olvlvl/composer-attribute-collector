@@ -1,12 +1,5 @@
 <?php
 
-/*
- * (c) Olivier Laviale <olivier.laviale@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace tests\olvlvl\ComposerAttributeCollector;
 
 use Acme\Attribute\ActiveRecord\Boolean;
@@ -21,6 +14,7 @@ use Acme\Attribute\Handler;
 use Acme\Attribute\Permission;
 use Acme\Attribute\Resource;
 use Acme\Attribute\Route;
+use Acme\Attribute\Routing\UrlGetter;
 use Acme\Attribute\Subscribe;
 use Acme\PSR4\Presentation\ArticleController;
 use Composer\IO\NullIO;
@@ -44,9 +38,6 @@ final class PluginTest extends TestCase
 {
     private static bool $initialized = false;
 
-    /**
-     * @throws ReflectionException
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -182,6 +173,12 @@ final class PluginTest extends TestCase
                 [
                     [ new Subscribe(), 'Acme\PSR4\SubscriberA::onEventA' ],
                     [ new Subscribe(), 'Acme\PSR4\SubscriberB::onEventA' ],
+                ]
+            ],
+            [
+                UrlGetter::class,
+                [
+                    [ new UrlGetter(), 'Acme\PSR4\InheritedAttributeSample::get_url' ]
                 ]
             ],
 

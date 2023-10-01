@@ -7,7 +7,6 @@ use Composer\IO\IOInterface;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
-use Throwable;
 
 /**
  * @internal
@@ -124,6 +123,7 @@ class ClassAttributeCollector
     {
         static $ignored = [
             \ReturnTypeWillChange::class => true,
+            InheritsAttributes::class => true,
         ];
 
         return isset($ignored[$attribute->getName()]);

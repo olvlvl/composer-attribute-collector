@@ -15,12 +15,15 @@ use Throwable;
 
 use function interface_exists;
 
-final class InterfaceFilter implements Filter
+/**
+ * Filters classes—removes interfaces and traits.
+ */
+final class ClassFilter implements Filter
 {
     public function filter(string $filepath, string $class, IOInterface $io): bool
     {
         try {
-            if (interface_exists($class)) {
+            if (!class_exists($class)) {
                 return false;
             }
         } catch (Throwable $e) {

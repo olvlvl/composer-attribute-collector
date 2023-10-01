@@ -272,6 +272,11 @@ You could also use [spatie/file-system-watcher][], it only requires PHP. If the 
 for your liking, try running the command with `COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE=yes`, it will
 enable caching and speed up consecutive runs.
 
+**How do I include a class that inherits its attributes?**
+
+To speed up the collection process, the plugin first looks at PHP files as plain text for hints of attribute usage. If a
+class inherits its attributes from traits, properties, or methods, it is ignored. Use the attribute
+`[#\olvlvl\ComposerAttributeCollector\InheritsAttributes]` to force the collection.
 
 
 ----------

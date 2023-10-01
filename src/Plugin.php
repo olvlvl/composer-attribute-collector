@@ -11,7 +11,7 @@ use Composer\Util\Platform;
 use olvlvl\ComposerAttributeCollector\Datastore\FileDatastore;
 use olvlvl\ComposerAttributeCollector\Datastore\RuntimeDatastore;
 use olvlvl\ComposerAttributeCollector\Filter\ContentFilter;
-use olvlvl\ComposerAttributeCollector\Filter\InterfaceFilter;
+use olvlvl\ComposerAttributeCollector\Filter\ClassFilter;
 
 use function file_exists;
 use function file_put_contents;
@@ -162,7 +162,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
     {
         return new Filter\Chain([
             new ContentFilter(),
-            new InterfaceFilter()
+            new ClassFilter()
         ]);
     }
 

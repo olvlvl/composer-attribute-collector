@@ -1,5 +1,29 @@
 # Migration
 
+## v2.0 to v2.1
+
+### New Requirements
+
+None
+
+### New features
+
+- The `InheritsAttributes` attribute can be used on classes that inherit their attributes from traits, properties, or methods, and were previously ignored by the collection process.
+
+### Backward Incompatible Changes
+
+None
+
+### Deprecated Features
+
+None
+
+### Other Changes
+
+- Just like interfaces, traits are excluded from the collection.
+
+
+
 ## v1.2 to v2.0
 
 ### New Requirements
