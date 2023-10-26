@@ -40,6 +40,11 @@ test-container80:
 	@-docker-compose run --rm app80 bash
 	@docker-compose down -v
 
+.PHONY: test-container81
+test-container81:
+	@-docker-compose run --rm app81 bash
+	@docker-compose down -v
+
 .PHONY: test-container82
 test-container82:
 	@-docker-compose run --rm app82 bash
