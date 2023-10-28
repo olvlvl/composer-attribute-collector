@@ -12,6 +12,17 @@ services:
     - .:/app:delegated
     - ~/.composer:/root/.composer:delegated
     working_dir: /app
+  app81:
+    build:
+      context: .
+      args:
+        PHP_VERSION: '8.1'
+    environment:
+      PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
+    volumes:
+      - .:/app:delegated
+      - ~/.composer:/root/.composer:delegated
+    working_dir: /app
   app82:
     build:
       context: .
