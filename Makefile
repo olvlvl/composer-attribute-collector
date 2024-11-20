@@ -1,6 +1,5 @@
 # customization
 
-PACKAGE_NAME = olvlvl/composer-attribute-collector
 PHPUNIT = vendor/bin/phpunit
 
 # do not edit the following lines
@@ -37,8 +36,8 @@ test-container: test-container80
 
 .PHONY: test-container80
 test-container80:
-	@-docker-compose run --rm app80 bash
-	@docker-compose down -v
+	@-docker compose run --rm app80 bash
+	@docker compose down -v
 
 .PHONY: test-container81
 test-container81:
@@ -47,8 +46,13 @@ test-container81:
 
 .PHONY: test-container82
 test-container82:
-	@-docker-compose run --rm app82 bash
-	@docker-compose down -v
+	@-docker compose run --rm app82 bash
+	@docker compose down -v
+
+.PHONY: test-container84
+test-container84:
+	@-docker compose run --rm app84 bash
+	@docker compose down -v
 
 .PHONY: lint
 lint:

@@ -1,30 +1,42 @@
-ARG PHP_VERSION=8.0
-FROM php:${PHP_VERSION}-cli-buster
+ARG PHP_TAG=8.0-cli-buster
+FROM php:${PHP_TAG}
 
-RUN apt-get update && \
-	apt-get install -y autoconf pkg-config && \
-	pecl channel-update pecl.php.net && \
-	pecl install xdebug && \
-	docker-php-ext-enable opcache xdebug
+RUN <<-EOF
+	docker-php-ext-enable opcache
 
-RUN echo '\
-xdebug.client_host=host.docker.internal\n\
-xdebug.mode=develop\n\
-xdebug.start_with_request=yes\n\
-' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+	if [ "$PHP_VERSION" \< "8.4" ]; then
+		apt-get update
+		apt-get install -y autoconf pkg-config
+		pecl channel-update pecl.php.net
+		pecl install xdebug
+		docker-php-ext-enable xdebug
+	fi
+EOF
 
-RUN echo '\
-display_errors=On\n\
-error_reporting=E_ALL\n\
-date.timezone=UTC\n\
-' >> /usr/local/etc/php/conf.d/php.ini
+RUN <<-EOF
+	cat <<-SHELL >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+	xdebug.client_host=host.docker.internal
+	xdebug.mode=develop
+	xdebug.start_with_request=yes
+	SHELL
+
+	cat <<-SHELL >> /usr/local/etc/php/conf.d/php.ini
+	display_errors=On
+	error_reporting=E_ALL
+	date.timezone=UTC
+	SHELL
+EOF
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
-RUN apt-get update && \
-	apt-get install unzip && \
-	curl -s https://raw.githubusercontent.com/composer/getcomposer.org/76a7060ccb93902cd7576b67264ad91c8a2700e2/web/installer | php -- --quiet && \
-	mv composer.phar /usr/local/bin/composer && \
-	echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"\n' >> /root/.bashrc
+RUN <<-EOF
+	apt-get update
+	apt-get install unzip
+	curl -s https://raw.githubusercontent.com/composer/getcomposer.org/76a7060ccb93902cd7576b67264ad91c8a2700e2/web/installer | php -- --quiet
+	mv composer.phar /usr/local/bin/composer
+	cat <<-SHELL >> /root/.bashrc
+	export PATH="$HOME/.composer/vendor/bin:$PATH"
+	SHELL
+EOF
 
 RUN composer global require squizlabs/php_codesniffer

@@ -80,7 +80,7 @@ class MemoizeClassMapGenerator
      *
      * @throws RuntimeException When the path is neither an existing file nor directory
      */
-    public function scanPaths(string $path, string $excluded = null): void
+    public function scanPaths(string $path, ?string $excluded = null): void
     {
         $this->paths[$path] = true;
         [ $timestamp ] = $this->state[$path] ?? [ 0 ];

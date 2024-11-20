@@ -1,4 +1,4 @@
-# Migration
+# CHANGELOG
 
 ## v1.2 to v2.0
 

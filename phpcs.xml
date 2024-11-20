@@ -6,7 +6,7 @@
     <exclude-pattern>tests/sandbox/*</exclude-pattern>
     <exclude-pattern>tests/sandbox-memoize-classmap/*</exclude-pattern>
 
-	<arg name="colors"/>
+    <arg name="colors"/>
 
     <rule ref="PSR1">
         <exclude name="PSR1.Methods.CamelCapsMethodName.NotCamelCaps"/>

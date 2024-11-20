@@ -1,6 +1,7 @@
+# $schema: https://phpstan.olvlvl.com/schema.json
 parameters:
   bootstrapFiles:
-  - tests/bootstrap.php
+    - tests/bootstrap.php
   level: max
   paths:
     - src

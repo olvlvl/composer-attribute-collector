@@ -1,8 +1,7 @@
 # composer-attribute-collector
 
-[![Packagist](https://img.shields.io/packagist/v/olvlvl/composer-attribute-collector.svg)](https://packagist.org/packages/olvlvl/composer-attribute-collector)
-[![Code Quality](https://img.shields.io/scrutinizer/g/olvlvl/composer-attribute-collector.svg)](https://scrutinizer-ci.com/g/olvlvl/composer-attribute-collector)
-[![Code Coverage](https://img.shields.io/coveralls/olvlvl/composer-attribute-collector.svg)](https://coveralls.io/r/olvlvl/composer-attribute-collector)
+[![Release](https://img.shields.io/packagist/v/olvlvl/composer-attribute-collector.svg)](https://packagist.org/packages/olvlvl/composer-attribute-collector)
+[![Code Coverage](https://coveralls.io/repos/github/olvlvl/composer-attribute-collector/badge.svg?branch=main)](https://coveralls.io/r/olvlvl/composer-attribute-collector?branch=main)
 [![Downloads](https://img.shields.io/packagist/dt/olvlvl/composer-attribute-collector.svg)](https://packagist.org/packages/olvlvl/composer-attribute-collector)
 
 composer-attribute-collector is a plugin for [Composer][]. Its ambition is to provide a convenient
@@ -282,28 +281,22 @@ enable caching and speed up consecutive runs.
 
 The project is continuously tested by [GitHub actions](https://github.com/olvlvl/composer-attribute-collector/actions).
 
-[![Tests](https://github.com/olvlvl/composer-attribute-collector/workflows/test/badge.svg?branch=main)](https://github.com/olvlvl/composer-attribute-collector/actions?query=workflow%3Atest)
-[![Static Analysis](https://github.com/olvlvl/composer-attribute-collector/workflows/static-analysis/badge.svg?branch=main)](https://github.com/olvlvl/composer-attribute-collector/actions?query=workflow%3Astatic-analysis)
-[![Code Style](https://github.com/olvlvl/composer-attribute-collector/workflows/code-style/badge.svg?branch=main)](https://github.com/olvlvl/composer-attribute-collector/actions?query=workflow%3Acode-style)
+[![Tests](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/test.yml)
+[![Static Analysis](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/static-analysis.yml/badge.svg?branch=main)](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/static-analysis.yml)
+[![Code Style](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/code-style.yml/badge.svg?branch=main)](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/code-style.yml)
 
 
 
 ## Code of Conduct
 
 This project adheres to a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in
-this project and its community, you are expected to uphold this code.
+this project and its community, you're expected to uphold this code.
 
 
 
 ## Contributing
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
-
-
-
-## License
-
-**olvlvl/composer-attribute-collector** is released under the [BSD-3-Clause](LICENSE).
+See [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 
 
