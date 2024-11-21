@@ -70,7 +70,7 @@ class MemoizeClassMapFilter
         }
 
         /**
-         * Paths might have been removed, we need to filter according to the paths found.
+         * Paths might have been removed, we need to filter entries according to the paths found.
          */
         $this->state = array_filter(
             $this->state,

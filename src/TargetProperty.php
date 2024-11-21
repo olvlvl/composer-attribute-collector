@@ -1,12 +1,5 @@
 <?php
 
-/*
- * (c) Olivier Laviale <olivier.laviale@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace olvlvl\ComposerAttributeCollector;
 
 /**
@@ -19,7 +12,9 @@ final class TargetProperty
     /**
      * @param T $attribute
      * @param class-string $class
+     *     The name of the target class.
      * @param non-empty-string $name
+     *     The name of the target property.
      */
     public function __construct(
         public object $attribute,

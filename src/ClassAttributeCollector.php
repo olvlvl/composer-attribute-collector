@@ -7,7 +7,6 @@ use Composer\IO\IOInterface;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
-use Throwable;
 
 /**
  * @internal
@@ -27,8 +26,6 @@ class ClassAttributeCollector
      *     array<TransientTargetMethod>,
      *     array<TransientTargetProperty>,
      * }
-     *     Where `0` is an array of class attributes, `1` is an array of method attributes,
-     *     and `2` is an array of property attributes.
      *
      * @throws ReflectionException
      */

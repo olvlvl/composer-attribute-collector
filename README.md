@@ -4,11 +4,11 @@
 [![Code Coverage](https://coveralls.io/repos/github/olvlvl/composer-attribute-collector/badge.svg?branch=main)](https://coveralls.io/r/olvlvl/composer-attribute-collector?branch=main)
 [![Downloads](https://img.shields.io/packagist/dt/olvlvl/composer-attribute-collector.svg)](https://packagist.org/packages/olvlvl/composer-attribute-collector)
 
-composer-attribute-collector is a plugin for [Composer][]. Its ambition is to provide a convenient
-way—and near zero cost—to retrieve targets of PHP 8 attributes. After the autoloader has been
-dumped, the plugin collects attribute targets and generates a static file. Later, these targets can
-be retrieved through a convenient interface, without reflection. The plugin is useful when you need
-to _discover_ attribute targets in a codebase—for known targets you can use reflection.
+**composer-attribute-collector** is a plugin for [Composer][]. Its ambition is to provide a
+convenient way—and near zero cost—to retrieve targets of PHP 8 attributes. After the autoloader has
+been dumped, the plugin collects attribute targets and generates a static file. These targets can be
+retrieved through a convenient interface, without reflection. The plugin is useful when you need to
+_discover_ attribute targets in a codebase—for known targets you can use reflection.
 
 
 
@@ -20,6 +20,10 @@ to _discover_ attribute targets in a codebase—for known targets you can use re
 - No dependency (except Composer of course)
 - A single interface to get attribute targets: classes, methods, and properties
 - Can cache discoveries to speed up consecutive runs.
+
+> [!NOTE]
+> Currently, the plugin supports class, method, and property targets.
+> You're welcome to [contribute](CONTRIBUTING.md) if you're interested in expending its support.
 
 
 
@@ -77,26 +81,13 @@ var_dump($attributes->propertyAttributes);
 
 ## Getting started
 
+Here are a few steps to get you started.
 
-### Installation
+### 1\. Configure the plugin
 
-```shell
-composer require olvlvl/composer-attribute-collector
-```
-
-The plugin is currently experimental and its interface subject to change. At the moment, it only
-supports class, method, and property targets. Please [contribute](CONTRIBUTING.md) if you're interested in
-shaping its future.
-
-
-
-### Sample configuration
-
-The plugin only inspects paths and files specified in the configuration with the direction
-`include`. That's usually your "src" directory. Add this section to your `composer.json` file to
-enable the generation of the attributes file on autoload dump.
-
-Check the [Configuration options](#configuration) for more details.
+The plugin only inspects paths and files specified in the configuration with the `include` property.
+That is usually your "src" directory. Add this section to your `composer.json` file to enable the
+generation of the "attributes" file when the autoloader is dumped.
 
 ```json
 {
@@ -110,12 +101,38 @@ Check the [Configuration options](#configuration) for more details.
 }
 ```
 
+Check the [Configuration options](#configuration) for more details.
 
 
-### Autoloading
 
-You can require the attributes file using `require_once 'vendor/attributes.php';` but you might
-prefer using Composer's autoloading feature:
+### 2\. Install the plugin
+
+Use [Composer][] to install the plugin.
+You will be asked if you trust the plugin and wish to activate it, select `y` to proceed.
+
+```shell
+composer require olvlvl/composer-attribute-collector
+```
+
+You should see log messages similar to this:
+
+```
+Generating autoload files
+Generating attributes file
+Generated attributes file in 9.137 ms
+Generated autoload files
+```
+
+> [!TIP]
+> See the [Frequently Asked Questions](#frequently-asked-questions) section
+> to automatically refresh the "attributes" file during development.
+
+
+
+### 3\. Autoload the "attributes" file
+
+You can require the "attributes" file using `require_once 'vendor/attributes.php';` but you might
+prefer to use Composer's autoloading feature:
 
 ```json
 {
@@ -131,10 +148,14 @@ prefer using Composer's autoloading feature:
 
 ## Configuration
 
+Here are a few ways you can configure the plugin.
+
+
+
 ### Including paths or files ([root-only][])
 
 Use the `include` property to define the paths or files to inspect for attributes. Without this
-property, the attributes file will be empty.
+property, the "attributes" file will be empty.
 
 The specified paths are relative to the `composer.json` file, and the `{vendor}` placeholder is
 replaced with the path to the vendor folder.
@@ -178,48 +199,24 @@ set the environment variable `COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE` to `1`, `y
 Cache items are persisted in the `.composer-attribute-collector` directory, you might want to add
 it to your `.gitignore` file.
 
+```shell
+COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE=1 composer dump-autoload
+```
+
 
 
 ## Test drive with the Symfony Demo
 
 You can try the plugin with a fresh installation of the [Symfony Demo Application](https://github.com/symfony/demo).
 
-Add the `composer-attribute-collector` node to `extra` and the autoload item to the `composer.json` file:
+> [!TIP]
+> The demo application configured with the plugin is [available on GitHub](https://github.com/olvlvl/composer-attribute-collector-usecase-symfony).
 
-```json
-{
-  "autoload": {
-    "files": [
-        "vendor/attributes.php"
-    ]
-  },
-  "extra": {
-    "composer-attribute-collector": {
-      "include": [
-        "src"
-      ]
-    }
-  }
-}
-```
+See the [Getting started](#getting-started) section to set up the plugin. If all went well, the file
+`vendor/attributes.php` should be available.
 
-Use Composer to install the plugin. You'll be asked if you trust the plugin and wish to activate it.
-If you wish to continue, choose `y`.
-
-```shell
-composer require olvlvl/composer-attribute-collector
-```
-
-You should see log messages similar to this:
-
-```
-Generating autoload files
-Generating attributes file
-Generated attributes file in 9.137 ms
-Generated autoload files
-```
-
-The plugin should have generated the file `vendor/attributes.php`. Let's see if we can get the controller methods tagged as routes. Create a PHP file with the following content and run it:
+Now, you can try to get the controller methods tagged as routes. Create a PHP file with the
+following content and run it:
 
 ```php
 <?php
@@ -248,8 +245,6 @@ action: App\Controller\BlogController#commentNew, path: /comment/{postSlug}/new
 action: App\Controller\BlogController#search, path: /search
 ```
 
-The demo application configured with the plugin is [available on GitHub](https://github.com/olvlvl/composer-attribute-collector-usecase-symfony).
-
 
 
 ## Frequently Asked Questions
@@ -261,15 +256,15 @@ to Composer to find classes. Anything that works with Composer should work with 
 
 **Can I use the plugin during development?**
 
-Yes, you can use the plugin during development, but keep in mind the attributes file is only
-generated after the autoloader is dumped. If you modify attributes you'll have to run
-`composer dump` to refresh the attributes file.
+Yes, you can use the plugin during development, but keep in mind the "attributes" file is only
+generated after the autoloader is dumped. If you modify attributes you will have to run
+`composer dump-autoload` to refresh the "attributes" file.
 
 As a workaround you could have watchers on the directories that contain classes with attributes to
-run `XDEBUG_MODE=off composer dump` when you make changes. [PhpStorm offers file watchers][phpstorm-watchers].
-You could also use [spatie/file-system-watcher][], it only requires PHP. If the plugin is too slow
-for your liking, try running the command with `COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE=yes`, it will
-enable caching and speed up consecutive runs.
+run `XDEBUG_MODE=off composer dump-autoload` when you make changes. [PhpStorm offers file
+watchers][phpstorm-watchers]. You could also use [spatie/file-system-watcher][], it only requires
+PHP. If the plugin is too slow for your liking, try running the command with
+`COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE=yes`, it will enable caching and speed up consecutive runs.
 
 
 

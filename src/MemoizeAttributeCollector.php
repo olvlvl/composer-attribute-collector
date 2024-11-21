@@ -45,8 +45,6 @@ class MemoizeAttributeCollector
     /**
      * @param array<class-string, string> $classMap
      *     Where _key_ is a class and _value_ its pathname.
-     *
-     * @throws ReflectionException
      */
     public function collectAttributes(array $classMap): TransientCollection
     {
@@ -95,7 +93,7 @@ class MemoizeAttributeCollector
         }
 
         /**
-         * Classes might have been removed, we need to filter according to the classes found.
+         * Classes might have been removed, we need to filter entries according to the classes found.
          */
         $this->state = array_filter(
             $this->state,

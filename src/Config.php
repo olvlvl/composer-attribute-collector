@@ -2,7 +2,6 @@
 
 namespace olvlvl\ComposerAttributeCollector;
 
-use Composer\Composer;
 use Composer\Factory;
 use Composer\PartialComposer;
 use Composer\Util\Platform;
@@ -91,9 +90,9 @@ final class Config
      * @param non-empty-string $attributesFile
      *     Absolute path to the `attributes.php` file.
      * @param non-empty-string[] $include
-     *     Paths that should be included to attributes collection.
+     *     Paths that should be included in the attribute collection.
      * @param non-empty-string[] $exclude
-     *     Paths that should be excluded from attributes collection.
+     *     Paths that should be excluded from the attribute collection.
      * @param bool $useCache
      *     Whether a cache should be used during the process.
      */

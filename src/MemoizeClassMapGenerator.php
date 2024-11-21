@@ -112,7 +112,7 @@ class MemoizeClassMapGenerator
             return true;
         }
 
-        // Could be a file referenced as class map, we don't want to iterate over that.
+        // Could be a file referenced as a class map, we don't want to iterate over that.
         if (!is_dir($path)) {
             return false;
         }

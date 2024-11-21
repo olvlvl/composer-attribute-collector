@@ -96,7 +96,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
     public static function dump(Config $config, IOInterface $io): void
     {
         //
-        // Scan include paths
+        // Scan the included paths
         //
         $start = microtime(true);
         $datastore = self::buildDefaultDatastore($config, $io);
