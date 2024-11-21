@@ -65,7 +65,6 @@ class ClassAttributeCollector
                 }
 
                 $method = $methodReflection->name;
-                assert($method !== '');
 
                 $this->io->debug("Found attribute {$attribute->getName()} on $class::$method");
 
@@ -126,6 +125,6 @@ class ClassAttributeCollector
             \ReturnTypeWillChange::class => true,
         ];
 
-        return isset($ignored[$attribute->getName()]);
+        return isset($ignored[$attribute->getName()]); // @phpstan-ignore offsetAccess.nonOffsetAccessible
     }
 }

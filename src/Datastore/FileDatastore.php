@@ -31,8 +31,6 @@ final class FileDatastore implements Datastore
         private string $dir,
         private IOInterface $io,
     ) {
-        assert($dir !== '');
-
         if (!is_dir($dir)) {
             mkdir($dir);
         }
