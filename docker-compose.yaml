@@ -37,7 +37,7 @@ services:
     build:
       context: .
       args:
-        PHP_TAG: '8.4.0RC4-cli-bookworm'
+        PHP_TAG: '8.4-cli-bookworm'
     environment:
       PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
     volumes:
