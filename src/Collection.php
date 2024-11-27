@@ -13,18 +13,18 @@ use function array_map;
 final class Collection
 {
     /**
-     * @param array<class-string, array<array{ mixed[], class-string }>> $targetClasses
+     * @param array<class-string, array<array{ string, class-string }>> $targetClasses
      *     Where _key_ is an attribute class and _value_ an array of arrays
-     *     where 0 are the attribute arguments and 1 is a target class.
-     * @param array<class-string, array<array{ mixed[], class-string, non-empty-string }>> $targetMethods
+     *     where `0` is the serialized attribute arguments and `1` is a target class.
+     * @param array<class-string, array<array{ string, class-string, non-empty-string }>> $targetMethods
      *     Where _key_ is an attribute class and _value_ an array of arrays
-     *     where 0 are the attribute arguments, 1 is a target class, and 2 is the target method.
-     * @param array<class-string, array<array{ mixed[], class-string, non-empty-string }>> $targetProperties
+     *     where `0` is the serialized attribute arguments, `1` is a target class, and `2` is the target method.
+     * @param array<class-string, array<array{ string, class-string, non-empty-string }>> $targetProperties
      *     Where _key_ is an attribute class and _value_ an array of arrays
-     *     where 0 are the attribute arguments, 1 is a target class, and 2 is the target property.
-     * @param array<class-string, array<array{ mixed[], class-string, non-empty-string, non-empty-string }>> $targetParameters
-     *     Where _key_ is an attribute class and _value_ an array of arrays where 0 are the
-     *     attribute arguments, 1 is a target class, 2 is the target method, and 3 is the target parameter.
+     *     where `0` is the serialized attribute arguments, `1` is a target class, and `2` is the target property.
+     * @param array<class-string, array<array{ string, class-string, non-empty-string, non-empty-string }>> $targetParameters
+     *     Where _key_ is an attribute class and _value_ an array of arrays
+     *     where `0` are the serialized attribute arguments, `1` is a target class, `2` is the target method, and `3` is the target parameter.
      */
     public function __construct(
         private array $targetClasses,
@@ -53,15 +53,15 @@ final class Collection
      * @template T of object
      *
      * @param class-string<T> $attribute
-     * @param array<mixed> $arguments
+     * @param string $arguments The serialized arguments
      * @param class-string $class
      *
      * @return TargetClass<T>
      */
-    private static function createClassAttribute(string $attribute, array $arguments, string $class): object
+    private static function createClassAttribute(string $attribute, string $arguments, string $class): object
     {
         try {
-            $a = new $attribute(...$arguments);
+            $a = new $attribute(...unserialize($arguments));
             return new TargetClass($a, $class);
         } catch (Throwable $e) {
             throw new RuntimeException(
@@ -90,7 +90,7 @@ final class Collection
      * @template T of object
      *
      * @param class-string<T> $attribute
-     * @param array<mixed> $arguments
+     * @param string $arguments The serialized arguments
      * @param class-string $class
      * @param non-empty-string $method
      *
@@ -98,12 +98,12 @@ final class Collection
      */
     private static function createMethodAttribute(
         string $attribute,
-        array $arguments,
+        string $arguments,
         string $class,
         string $method,
     ): object {
         try {
-            $a = new $attribute(...$arguments);
+            $a = new $attribute(...unserialize($arguments));
             return new TargetMethod($a, $class, $method);
         } catch (Throwable $e) {
             throw new RuntimeException(
@@ -132,7 +132,7 @@ final class Collection
      * @template T of object
      *
      * @param class-string<T> $attribute
-     * @param array<mixed> $arguments
+     * @param string $arguments The serialized arguments
      * @param class-string $class
      * @param non-empty-string $method
      * @param non-empty-string $parameter
@@ -141,13 +141,13 @@ final class Collection
      */
     private static function createParameterAttribute(
         string $attribute,
-        array $arguments,
+        string $arguments,
         string $class,
         string $method,
         string $parameter,
     ): object {
         try {
-            $a = new $attribute(...$arguments);
+            $a = new $attribute(...unserialize($arguments));
             return new TargetParameter($a, $class, $method, $parameter);
         } catch (Throwable $e) {
             throw new RuntimeException(
@@ -176,7 +176,7 @@ final class Collection
      * @template T of object
      *
      * @param class-string<T> $attribute
-     * @param array<mixed> $arguments
+     * @param string $arguments The serialized arguments
      * @param class-string $class
      * @param non-empty-string $property
      *
@@ -184,12 +184,12 @@ final class Collection
      */
     private static function createPropertyAttribute(
         string $attribute,
-        array $arguments,
+        string $arguments,
         string $class,
         string $property,
     ): object {
         try {
-            $a = new $attribute(...$arguments);
+            $a = new $attribute(...unserialize($arguments));
             return new TargetProperty($a, $class, $property);
         } catch (Throwable $e) {
             throw new RuntimeException(

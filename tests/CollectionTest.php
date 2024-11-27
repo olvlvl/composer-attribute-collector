@@ -43,17 +43,17 @@ final class CollectionTest extends TestCase
         $collection = new Collection(
             targetClasses: [
                 Permission::class => [
-                    [ [ 'Permission' => 'is_admin' ], DeleteMenu::class ],
+                    [ serialize([ 'Permission' => 'is_admin' ]), DeleteMenu::class ],
                 ]
             ],
             targetMethods: [
                 Route::class => [
-                    [ [ 'Method' => 'GET' ], ArticleController::class, 'list' ],
+                    [ serialize([ 'Method' => 'GET' ]), ArticleController::class, 'list' ],
                 ]
             ],
             targetProperties: [
                 Serial::class => [
-                    [ [ 'Primary' => true ], Article::class, 'id' ],
+                    [ serialize([ 'Primary' => true ]), Article::class, 'id' ],
                 ]
             ],
             targetParameters: [
@@ -101,9 +101,9 @@ final class CollectionTest extends TestCase
         $collection = new Collection(
             targetClasses: [
                 Route::class => [
-                    [ [ 'pattern' => '/articles' ], ArticleController::class ],
-                    [ [ 'pattern' => '/images' ], ImageController::class ],
-                    [ [ 'pattern' => '/files' ], FileController::class ],
+                    [ serialize([ 'pattern' => '/articles' ]), ArticleController::class ],
+                    [ serialize([ 'pattern' => '/images' ]), ImageController::class ],
+                    [ serialize([ 'pattern' => '/files' ]), FileController::class ],
                 ],
             ],
             targetMethods: [
@@ -131,13 +131,13 @@ final class CollectionTest extends TestCase
             ],
             targetMethods: [
                 Route::class => [
-                    [ [ 'pattern' => '/recent' ], ArticleController::class, 'recent' ],
+                    [ serialize([ 'pattern' => '/recent' ]), ArticleController::class, 'recent' ],
                 ],
                 Get::class => [
-                    [ [ ], ArticleController::class, 'show' ],
+                    [ serialize([ ]), ArticleController::class, 'show' ],
                 ],
                 Post::class => [
-                    [ [ ], ArticleController::class, 'create' ],
+                    [ serialize([ ]), ArticleController::class, 'create' ],
                 ],
             ],
             targetProperties: [
@@ -166,12 +166,12 @@ final class CollectionTest extends TestCase
             ],
             targetParameters: [
                 ParameterA::class => [
-                    [ [ 'a' ], ArticleController::class, 'myMethod', 'myParamA', ],
-                    [ [ 'a2' ], ArticleController::class, 'myMethod', 'myParamA2' ],
-                    [ [ 'a3' ], ArticleController::class, 'myFoo', 'fooParam' ],
+                    [ serialize([ 'a' ]), ArticleController::class, 'myMethod', 'myParamA', ],
+                    [ serialize([ 'a2' ]), ArticleController::class, 'myMethod', 'myParamA2' ],
+                    [ serialize([ 'a3' ]), ArticleController::class, 'myFoo', 'fooParam' ],
                 ],
                 ParameterB::class => [
-                    [ [ 'b', 'more data'], ArticleController::class, 'myMethod', 'myParamB' ],
+                    [ serialize([ 'b', 'more data']), ArticleController::class, 'myMethod', 'myParamB' ],
                 ],
             ]
         );
@@ -192,27 +192,27 @@ final class CollectionTest extends TestCase
             ],
             targetMethods: [
                 Route::class => [
-                    [ [ 'pattern' => '/recent' ], ArticleController::class, 'recent' ],
+                    [ serialize([ 'pattern' => '/recent' ]), ArticleController::class, 'recent' ],
                 ],
                 Get::class => [
-                    [ [ ], ArticleController::class, 'show' ],
+                    [ serialize([ ]), ArticleController::class, 'show' ],
                 ],
                 Post::class => [
-                    [ [ ], ArticleController::class, 'create' ],
+                    [ serialize([ ]), ArticleController::class, 'create' ],
                 ],
             ],
             targetProperties: [
                 Id::class => [
-                    [ [ ], Article::class, 'id' ],
+                    [ serialize([ ]), Article::class, 'id' ],
                 ],
                 Serial::class => [
-                    [ [ ], Article::class, 'id' ],
+                    [ serialize([ ]), Article::class, 'id' ],
                 ],
                 Varchar::class => [
-                    [ [ 'size' => 80 ], Article::class, 'title' ],
+                    [ serialize([ 'size' => 80 ]), Article::class, 'title' ],
                 ],
                 Text::class => [
-                    [ [ ], Article::class, 'body' ],
+                    [ serialize([ ]), Article::class, 'body' ],
                 ]
             ],
             targetParameters: [
@@ -236,30 +236,30 @@ final class CollectionTest extends TestCase
         $collection = new Collection(
             targetClasses: [
                 Index::class => [
-                    [ [ 'slug', 'unique' => true ], Article::class ],
+                    [ serialize([ 'slug', 'unique' => true ]), Article::class ],
                 ],
                 Route::class => [ // trap
-                    [ [ 'pattern' => '/articles' ], ArticleController::class ],
+                    [ serialize([ 'pattern' => '/articles' ]), ArticleController::class ],
                 ],
             ],
             targetMethods: [
                 Route::class => [ // trap
-                    [ [ 'pattern' => '/recent' ], ArticleController::class, 'recent' ],
+                    [ serialize([ 'pattern' => '/recent' ]), ArticleController::class, 'recent' ],
                 ],
             ],
             targetProperties: [
                 Id::class => [
-                    [ [ ], Article::class, 'id' ],
+                    [ serialize([ ]), Article::class, 'id' ],
                 ],
                 Serial::class => [
-                    [ [ ], Article::class, 'id' ],
+                    [ serialize([ ]), Article::class, 'id' ],
                 ],
                 Varchar::class => [
-                    [ [ 'size' => 80 ], Article::class, 'title' ],
-                    [ [ 'size' => 80 ], Article::class, 'slug' ],
+                    [ serialize([ 'size' => 80 ]), Article::class, 'title' ],
+                    [ serialize([ 'size' => 80 ]), Article::class, 'slug' ],
                 ],
                 Text::class => [
-                    [ [ ], Article::class, 'body' ],
+                    [ serialize([ ]), Article::class, 'body' ],
                 ]
             ],
             targetParameters: [
