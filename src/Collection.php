@@ -40,8 +40,8 @@ final class Collection
     public function findTargetClasses(string $attribute): array
     {
         return array_map(
-            fn(array $a) => new TargetClass(self::createClassAttribute($attribute, ...$a), $a[1]),
-            $this->targetClasses[$attribute] ?? []
+            fn(array $t) => self::createClassAttribute($attribute, ...$t),
+            $this->targetClasses[$attribute] ?? [],
         );
     }
 
@@ -49,19 +49,20 @@ final class Collection
      * @template T of object
      *
      * @param class-string<T> $attribute
-     * @param array<int|string, mixed> $arguments
+     * @param array<mixed> $arguments
      * @param class-string $class
      *
-     * @return T
+     * @return TargetClass<T>
      */
     private static function createClassAttribute(string $attribute, array $arguments, string $class): object
     {
         try {
-            return new $attribute(...$arguments);
+            $a = new $attribute(...$arguments);
+            return new TargetClass($a, $class);
         } catch (Throwable $e) {
             throw new RuntimeException(
                 "An error occurred while instantiating attribute $attribute on class $class",
-                previous: $e
+                previous: $e,
             );
         }
     }
@@ -76,8 +77,8 @@ final class Collection
     public function findTargetMethods(string $attribute): array
     {
         return array_map(
-            fn(array $a) => new TargetMethod(self::createMethodAttribute($attribute, ...$a), $a[1], $a[2]),
-            $this->targetMethods[$attribute] ?? []
+            fn(array $t) => self::createMethodAttribute($attribute, ...$t),
+            $this->targetMethods[$attribute] ?? [],
         );
     }
 
@@ -85,23 +86,25 @@ final class Collection
      * @template T of object
      *
      * @param class-string<T> $attribute
-     * @param array<int|string, mixed> $arguments
+     * @param array<mixed> $arguments
      * @param class-string $class
+     * @param non-empty-string $method
      *
-     * @return T
+     * @return TargetMethod<T>
      */
     private static function createMethodAttribute(
         string $attribute,
         array $arguments,
         string $class,
-        string $method
+        string $method,
     ): object {
         try {
-            return new $attribute(...$arguments);
+            $a = new $attribute(...$arguments);
+            return new TargetMethod($a, $class, $method);
         } catch (Throwable $e) {
             throw new RuntimeException(
                 "An error occurred while instantiating attribute $attribute on method $class::$method",
-                previous: $e
+                previous: $e,
             );
         }
     }
@@ -116,8 +119,8 @@ final class Collection
     public function findTargetProperties(string $attribute): array
     {
         return array_map(
-            fn(array $a) => new TargetProperty(self::createPropertyAttribute($attribute, ...$a), $a[1], $a[2]),
-            $this->targetProperties[$attribute] ?? []
+            fn(array $t) => self::createPropertyAttribute($attribute, ...$t),
+            $this->targetProperties[$attribute] ?? [],
         );
     }
 
@@ -125,23 +128,25 @@ final class Collection
      * @template T of object
      *
      * @param class-string<T> $attribute
-     * @param array<int|string, mixed> $arguments
+     * @param array<mixed> $arguments
      * @param class-string $class
+     * @param non-empty-string $property
      *
-     * @return T
+     * @return TargetProperty<T>
      */
     private static function createPropertyAttribute(
         string $attribute,
         array $arguments,
         string $class,
-        string $property
+        string $property,
     ): object {
         try {
-            return new $attribute(...$arguments);
+            $a = new $attribute(...$arguments);
+            return new TargetProperty($a, $class, $property);
         } catch (Throwable $e) {
             throw new RuntimeException(
                 "An error occurred while instantiating attribute $attribute on property $class::$property",
-                previous: $e
+                previous: $e,
             );
         }
     }
@@ -156,9 +161,9 @@ final class Collection
         $ar = [];
 
         foreach ($this->targetClasses as $attribute => $references) {
-            foreach ($references as [ $arguments, $class ]) {
+            foreach ($references as [$arguments, $class]) {
                 if ($predicate($attribute, $class)) {
-                    $ar[] = new TargetClass(self::createClassAttribute($attribute, $arguments, $class), $class);
+                    $ar[] = self::createClassAttribute($attribute, $arguments, $class);
                 }
             }
         }
@@ -176,14 +181,14 @@ final class Collection
         $ar = [];
 
         foreach ($this->targetMethods as $attribute => $references) {
-            foreach ($references as [ $arguments, $class, $method ]) {
+            foreach ($references as [$arguments, $class, $method]) {
                 if ($predicate($attribute, $class, $method)) {
-                    $ar[] = new TargetMethod(self::createMethodAttribute(
+                    $ar[] = self::createMethodAttribute(
                         $attribute,
                         $arguments,
                         $class,
-                        $method
-                    ), $class, $method);
+                        $method,
+                    );
                 }
             }
         }
@@ -201,14 +206,14 @@ final class Collection
         $ar = [];
 
         foreach ($this->targetProperties as $attribute => $references) {
-            foreach ($references as [ $arguments, $class, $property ]) {
+            foreach ($references as [$arguments, $class, $property]) {
                 if ($predicate($attribute, $class, $property)) {
-                    $ar[] = new TargetProperty(self::createPropertyAttribute(
+                    $ar[] = self::createPropertyAttribute(
                         $attribute,
                         $arguments,
                         $class,
-                        $property
-                    ), $class, $property);
+                        $property,
+                    );
                 }
             }
         }
