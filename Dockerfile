@@ -2,15 +2,11 @@ ARG PHP_TAG=8.0-cli-buster
 FROM php:${PHP_TAG}
 
 RUN <<-EOF
-	docker-php-ext-enable opcache
-
-	if [ "$PHP_VERSION" \< "8.4" ]; then
-		apt-get update
-		apt-get install -y autoconf pkg-config
-		pecl channel-update pecl.php.net
-		pecl install xdebug
-		docker-php-ext-enable xdebug
-	fi
+	apt-get update
+	apt-get install -y autoconf pkg-config
+	pecl channel-update pecl.php.net
+	pecl install xdebug
+	docker-php-ext-enable opcache xdebug
 EOF
 
 RUN <<-EOF
