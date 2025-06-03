@@ -14,11 +14,9 @@ use PhpParser\Parser;
  */
 class ParameterAttributeCollector
 {
-    private IOInterface $io;
-
-    public function __construct(IOInterface $io)
-    {
-        $this->io = $io;
+    public function __construct(
+        private IOInterface $io
+    ) {
     }
 
     /**
@@ -55,5 +53,4 @@ class ParameterAttributeCollector
 
         return $funcParameterAttributes;
     }
-
 }
