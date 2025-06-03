@@ -22,11 +22,15 @@ final class Collection
      * @param array<class-string, array<array{ mixed[], class-string, non-empty-string }>> $targetProperties
      *     Where _key_ is an attribute class and _value_ an array of arrays
      *     where 0 are the attribute arguments, 1 is a target class, and 2 is the target property.
+     * @param array<class-string, array<array{ mixed[], class-string, non-empty-string, non-empty-string }>> $targetMethodParameters
+     *     Where _key_ is an attribute class and _value_ an array of arrays
+     *     where 0 are the attribute arguments, 1 is a target class, 2 is the target method, and 3 is the target parameter.
      */
     public function __construct(
         private array $targetClasses,
         private array $targetMethods,
         private array $targetProperties,
+        private array $targetMethodParameters,
     ) {
     }
 
@@ -114,6 +118,46 @@ final class Collection
      *
      * @param class-string<T> $attribute
      *
+     * @return array<TargetMethodParameter<T>>
+     */
+    public function findTargetMethodParameters(string $attribute): array
+    {
+        return array_map(
+            fn(array $t) => self::createMethodParameterAttribute($attribute, ...$t),
+            $this->targetMethodParameters[$attribute] ?? [],
+        );
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $attribute
+     * @param array<mixed> $arguments
+     * @param class-string $class
+     * @param non-empty-string $method
+     * @param non-empty-string $parameter
+     *
+     * @return TargetMethodParameter<T>
+     */
+    private static function createMethodParameterAttribute(string $attribute, array $arguments, string $class, string $method, string $parameter): object
+    {
+        try {
+            $a = new $attribute(...$arguments);
+            return new TargetMethodParameter($a, $class, $method, $parameter);
+        } catch (Throwable $e) {
+            throw new RuntimeException(
+                "An error occurred while instantiating attribute $attribute on method $class::$method($parameter)",
+                0,
+                $e,
+            );
+        }
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $attribute
+     *
      * @return array<TargetProperty<T>>
      */
     public function findTargetProperties(string $attribute): array
@@ -188,6 +232,32 @@ final class Collection
                         $arguments,
                         $class,
                         $method,
+                    );
+                }
+            }
+        }
+
+        return $ar;
+    }
+
+    /**
+     * @param callable(class-string $attribute, class-string $class, non-empty-string $method, non-empty-string $parameter):bool $predicate
+     *
+     * @return array<TargetMethodParameter<object>>
+     */
+    public function filterTargetMethodParameters(callable $predicate): array
+    {
+        $ar = [];
+
+        foreach ($this->targetMethodParameters as $attribute => $references) {
+            foreach ($references as [$arguments, $class, $method, $parameter]) {
+                if ($predicate($attribute, $class, $method, $parameter)) {
+                    $ar[] = self::createMethodParameterAttribute(
+                        $attribute,
+                        $arguments,
+                        $class,
+                        $method,
+                        $parameter
                     );
                 }
             }
