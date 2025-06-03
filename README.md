@@ -59,6 +59,11 @@ foreach (Attributes::findTargetProperties(Column::class) as $target) {
     var_dump($target->attribute, $target->class, $target->name);
 }
 
+// Find the target method-parameters of the UserInput attribute.
+foreach (Attributes::findTargetMethodParameters(UserInput::class) as $target) {
+    var_dump($target->attribute, $target->class, $target->method, $target->name);
+}
+
 // Filter target methods using a predicate.
 // You can also filter target classes and properties.
 $predicate = fn($attribute) => is_a($attribute, Route::class, true);

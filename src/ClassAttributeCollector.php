@@ -9,12 +9,16 @@ use ReflectionException;
 
 /**
  * @internal
+ * @readonly
  */
 class ClassAttributeCollector
 {
+    private ParameterAttributeCollector $methodParameterCollector;
+
     public function __construct(
         private Logger $log,
     ) {
+        $this->methodParameterCollector = new ParameterAttributeCollector($this->log);
     }
 
     /**
@@ -24,6 +28,7 @@ class ClassAttributeCollector
      *     array<TransientTargetClass>,
      *     array<TransientTargetMethod>,
      *     array<TransientTargetProperty>,
+     *     array<array<TransientTargetMethodParameter>>,
      * }
      *
      * @throws ReflectionException
@@ -33,7 +38,7 @@ class ClassAttributeCollector
         $classReflection = new ReflectionClass($class);
 
         if (self::isAttribute($classReflection)) {
-            return [ [], [], [] ];
+            return [ [], [], [], [] ];
         }
 
         $classAttributes = [];
@@ -53,23 +58,15 @@ class ClassAttributeCollector
         }
 
         $methodAttributes = [];
+        $methodParameterAttributes = [];
 
         foreach ($classReflection->getMethods() as $methodReflection) {
-            foreach ($methodReflection->getAttributes() as $attribute) {
-                if (self::isAttributeIgnored($attribute)) {
-                    continue;
-                }
-
-                $method = $methodReflection->name;
-
-                $this->log->debug("Found attribute {$attribute->getName()} on $class::$method");
-
-                $methodAttributes[] = new TransientTargetMethod(
-                    $attribute->getName(),
-                    $attribute->getArguments(),
-                    $method,
-                );
-            }
+            $this->collectMethodAndParameterAttributes(
+                $class,
+                $methodReflection,
+                $methodAttributes,
+                $methodParameterAttributes,
+            );
         }
 
         $propertyAttributes = [];
@@ -93,7 +90,7 @@ class ClassAttributeCollector
             }
         }
 
-        return [ $classAttributes, $methodAttributes, $propertyAttributes ];
+        return [ $classAttributes, $methodAttributes, $propertyAttributes, $methodParameterAttributes ];
     }
 
     /**
@@ -122,5 +119,40 @@ class ClassAttributeCollector
         ];
 
         return isset($ignored[$attribute->getName()]); // @phpstan-ignore offsetAccess.nonOffsetAccessible
+    }
+
+    /**
+     * @param array<TransientTargetMethod> $methodAttributes
+     * @param array<array<TransientTargetMethodParameter>> $methodParameterAttributes
+     *
+     * @return void
+     */
+    private function collectMethodAndParameterAttributes(
+        string $class,
+        \ReflectionMethod $methodReflection,
+        array &$methodAttributes,
+        array &$methodParameterAttributes,
+    ): void {
+        foreach ($methodReflection->getAttributes() as $attribute) {
+            if (self::isAttributeIgnored($attribute)) {
+                continue;
+            }
+
+            $method = $methodReflection->name;
+
+            $this->log->debug("Found attribute {$attribute->getName()} on $class::$method");
+
+            $methodAttributes[] = new TransientTargetMethod(
+                $attribute->getName(),
+                $attribute->getArguments(),
+                $method,
+            );
+        }
+
+        $parameterAttributes = $this->methodParameterCollector->collectAttributes($methodReflection);
+
+        if (count($parameterAttributes)) {
+            $methodParameterAttributes[] = $parameterAttributes;
+        }
     }
 }
