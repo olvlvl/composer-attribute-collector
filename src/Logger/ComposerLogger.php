@@ -5,6 +5,10 @@ namespace olvlvl\ComposerAttributeCollector\Logger;
 use Composer\IO\IOInterface;
 use olvlvl\ComposerAttributeCollector\Logger;
 
+/**
+ * @internal
+ * @readonly
+ */
 final class ComposerLogger implements Logger
 {
     public function __construct(

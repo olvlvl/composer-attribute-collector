@@ -8,11 +8,11 @@ None
 
 ### New features
 
-- [#38](https://github.com/olvlvl/composer-attribute-collector/pull/38) Attributes are now collected from interfaces as well as classes.
+- [#38](https://github.com/olvlvl/composer-attribute-collector/pull/38) Attributes are now collected from interfaces as well as classes. (@olvlvl)
 
 - [#37](https://github.com/olvlvl/composer-attribute-collector/pull/37) Parameter attributes are now collected. Use the method `findTargetParameters()` to find target parameters, and the method `filterTargetParameters()` to filter target parameters according to a predicate. (@staabm @olvlvl)
 
-- [#39](https://github.com/olvlvl/composer-attribute-collector/pull/39) The `InheritsAttributes` attribute can be used on classes that inherit their attributes from traits, properties, or methods, and were previously ignored by the collection process.
+- [#39](https://github.com/olvlvl/composer-attribute-collector/pull/39) The `InheritsAttributes` attribute can be used on classes that inherit their attributes from traits, properties, or methods, and were previously ignored by the collection process. (@olvlvl)
 
     ```php
     trait UrlTrait
@@ -41,7 +41,9 @@ None
 
 ### Other Changes
 
-None
+[#35](https://github.com/olvlvl/composer-attribute-collector/pull/35) The collector runs as a
+command to avoid clashes between packages used by Composer and those used by the application, such
+as incompatible signatures between different versions of the PSR Logger. (@olvlvl)
 
 
 

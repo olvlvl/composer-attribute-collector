@@ -31,7 +31,8 @@
   },
   "require": {
     "php": ">=8.0",
-    "composer-plugin-api": "^2.0"
+    "composer-plugin-api": "^2.0",
+    "composer/class-map-generator": "^1.4"
   },
   "require-dev": {
     "composer/composer": ">=2.4",

@@ -2,6 +2,9 @@
 
 namespace olvlvl\ComposerAttributeCollector;
 
+/**
+ * @internal
+ */
 interface Logger
 {
     public function debug(string|\Stringable $message): void;
