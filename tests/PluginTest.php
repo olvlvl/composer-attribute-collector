@@ -23,7 +23,6 @@ use Acme\Attribute\Resource;
 use Acme\Attribute\Route;
 use Acme\Attribute\Subscribe;
 use Acme\PSR4\Presentation\ArticleController;
-use Composer\IO\NullIO;
 use olvlvl\ComposerAttributeCollector\Attributes;
 use olvlvl\ComposerAttributeCollector\Config;
 use olvlvl\ComposerAttributeCollector\Plugin;
@@ -79,7 +78,7 @@ final class PluginTest extends TestCase
 
         Plugin::dump(
             $config,
-            new NullIO(),
+            new FakeLogger(),
         );
 
         $this->assertFileExists($filepath);

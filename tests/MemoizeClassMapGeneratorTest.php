@@ -2,7 +2,6 @@
 
 namespace tests\olvlvl\ComposerAttributeCollector;
 
-use Composer\IO\NullIO;
 use olvlvl\ComposerAttributeCollector\Datastore\FileDatastore;
 use olvlvl\ComposerAttributeCollector\MemoizeClassMapGenerator;
 use PHPUnit\Framework\TestCase;
@@ -100,10 +99,10 @@ final class MemoizeClassMapGeneratorTest extends TestCase
      */
     private static function map(string $path): array
     {
-        $io = new NullIO();
+        $log = new FakeLogger();
         $generator = new MemoizeClassMapGenerator(
-            new FileDatastore(get_cache_dir(), $io),
-            $io,
+            new FileDatastore(get_cache_dir(), $log),
+            $log,
         );
 
         $generator->scanPaths($path);

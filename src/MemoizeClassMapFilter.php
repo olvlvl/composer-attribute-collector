@@ -3,7 +3,6 @@
 namespace olvlvl\ComposerAttributeCollector;
 
 use Closure;
-use Composer\IO\IOInterface;
 
 use function array_filter;
 use function filemtime;
@@ -26,7 +25,7 @@ class MemoizeClassMapFilter
 
     public function __construct(
         private Datastore $datastore,
-        private IOInterface $io,
+        private Logger $io,
     ) {
         /** @phpstan-ignore-next-line */
         $this->state = $this->datastore->get(self::KEY);

@@ -2,8 +2,8 @@
 
 namespace olvlvl\ComposerAttributeCollector\Datastore;
 
-use Composer\IO\IOInterface;
 use olvlvl\ComposerAttributeCollector\Datastore;
+use olvlvl\ComposerAttributeCollector\Logger;
 use olvlvl\ComposerAttributeCollector\Plugin;
 
 use function file_exists;
@@ -29,7 +29,7 @@ final class FileDatastore implements Datastore
      */
     public function __construct(
         private string $dir,
-        private IOInterface $io,
+        private Logger $log,
     ) {
         if (!is_dir($dir)) {
             mkdir($dir);
@@ -70,7 +70,7 @@ final class FileDatastore implements Datastore
         set_error_handler(function (int $errno, string $errstr) use (&$errored, $filename): bool {
             $errored = true;
 
-            $this->io->warning("Unable to unserialize cache item $filename: $errstr");
+            $this->log->warning("Unable to unserialize cache item $filename: $errstr");
 
             return true;
         });

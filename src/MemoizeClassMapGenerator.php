@@ -3,7 +3,6 @@
 namespace olvlvl\ComposerAttributeCollector;
 
 use Composer\ClassMapGenerator\ClassMapGenerator;
-use Composer\IO\IOInterface;
 use DirectoryIterator;
 use RuntimeException;
 
@@ -38,7 +37,7 @@ class MemoizeClassMapGenerator
 
     public function __construct(
         private Datastore $datastore,
-        private IOInterface $io,
+        private Logger $log,
     ) {
         /** @phpstan-ignore-next-line */
         $this->state = $this->datastore->get(self::KEY);
@@ -107,7 +106,7 @@ class MemoizeClassMapGenerator
 
         if ($timestamp < $mtime) {
             $diff = $mtime - $timestamp;
-            $this->io->debug("Refresh class map for path '$path' ($diff sec ago)");
+            $this->log->debug("Refresh class map for path '$path' ($diff sec ago)");
 
             return true;
         }

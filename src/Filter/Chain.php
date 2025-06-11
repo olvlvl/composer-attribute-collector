@@ -2,8 +2,8 @@
 
 namespace olvlvl\ComposerAttributeCollector\Filter;
 
-use Composer\IO\IOInterface;
 use olvlvl\ComposerAttributeCollector\Filter;
+use olvlvl\ComposerAttributeCollector\Logger;
 
 final class Chain implements Filter
 {
@@ -15,10 +15,10 @@ final class Chain implements Filter
     ) {
     }
 
-    public function filter(string $filepath, string $class, IOInterface $io): bool
+    public function filter(string $filepath, string $class, Logger $log): bool
     {
         foreach ($this->filters as $filter) {
-            if ($filter->filter($filepath, $class, $io) === false) {
+            if ($filter->filter($filepath, $class, $log) === false) {
                 return false;
             }
         }
