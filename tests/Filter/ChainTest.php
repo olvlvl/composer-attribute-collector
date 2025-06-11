@@ -9,17 +9,18 @@
 
 namespace tests\olvlvl\ComposerAttributeCollector\Filter;
 
-use Composer\IO\IOInterface;
 use olvlvl\ComposerAttributeCollector\Filter;
+use olvlvl\ComposerAttributeCollector\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use tests\olvlvl\ComposerAttributeCollector\FakeLogger;
 
 final class ChainTest extends TestCase
 {
     private const FILEPATH = "vendor/symfony/cache/Traits/RedisCluster5Proxy.php";
     private const CLASSNAME = "RedisCluster5Proxy";
 
-    private IOInterface|MockObject $io;
+    private Logger $log;
     private Filter|MockObject $ok;
     private Filter|MockObject $ko;
     private Filter|MockObject $no;
@@ -28,23 +29,23 @@ final class ChainTest extends TestCase
     {
         parent::setUp();
 
-        $this->io = $this->getMockBuilder(IOInterface::class)->getMock();
+        $this->log = new FakeLogger();
 
         $ok = $this->ok = $this->getMockBuilder(Filter::class)->getMock();
-        $ok->method('filter')->with(self::FILEPATH, self::CLASSNAME, $this->io)->willReturn(true);
+        $ok->method('filter')->with(self::FILEPATH, self::CLASSNAME, $this->log)->willReturn(true);
 
         $ko = $this->ko = $this->getMockBuilder(Filter::class)->getMock();
-        $ko->method('filter')->with(self::FILEPATH, self::CLASSNAME, $this->io)->willReturn(false);
+        $ko->method('filter')->with(self::FILEPATH, self::CLASSNAME, $this->log)->willReturn(false);
 
         $no = $this->no = $this->getMockBuilder(Filter::class)->getMock();
-        $no->expects($this->never())->method('filter')->with(self::FILEPATH, self::CLASSNAME, $this->io);
+        $no->expects($this->never())->method('filter')->with(self::FILEPATH, self::CLASSNAME, $this->log);
     }
 
     public function testFilter_OkIfNoFalse()
     {
         $chain = new Filter\Chain([ $this->ok, $this->ok ]);
 
-        $actual = $chain->filter(self::FILEPATH, self::CLASSNAME, $this->io);
+        $actual = $chain->filter(self::FILEPATH, self::CLASSNAME, $this->log);
 
         $this->assertTrue($actual);
     }
@@ -53,7 +54,7 @@ final class ChainTest extends TestCase
     {
         $chain = new Filter\Chain([ $this->ko ]);
 
-        $actual = $chain->filter(self::FILEPATH, self::CLASSNAME, $this->io);
+        $actual = $chain->filter(self::FILEPATH, self::CLASSNAME, $this->log);
 
         $this->assertFalse($actual);
     }
@@ -62,7 +63,7 @@ final class ChainTest extends TestCase
     {
         $chain = new Filter\Chain([ $this->ko, $this->no ]);
 
-        $actual = $chain->filter(self::FILEPATH, self::CLASSNAME, $this->io);
+        $actual = $chain->filter(self::FILEPATH, self::CLASSNAME, $this->log);
 
         $this->assertFalse($actual);
     }
@@ -71,7 +72,7 @@ final class ChainTest extends TestCase
     {
         $chain = new Filter\Chain([ $this->ok, $this->ko, $this->no ]);
 
-        $actual = $chain->filter(self::FILEPATH, self::CLASSNAME, $this->io);
+        $actual = $chain->filter(self::FILEPATH, self::CLASSNAME, $this->log);
 
         $this->assertFalse($actual);
     }

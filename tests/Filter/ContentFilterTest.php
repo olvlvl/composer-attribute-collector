@@ -9,37 +9,37 @@
 
 namespace tests\olvlvl\ComposerAttributeCollector\Filter;
 
-use Composer\IO\IOInterface;
 use olvlvl\ComposerAttributeCollector\Filter\ContentFilter;
+use olvlvl\ComposerAttributeCollector\Logger;
 use PHPUnit\Framework\MockObject\MockObject as MockObjectAlias;
 use PHPUnit\Framework\TestCase;
 
 final class ContentFilterTest extends TestCase
 {
     private ContentFilter $sut;
-    private MockObjectAlias|IOInterface $io;
+    private MockObjectAlias|Logger $log;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->sut = new ContentFilter();
-        $this->io = $this->getMockBuilder(IOInterface::class)->getMock();
+        $this->log = $this->getMockBuilder(Logger::class)->getMock();
     }
 
     /**
      * @dataProvider provideAttribute
      */
-    public function testAttribute(string $case)
+    public function testAttribute(string $case): void
     {
-        $this->io->expects($this->once())
+        $this->log->expects($this->once())
             ->method('debug')
             ->with("Discarding '$case' because it looks like an attribute");
 
         $actual = $this->sut->filter(
             __DIR__ . "/ContentFilterCases/$case.php",
             $case,
-            $this->io
+            $this->log
         );
 
         $this->assertFalse($actual);
@@ -60,16 +60,16 @@ final class ContentFilterTest extends TestCase
     /**
      * @@dataProvider provideClass
      */
-    public function testClass(string $case, bool $expected)
+    public function testClass(string $case, bool $expected): void
     {
-        $this->io->expects($this->never())
+        $this->log->expects($this->never())
             ->method('debug')
             ->with($this->anything());
 
         $actual = $this->sut->filter(
             __DIR__ . "/ContentFilterCases/$case.php",
             $case,
-            $this->io
+            $this->log
         );
 
         $this->assertEquals($expected, $actual);

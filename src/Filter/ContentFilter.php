@@ -2,8 +2,8 @@
 
 namespace olvlvl\ComposerAttributeCollector\Filter;
 
-use Composer\IO\IOInterface;
 use olvlvl\ComposerAttributeCollector\Filter;
+use olvlvl\ComposerAttributeCollector\Logger;
 
 use function assert;
 use function file_get_contents;
@@ -13,7 +13,7 @@ use function str_contains;
 
 final class ContentFilter implements Filter
 {
-    public function filter(string $filepath, string $class, IOInterface $io): bool
+    public function filter(string $filepath, string $class, Logger $log): bool
     {
         $content = file_get_contents($filepath);
 
@@ -26,7 +26,7 @@ final class ContentFilter implements Filter
 
         // Hint of an attribute class.
         if (preg_match('/#\[\\\?Attribute[\]\(]/', $content)) {
-            $io->debug("Discarding '$class' because it looks like an attribute");
+            $log->debug("Discarding '$class' because it looks like an attribute");
             return false;
         }
 

@@ -3,7 +3,6 @@
 namespace olvlvl\ComposerAttributeCollector;
 
 use Attribute;
-use Composer\IO\IOInterface;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
@@ -14,7 +13,7 @@ use ReflectionException;
 class ClassAttributeCollector
 {
     public function __construct(
-        private IOInterface $io,
+        private Logger $log,
     ) {
     }
 
@@ -45,7 +44,7 @@ class ClassAttributeCollector
                 continue;
             }
 
-            $this->io->debug("Found attribute {$attribute->getName()} on $class");
+            $this->log->debug("Found attribute {$attribute->getName()} on $class");
 
             $classAttributes[] = new TransientTargetClass(
                 $attribute->getName(),
@@ -63,7 +62,7 @@ class ClassAttributeCollector
 
                 $method = $methodReflection->name;
 
-                $this->io->debug("Found attribute {$attribute->getName()} on $class::$method");
+                $this->log->debug("Found attribute {$attribute->getName()} on $class::$method");
 
                 $methodAttributes[] = new TransientTargetMethod(
                     $attribute->getName(),
@@ -84,7 +83,7 @@ class ClassAttributeCollector
                 $property = $propertyReflection->name;
                 assert($property !== '');
 
-                $this->io->debug("Found attribute {$attribute->getName()} on $class::$property");
+                $this->log->debug("Found attribute {$attribute->getName()} on $class::$property");
 
                 $propertyAttributes[] = new TransientTargetProperty(
                     $attribute->getName(),

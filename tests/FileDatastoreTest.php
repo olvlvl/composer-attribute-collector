@@ -2,8 +2,8 @@
 
 namespace tests\olvlvl\ComposerAttributeCollector;
 
-use Composer\IO\IOInterface;
 use olvlvl\ComposerAttributeCollector\Datastore\FileDatastore;
+use olvlvl\ComposerAttributeCollector\Logger;
 use olvlvl\ComposerAttributeCollector\Plugin;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -16,15 +16,15 @@ final class FileDatastoreTest extends TestCase
     private const KEY = 'file-datastore';
 
     /**
-     * @var MockObject&IOInterface
+     * @var MockObject&Logger
      */
-    private MockObject|IOInterface $io;
+    private MockObject|Logger $log;
     private FileDatastore $sut;
 
     protected function setUp(): void
     {
-        $this->io = $this->createMock(IOInterface::class);
-        $this->sut = new FileDatastore(self::DIR, $this->io);
+        $this->log = $this->createMock(Logger::class);
+        $this->sut = new FileDatastore(self::DIR, $this->log);
 
         parent::setUp();
     }
@@ -33,7 +33,7 @@ final class FileDatastoreTest extends TestCase
     {
         $str = 'a:3:{i:0;i:2;i:1;i:3;i:2;i:5;}';
         $expected = [ 2, 3, 5 ];
-        $this->io
+        $this->log
             ->expects($this->never())
             ->method('warning')
             ->withAnyParameters();
@@ -49,7 +49,7 @@ final class FileDatastoreTest extends TestCase
     {
         $str = 'a:1:{i:0;E:12:"Priority:TOP";}';
         $expected = [];
-        $this->io
+        $this->log
             ->expects($this->atLeastOnce()) // PHP 8.2 also complains that the class 'Priority' is not found
             ->method('warning')
             ->with($this->stringStartsWith("Unable to unserialize cache item"));
@@ -67,7 +67,7 @@ final class FileDatastoreTest extends TestCase
 
         $str = 'a:1:{i:0;O:8:"Priority":1:{s:8:"priority";i:1;}}';
         $expected = [];
-        $this->io
+        $this->log
             ->expects($this->atLeastOnce())
             ->method('warning')
             ->with($this->stringStartsWith("Unable to unserialize cache item"));

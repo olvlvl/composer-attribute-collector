@@ -12,6 +12,7 @@ use olvlvl\ComposerAttributeCollector\Datastore\FileDatastore;
 use olvlvl\ComposerAttributeCollector\Datastore\RuntimeDatastore;
 use olvlvl\ComposerAttributeCollector\Filter\ContentFilter;
 use olvlvl\ComposerAttributeCollector\Filter\InterfaceFilter;
+use olvlvl\ComposerAttributeCollector\Logger\ComposerLogger;
 
 use function file_exists;
 use function file_put_contents;
@@ -88,47 +89,48 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
 
         $start = microtime(true);
         $io->write('<info>Generating attributes file</info>');
-        self::dump($config, $io);
+        $logger = new ComposerLogger($io);
+        self::dump($config, $logger);
         $elapsed = self::renderElapsedTime($start);
         $io->write("<info>Generated attributes file in $elapsed</info>");
     }
 
-    public static function dump(Config $config, IOInterface $io): void
+    public static function dump(Config $config, Logger $log): void
     {
         //
         // Scan the included paths
         //
         $start = microtime(true);
-        $datastore = self::buildDefaultDatastore($config, $io);
-        $classMapGenerator = new MemoizeClassMapGenerator($datastore, $io);
+        $datastore = self::buildDefaultDatastore($config, $log);
+        $classMapGenerator = new MemoizeClassMapGenerator($datastore, $log);
         foreach ($config->include as $include) {
             $classMapGenerator->scanPaths($include, $config->excludeRegExp);
         }
         $classMap = $classMapGenerator->getMap();
         $elapsed = self::renderElapsedTime($start);
-        $io->debug("Generating attributes file: scanned paths in $elapsed");
+        $log->debug("Generating attributes file: scanned paths in $elapsed");
 
         //
         // Filter the class map
         //
         $start = microtime(true);
-        $classMapFilter = new MemoizeClassMapFilter($datastore, $io);
+        $classMapFilter = new MemoizeClassMapFilter($datastore, $log);
         $filter = self::buildFileFilter();
         $classMap = $classMapFilter->filter(
             $classMap,
-            fn (string $class, string $filepath): bool => $filter->filter($filepath, $class, $io)
+            fn (string $class, string $filepath): bool => $filter->filter($filepath, $class, $log)
         );
         $elapsed = self::renderElapsedTime($start);
-        $io->debug("Generating attributes file: filtered class map in $elapsed");
+        $log->debug("Generating attributes file: filtered class map in $elapsed");
 
         //
         // Collect attributes
         //
         $start = microtime(true);
-        $attributeCollector = new MemoizeAttributeCollector(new ClassAttributeCollector($io), $datastore, $io);
+        $attributeCollector = new MemoizeAttributeCollector(new ClassAttributeCollector($log), $datastore, $log);
         $collection = $attributeCollector->collectAttributes($classMap);
         $elapsed = self::renderElapsedTime($start);
-        $io->debug("Generating attributes file: collected attributes in $elapsed");
+        $log->debug("Generating attributes file: collected attributes in $elapsed");
 
         //
         // Render attributes
@@ -137,10 +139,10 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         $code = self::render($collection);
         file_put_contents($config->attributesFile, $code);
         $elapsed = self::renderElapsedTime($start);
-        $io->debug("Generating attributes file: rendered code in $elapsed");
+        $log->debug("Generating attributes file: rendered code in $elapsed");
     }
 
-    private static function buildDefaultDatastore(Config $config, IOInterface $io): Datastore
+    private static function buildDefaultDatastore(Config $config, Logger $log): Datastore
     {
         if (!$config->useCache) {
             return new RuntimeDatastore();
@@ -150,7 +152,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
 
         assert($basePath !== '');
 
-        return new FileDatastore($basePath . DIRECTORY_SEPARATOR . self::CACHE_DIR, $io);
+        return new FileDatastore($basePath . DIRECTORY_SEPARATOR . self::CACHE_DIR, $log);
     }
 
     private static function renderElapsedTime(float $start): string

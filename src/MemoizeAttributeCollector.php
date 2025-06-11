@@ -2,7 +2,6 @@
 
 namespace olvlvl\ComposerAttributeCollector;
 
-use Composer\IO\IOInterface;
 use Throwable;
 
 use function array_filter;
@@ -35,7 +34,7 @@ class MemoizeAttributeCollector
     public function __construct(
         private ClassAttributeCollector $classAttributeCollector,
         private Datastore $datastore,
-        private IOInterface $io,
+        private Logger $log,
     ) {
         /** @phpstan-ignore-next-line */
         $this->state = $this->datastore->get(self::KEY);
@@ -66,9 +65,9 @@ class MemoizeAttributeCollector
             if ($timestamp < $mtime) {
                 if ($timestamp) {
                     $diff = $mtime - $timestamp;
-                    $this->io->debug("Refresh attributes of class '$class' in '$filepath' ($diff sec ago)");
+                    $this->log->debug("Refresh attributes of class '$class' in '$filepath' ($diff sec ago)");
                 } else {
-                    $this->io->debug("Collect attributes of class '$class' in '$filepath'");
+                    $this->log->debug("Collect attributes of class '$class' in '$filepath'");
                 }
 
                 try {
@@ -78,7 +77,7 @@ class MemoizeAttributeCollector
                         $propertyAttributes,
                     ] = $classAttributeCollector->collectAttributes($class);
                 } catch (Throwable $e) {
-                    $this->io->error(
+                    $this->log->error(
                         "Attribute collection failed for $class: {$e->getMessage()}",
                     );
                 }

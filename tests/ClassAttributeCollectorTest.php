@@ -8,7 +8,6 @@ use Acme\PSR4\CreateMenuHandler;
 use Acme\PSR4\Presentation\ArticleController;
 use Acme\PSR4\SubscriberA;
 use Attribute;
-use Composer\IO\NullIO;
 use olvlvl\ComposerAttributeCollector\ClassAttributeCollector;
 use olvlvl\ComposerAttributeCollector\TransientTargetClass;
 use olvlvl\ComposerAttributeCollector\TransientTargetMethod;
@@ -24,7 +23,7 @@ final class ClassAttributeCollectorTest extends TestCase
     {
         parent::setUp();
 
-        $this->sut = new ClassAttributeCollector(new NullIO());
+        $this->sut = new ClassAttributeCollector(new FakeLogger());
     }
 
     /**
