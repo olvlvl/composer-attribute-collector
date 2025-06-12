@@ -131,7 +131,8 @@ class ClassAttributeCollector
         string $class,
         \ReflectionMethod $methodReflection,
         array &$methodAttributes,
-        array &$methodParameterAttributes,
+        array &$methodParameterAttributes
+    ,
     ): void {
         foreach ($methodReflection->getAttributes() as $attribute) {
             if (self::isAttributeIgnored($attribute)) {

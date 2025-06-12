@@ -7,10 +7,8 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PARAMETER)]
 class ParameterA
 {
-    public string $label;
     public function __construct(
-        string $label = ''
+        public string $label = ''
     ) {
-        $this->label = $label;
     }
 }
