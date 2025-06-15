@@ -59,15 +59,15 @@ final class TransientCollectionRenderer
             foreach ($targets as $t) {
                 $a = [ $t->arguments, $class ];
 
+                if ($t instanceof TransientTargetMethodParameter) {
+                    $a[] = $t->method;
+                }
+
                 if ($t instanceof TransientTargetMethod
                     || $t instanceof TransientTargetProperty
                     || $t instanceof TransientTargetMethodParameter
                 ) {
                     $a[] = $t->name;
-                }
-
-                if ($t instanceof TransientTargetMethodParameter) {
-                    $a[] = $t->method;
                 }
 
                 $by[$t->attribute][] = $a;
