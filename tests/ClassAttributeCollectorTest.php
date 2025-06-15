@@ -11,7 +11,7 @@ use Attribute;
 use olvlvl\ComposerAttributeCollector\ClassAttributeCollector;
 use olvlvl\ComposerAttributeCollector\TransientTargetClass;
 use olvlvl\ComposerAttributeCollector\TransientTargetMethod;
-use olvlvl\ComposerAttributeCollector\TransientTargetMethodParameter;
+use olvlvl\ComposerAttributeCollector\TransientTargetParameter;
 use olvlvl\ComposerAttributeCollector\TransientTargetProperty;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
@@ -107,19 +107,19 @@ final class ClassAttributeCollectorTest extends TestCase
                     ],
                     [],
                     [
-                        new TransientTargetMethodParameter(
+                        new TransientTargetParameter(
                             'Acme81\Attribute\ParameterA',
                             ["my parameter label"],
                             'aMethod',
                             'myParameter'
                         ),
-                        new TransientTargetMethodParameter(
+                        new TransientTargetParameter(
                             'Acme81\Attribute\ParameterB',
                             ["my 2nd parameter label", "some more data"],
                             'aMethod',
                             'anotherParameter'
                         ),
-                        new TransientTargetMethodParameter(
+                        new TransientTargetParameter(
                             'Acme81\Attribute\ParameterA',
                             ["my yet another parameter label"],
                             'aMethod',

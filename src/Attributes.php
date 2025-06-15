@@ -66,11 +66,11 @@ final class Attributes
      *
      * @param class-string<T> $attribute
      *
-     * @return TargetMethodParameter<T>[]
+     * @return TargetParameter<T>[]
      */
-    public static function findTargetMethodParameters(string $attribute): array
+    public static function findTargetParameters(string $attribute): array
     {
-        return self::getCollection()->findTargetMethodParameters($attribute);
+        return self::getCollection()->findTargetParameters($attribute);
     }
 
     /**
@@ -106,11 +106,11 @@ final class Attributes
     /**
      * @param callable(class-string $attribute, class-string $class, string $property, string $method):bool $predicate
      *
-     * @return array<TargetMethodParameter<object>>
+     * @return array<TargetParameter<object>>
      */
-    public static function filterTargetMethodParameters(callable $predicate): array
+    public static function filterTargetParameters(callable $predicate): array
     {
-        return self::getCollection()->filterTargetMethodParameters($predicate);
+        return self::getCollection()->filterTargetParameters($predicate);
     }
 
     /**

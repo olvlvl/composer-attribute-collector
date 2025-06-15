@@ -22,7 +22,7 @@ final class Collection
      * @param array<class-string, array<array{ mixed[], class-string, non-empty-string }>> $targetProperties
      *     Where _key_ is an attribute class and _value_ an array of arrays
      *     where 0 are the attribute arguments, 1 is a target class, and 2 is the target property.
-     * @param array<class-string, array<array{ mixed[], class-string, non-empty-string, non-empty-string }>> $targetMethodParameters
+     * @param array<class-string, array<array{ mixed[], class-string, non-empty-string, non-empty-string }>> $targetParameters
      *     Where _key_ is an attribute class and _value_ an array of arrays where 0 are the
      *     attribute arguments, 1 is a target class, 2 is the target method, and 3 is the target parameter.
      */
@@ -30,7 +30,7 @@ final class Collection
         private array $targetClasses,
         private array $targetMethods,
         private array $targetProperties,
-        private array $targetMethodParameters,
+        private array $targetParameters,
     ) {
     }
 
@@ -118,13 +118,13 @@ final class Collection
      *
      * @param class-string<T> $attribute
      *
-     * @return array<TargetMethodParameter<T>>
+     * @return array<TargetParameter<T>>
      */
-    public function findTargetMethodParameters(string $attribute): array
+    public function findTargetParameters(string $attribute): array
     {
         return array_map(
-            fn(array $t) => self::createMethodParameterAttribute($attribute, ...$t),
-            $this->targetMethodParameters[$attribute] ?? [],
+            fn(array $t) => self::createParameterAttribute($attribute, ...$t),
+            $this->targetParameters[$attribute] ?? [],
         );
     }
 
@@ -137,9 +137,9 @@ final class Collection
      * @param non-empty-string $method
      * @param non-empty-string $parameter
      *
-     * @return TargetMethodParameter<T>
+     * @return TargetParameter<T>
      */
-    private static function createMethodParameterAttribute(
+    private static function createParameterAttribute(
         string $attribute,
         array $arguments,
         string $class,
@@ -148,7 +148,7 @@ final class Collection
     ): object {
         try {
             $a = new $attribute(...$arguments);
-            return new TargetMethodParameter($a, $class, $method, $parameter);
+            return new TargetParameter($a, $class, $method, $parameter);
         } catch (Throwable $e) {
             throw new RuntimeException(
                 "An error occurred while instantiating attribute $attribute on parameter $class::$method($parameter)",
@@ -247,16 +247,16 @@ final class Collection
     /**
      * @param callable(class-string $attribute, class-string $class, non-empty-string $method, non-empty-string $parameter):bool $predicate
      *
-     * @return array<TargetMethodParameter<object>>
+     * @return array<TargetParameter<object>>
      */
-    public function filterTargetMethodParameters(callable $predicate): array
+    public function filterTargetParameters(callable $predicate): array
     {
         $ar = [];
 
-        foreach ($this->targetMethodParameters as $attribute => $references) {
+        foreach ($this->targetParameters as $attribute => $references) {
             foreach ($references as [$arguments, $class, $method, $parameter]) {
                 if ($predicate($attribute, $class, $method, $parameter)) {
-                    $ar[] = self::createMethodParameterAttribute(
+                    $ar[] = self::createParameterAttribute(
                         $attribute,
                         $arguments,
                         $class,

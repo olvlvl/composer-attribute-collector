@@ -7,7 +7,7 @@ namespace olvlvl\ComposerAttributeCollector;
  *
  * @template T of object
  */
-final class TargetMethodParameter
+final class TargetParameter
 {
     /**
      * @param T $attribute

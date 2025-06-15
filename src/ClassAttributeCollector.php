@@ -13,12 +13,12 @@ use ReflectionException;
  */
 class ClassAttributeCollector
 {
-    private ParameterAttributeCollector $methodParameterCollector;
+    private ParameterAttributeCollector $parameterAttributeCollector;
 
     public function __construct(
         private Logger $log,
     ) {
-        $this->methodParameterCollector = new ParameterAttributeCollector($this->log);
+        $this->parameterAttributeCollector = new ParameterAttributeCollector($this->log);
     }
 
     /**
@@ -28,7 +28,7 @@ class ClassAttributeCollector
      *     array<TransientTargetClass>,
      *     array<TransientTargetMethod>,
      *     array<TransientTargetProperty>,
-     *     array<TransientTargetMethodParameter>,
+     *     array<TransientTargetParameter>,
      * }
      *
      * @throws ReflectionException
@@ -59,15 +59,15 @@ class ClassAttributeCollector
 
         /** @var array<TransientTargetMethod> $methodAttributes */
         $methodAttributes = [];
-        /** @var array<TransientTargetMethodParameter> $methodParameterAttributes */
-        $methodParameterAttributes = [];
+        /** @var array<TransientTargetParameter> $parameterAttributes */
+        $parameterAttributes = [];
 
         foreach ($classReflection->getMethods() as $methodReflection) {
             $this->collectMethodAndParameterAttributes(
                 $class,
                 $methodReflection,
                 $methodAttributes,
-                $methodParameterAttributes,
+                $parameterAttributes,
             );
         }
 
@@ -92,7 +92,7 @@ class ClassAttributeCollector
             }
         }
 
-        return [ $classAttributes, $methodAttributes, $propertyAttributes, $methodParameterAttributes ];
+        return [ $classAttributes, $methodAttributes, $propertyAttributes, $parameterAttributes ];
     }
 
     /**
@@ -125,7 +125,7 @@ class ClassAttributeCollector
 
     /**
      * @param array<TransientTargetMethod> $methodAttributes
-     * @param array<TransientTargetMethodParameter> $methodParameterAttributes
+     * @param array<TransientTargetParameter> $parameterAttributes
      *
      * @return void
      */
@@ -133,8 +133,7 @@ class ClassAttributeCollector
         string $class,
         \ReflectionMethod $methodReflection,
         array &$methodAttributes,
-        array &$methodParameterAttributes
-    ,
+        array &$parameterAttributes,
     ): void {
         foreach ($methodReflection->getAttributes() as $attribute) {
             if (self::isAttributeIgnored($attribute)) {
@@ -152,10 +151,9 @@ class ClassAttributeCollector
             );
         }
 
-        $parameterAttributes = $this->methodParameterCollector->collectAttributes($methodReflection);
-
-        if (count($parameterAttributes)) {
-            $methodParameterAttributes = array_merge($methodParameterAttributes, $parameterAttributes);
-        }
+        $parameterAttributes = array_merge(
+            $parameterAttributes,
+            $this->parameterAttributeCollector->collectAttributes($methodReflection),
+        );
     }
 }

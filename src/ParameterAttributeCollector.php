@@ -14,9 +14,9 @@ class ParameterAttributeCollector
     }
 
     /**
-     * @return array<TransientTargetMethodParameter>
+     * @return array<TransientTargetParameter>
      */
-    public function collectAttributes(\ReflectionFunctionAbstract $reflectionFunctionAbstract): array // TODO: change to
+    public function collectAttributes(\ReflectionFunctionAbstract $reflectionFunctionAbstract): array
     {
         $targets = [];
 
@@ -36,7 +36,7 @@ class ParameterAttributeCollector
             foreach ($parameter->getAttributes() as $attribute) {
                 $this->log->debug("Found attribute {$attribute->getName()} on $paramLabel");
 
-                $targets[] = new TransientTargetMethodParameter(
+                $targets[] = new TransientTargetParameter(
                     $attribute->getName(),
                     $attribute->getArguments(),
                     $functionName,

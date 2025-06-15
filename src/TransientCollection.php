@@ -20,9 +20,9 @@ final class TransientCollection
     public array $methods = [];
 
     /**
-     * @var array<class-string, iterable<TransientTargetMethodParameter>>
+     * @var array<class-string, iterable<TransientTargetParameter>>
      */
-    public array $methodParameters = [];
+    public array $parameters = [];
 
     /**
      * @var array<class-string, iterable<TransientTargetProperty>>
@@ -52,12 +52,12 @@ final class TransientCollection
 
     /**
      * @param class-string $class
-     * @param iterable<TransientTargetMethodParameter> $targets
+     * @param iterable<TransientTargetParameter> $targets
      *     The target class.
      */
-    public function addMethodParameterAttributes(string $class, iterable $targets): void
+    public function addParameterAttributes(string $class, iterable $targets): void
     {
-        $this->methodParameters[$class] = $targets;
+        $this->parameters[$class] = $targets;
     }
 
     /**

@@ -31,7 +31,7 @@ use olvlvl\ComposerAttributeCollector\Config;
 use olvlvl\ComposerAttributeCollector\Plugin;
 use olvlvl\ComposerAttributeCollector\TargetClass;
 use olvlvl\ComposerAttributeCollector\TargetMethod;
-use olvlvl\ComposerAttributeCollector\TargetMethodParameter;
+use olvlvl\ComposerAttributeCollector\TargetParameter;
 use olvlvl\ComposerAttributeCollector\TargetProperty;
 use PhpParser\Node\Param;
 use PHPUnit\Framework\TestCase;
@@ -203,22 +203,22 @@ final class PluginTest extends TestCase
     }
 
     /**
-     * @dataProvider provideTargetMethodParameters
+     * @dataProvider provideTargetParameters
      *
      * @param class-string $attribute
      * @param array<array{ object, callable-string }> $expected
      */
-    public function testTargetMethodParameters(string $attribute, array $expected): void
+    public function testTargetParameters(string $attribute, array $expected): void
     {
-        $actual = Attributes::findTargetMethodParameters($attribute);
+        $actual = Attributes::findTargetParameters($attribute);
 
-        $this->assertEquals($expected, $this->collectMethodParameters($actual));
+        $this->assertEquals($expected, $this->collectParameters($actual));
     }
 
     /**
      * @return array<array{ class-string, array<array{ object, callable-string }> }>
      */
-    public static function provideTargetMethodParameters(): array
+    public static function provideTargetParameters(): array
     {
         return [
 
@@ -356,16 +356,16 @@ final class PluginTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testFilterTargetMethodParameters(): void
+    public function testFilterTargetParameters(): void
     {
-        $actual = Attributes::filterTargetMethodParameters(
+        $actual = Attributes::filterTargetParameters(
             Attributes::predicateForAttributeInstanceOf(ParameterA::class)
         );
 
         $this->assertEquals([
             [ new ParameterA("my parameter label"), 'Acme\PSR4\Presentation\ArticleController::aMethod(myParameter)' ],
             [ new ParameterA('my yet another parameter label'), 'Acme\PSR4\Presentation\ArticleController::aMethod(yetAnotherParameter)' ],
-        ], $this->collectMethodParameters($actual));
+        ], $this->collectParameters($actual));
     }
 
     public function testFilterTargetProperties(): void
@@ -442,11 +442,11 @@ final class PluginTest extends TestCase
     /**
      * @template T of object
      *
-     * @param TargetMethodParameter<T>[] $targets
+     * @param TargetParameter<T>[] $targets
      *
      * @return array<array{T, string}>
      */
-    private function collectMethodParameters(array $targets): array
+    private function collectParameters(array $targets): array
     {
         $parameters = [];
 

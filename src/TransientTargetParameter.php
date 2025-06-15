@@ -6,7 +6,7 @@ namespace olvlvl\ComposerAttributeCollector;
  * @readonly
  * @internal
  */
-final class TransientTargetMethodParameter
+final class TransientTargetParameter
 {
     /**
      * @param class-string $attribute The attribute class.

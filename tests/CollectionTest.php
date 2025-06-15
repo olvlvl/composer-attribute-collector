@@ -24,7 +24,7 @@ use olvlvl\ComposerAttributeCollector\Attributes;
 use olvlvl\ComposerAttributeCollector\Collection;
 use olvlvl\ComposerAttributeCollector\TargetClass;
 use olvlvl\ComposerAttributeCollector\TargetMethod;
-use olvlvl\ComposerAttributeCollector\TargetMethodParameter;
+use olvlvl\ComposerAttributeCollector\TargetParameter;
 use olvlvl\ComposerAttributeCollector\TargetProperty;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -56,7 +56,7 @@ final class CollectionTest extends TestCase
                     [ [ 'Primary' => true ], Article::class, 'id' ],
                 ]
             ],
-            targetMethodParameters: [
+            targetParameters: [
             ]
         );
 
@@ -110,7 +110,7 @@ final class CollectionTest extends TestCase
             ],
             targetProperties: [
             ],
-            targetMethodParameters: [
+            targetParameters: [
             ]
         );
 
@@ -142,7 +142,7 @@ final class CollectionTest extends TestCase
             ],
             targetProperties: [
             ],
-            targetMethodParameters: [
+            targetParameters: [
             ]
         );
 
@@ -155,7 +155,7 @@ final class CollectionTest extends TestCase
         ], $actual);
     }
 
-    public function testFilterTargetMethodParameters(): void
+    public function testFilterTargetParameters(): void
     {
         $collection = new Collection(
             targetClasses: [
@@ -164,7 +164,7 @@ final class CollectionTest extends TestCase
             ],
             targetProperties: [
             ],
-            targetMethodParameters: [
+            targetParameters: [
                 ParameterA::class => [
                     [ [ 'a' ], ArticleController::class, 'myMethod', 'myParamA', ],
                     [ [ 'a2' ], ArticleController::class, 'myMethod', 'myParamA2' ],
@@ -176,12 +176,12 @@ final class CollectionTest extends TestCase
             ]
         );
 
-        $actual = $collection->filterTargetMethodParameters(fn($a) => is_a($a, ParameterA::class, true));
+        $actual = $collection->filterTargetParameters(fn($a) => is_a($a, ParameterA::class, true));
 
         $this->assertEquals([
-            new TargetMethodParameter(new ParameterA('a'), ArticleController::class, 'myMethod', 'myParamA'),
-            new TargetMethodParameter(new ParameterA('a2'), ArticleController::class, 'myMethod', 'myParamA2'),
-            new TargetMethodParameter(new ParameterA('a3'), ArticleController::class, 'myFoo', 'fooParam'),
+            new TargetParameter(new ParameterA('a'), ArticleController::class, 'myMethod', 'myParamA'),
+            new TargetParameter(new ParameterA('a2'), ArticleController::class, 'myMethod', 'myParamA2'),
+            new TargetParameter(new ParameterA('a3'), ArticleController::class, 'myFoo', 'fooParam'),
         ], $actual);
     }
 
@@ -215,7 +215,7 @@ final class CollectionTest extends TestCase
                     [ [ ], Article::class, 'body' ],
                 ]
             ],
-            targetMethodParameters: [
+            targetParameters: [
             ]
         );
 
@@ -262,7 +262,7 @@ final class CollectionTest extends TestCase
                     [ [ ], Article::class, 'body' ],
                 ]
             ],
-            targetMethodParameters: [
+            targetParameters: [
             ]
         );
 

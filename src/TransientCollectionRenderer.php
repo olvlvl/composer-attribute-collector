@@ -16,7 +16,7 @@ final class TransientCollectionRenderer
         $targetClassesCode = self::targetsToCode($collector->classes);
         $targetMethodsCode = self::targetsToCode($collector->methods);
         $targetPropertiesCode = self::targetsToCode($collector->properties);
-        $targetMethodParametersCode = self::targetsToCode($collector->methodParameters);
+        $targetParametersCode = self::targetsToCode($collector->parameters);
 
         return <<<PHP
         <?php
@@ -27,14 +27,15 @@ final class TransientCollectionRenderer
             targetClasses: $targetClassesCode,
             targetMethods: $targetMethodsCode,
             targetProperties: $targetPropertiesCode,
-            targetMethodParameters: $targetMethodParametersCode,
+            targetParameters: $targetParametersCode,
         ));
         PHP;
     }
 
     /**
      * //phpcs:disable Generic.Files.LineLength.TooLong
-     * @param iterable<class-string, iterable<TransientTargetClass|TransientTargetMethod|TransientTargetMethodParameter|TransientTargetProperty>> $targetByClass
+     *
+     * @param iterable<class-string, iterable<TransientTargetClass|TransientTargetMethod|TransientTargetParameter|TransientTargetProperty>> $targetByClass
      *
      * @return string
      */
@@ -47,9 +48,15 @@ final class TransientCollectionRenderer
 
     /**
      * //phpcs:disable Generic.Files.LineLength.TooLong
-     * @param iterable<class-string, iterable<TransientTargetClass|TransientTargetMethod|TransientTargetMethodParameter|TransientTargetProperty>> $targetByClass
      *
-     * @return array<class-string, array<array{ array<int|string, mixed>, class-string, 2?:non-empty-string, 3?:non-empty-string }>>
+     * @param iterable<class-string, iterable<TransientTargetClass|TransientTargetMethod|TransientTargetParameter|TransientTargetProperty>> $targetByClass
+     *
+     * @return array<class-string, array<array{
+     *     array<int|string, mixed>,
+     *     class-string,
+     *     2?:non-empty-string,
+     *     3?:non-empty-string
+     * }>>
      */
     private static function targetsToArray(iterable $targetByClass): array
     {
@@ -59,13 +66,14 @@ final class TransientCollectionRenderer
             foreach ($targets as $t) {
                 $a = [ $t->arguments, $class ];
 
-                if ($t instanceof TransientTargetMethodParameter) {
+                if ($t instanceof TransientTargetParameter) {
                     $a[] = $t->method;
                 }
 
-                if ($t instanceof TransientTargetMethod
+                if (
+                    $t instanceof TransientTargetMethod
                     || $t instanceof TransientTargetProperty
-                    || $t instanceof TransientTargetMethodParameter
+                    || $t instanceof TransientTargetParameter
                 ) {
                     $a[] = $t->name;
                 }
