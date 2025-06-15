@@ -13,12 +13,9 @@ use ReflectionException;
  */
 class ClassAttributeCollector
 {
-    private ParameterAttributeCollector $parameterAttributeCollector;
-
     public function __construct(
         private Logger $log,
     ) {
-        $this->parameterAttributeCollector = new ParameterAttributeCollector($this->log);
     }
 
     /**
@@ -126,8 +123,6 @@ class ClassAttributeCollector
     /**
      * @param array<TransientTargetMethod> $methodAttributes
      * @param array<TransientTargetParameter> $parameterAttributes
-     *
-     * @return void
      */
     private function collectMethodAndParameterAttributes(
         string $class,
@@ -153,7 +148,41 @@ class ClassAttributeCollector
 
         $parameterAttributes = array_merge(
             $parameterAttributes,
-            $this->parameterAttributeCollector->collectAttributes($methodReflection),
+            $this->collectParameterAttributes($methodReflection),
         );
+    }
+
+    /**
+     * @return array<TransientTargetParameter>
+     */
+    private function collectParameterAttributes(\ReflectionMethod $reflectionFunctionAbstract): array
+    {
+        $targets = [];
+        $class = $reflectionFunctionAbstract->class;
+        $method = $reflectionFunctionAbstract->name;
+
+        foreach ($reflectionFunctionAbstract->getParameters() as $parameter) {
+            /** @var non-empty-string $name */
+            $name = $parameter->name;
+
+            $paramLabel = $class . '::' . $method . '(' . $name . ')';
+
+            foreach ($parameter->getAttributes() as $attribute) {
+                if (self::isAttributeIgnored($attribute)) {
+                    continue;
+                }
+
+                $this->log->debug("Found attribute {$attribute->getName()} on $paramLabel");
+
+                $targets[] = new TransientTargetParameter(
+                    $attribute->getName(),
+                    $attribute->getArguments(),
+                    $method,
+                    $name
+                );
+            }
+        }
+
+        return $targets;
     }
 }
