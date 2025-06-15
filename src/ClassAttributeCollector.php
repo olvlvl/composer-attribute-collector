@@ -28,7 +28,7 @@ class ClassAttributeCollector
      *     array<TransientTargetClass>,
      *     array<TransientTargetMethod>,
      *     array<TransientTargetProperty>,
-     *     array<array<TransientTargetMethodParameter>>,
+     *     array<TransientTargetMethodParameter>,
      * }
      *
      * @throws ReflectionException
@@ -57,7 +57,9 @@ class ClassAttributeCollector
             );
         }
 
+        /** @var array<TransientTargetMethod> $methodAttributes */
         $methodAttributes = [];
+        /** @var array<TransientTargetMethodParameter> $methodParameterAttributes */
         $methodParameterAttributes = [];
 
         foreach ($classReflection->getMethods() as $methodReflection) {
@@ -123,7 +125,7 @@ class ClassAttributeCollector
 
     /**
      * @param array<TransientTargetMethod> $methodAttributes
-     * @param array<array<TransientTargetMethodParameter>> $methodParameterAttributes
+     * @param array<TransientTargetMethodParameter> $methodParameterAttributes
      *
      * @return void
      */
@@ -153,7 +155,7 @@ class ClassAttributeCollector
         $parameterAttributes = $this->methodParameterCollector->collectAttributes($methodReflection);
 
         if (count($parameterAttributes)) {
-            $methodParameterAttributes[] = $parameterAttributes;
+            $methodParameterAttributes = array_merge($methodParameterAttributes, $parameterAttributes);
         }
     }
 }

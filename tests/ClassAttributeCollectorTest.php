@@ -107,26 +107,24 @@ final class ClassAttributeCollectorTest extends TestCase
                     ],
                     [],
                     [
-                        [
-                            new TransientTargetMethodParameter(
-                                'Acme81\Attribute\ParameterA',
-                                ["my parameter label"],
-                                'aMethod',
-                                'myParameter'
-                            ),
-                            new TransientTargetMethodParameter(
-                                'Acme81\Attribute\ParameterB',
-                                ["my 2nd parameter label", "some more data"],
-                                'aMethod',
-                                'anotherParameter'
-                            ),
-                            new TransientTargetMethodParameter(
-                                'Acme81\Attribute\ParameterA',
-                                ["my yet another parameter label"],
-                                'aMethod',
-                                'yetAnotherParameter'
-                            ),
-                        ]
+                        new TransientTargetMethodParameter(
+                            'Acme81\Attribute\ParameterA',
+                            ["my parameter label"],
+                            'aMethod',
+                            'myParameter'
+                        ),
+                        new TransientTargetMethodParameter(
+                            'Acme81\Attribute\ParameterB',
+                            ["my 2nd parameter label", "some more data"],
+                            'aMethod',
+                            'anotherParameter'
+                        ),
+                        new TransientTargetMethodParameter(
+                            'Acme81\Attribute\ParameterA',
+                            ["my yet another parameter label"],
+                            'aMethod',
+                            'yetAnotherParameter'
+                        ),
                     ],
                 ]
             ],
