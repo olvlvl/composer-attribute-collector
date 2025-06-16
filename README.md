@@ -25,6 +25,9 @@ _discover_ attribute targets in a codebase—for known targets you can use refle
 > Currently, the plugin supports class, method, property, and parameter targets.
 > You're welcome to [contribute](CONTRIBUTING.md) if you're interested in expending its support.
 
+> [!WARNING]
+> Attributes used on functions are ignored at this time.
+
 
 
 #### Usage
