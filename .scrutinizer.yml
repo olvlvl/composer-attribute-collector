@@ -1,0 +1,4 @@
+filter:
+  excluded_paths:
+    - "cases/*"
+    - "tests/*"
