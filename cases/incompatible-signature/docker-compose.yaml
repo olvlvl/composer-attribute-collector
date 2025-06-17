@@ -1,0 +1,46 @@
+---
+services:
+  app80:
+    build:
+      context: .
+      args:
+        PHP_TAG: '8.0-cli-buster'
+    environment:
+      PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
+    volumes:
+      - .:/app:delegated
+      - ~/.composer:/root/.composer:delegated
+    working_dir: /app
+  app81:
+    build:
+      context: .
+      args:
+        PHP_TAG: '8.1-cli-buster'
+    environment:
+      PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
+    volumes:
+      - .:/app:delegated
+      - ~/.composer:/root/.composer:delegated
+    working_dir: /app
+  app82:
+    build:
+      context: .
+      args:
+        PHP_TAG: '8.2-cli-bookworm'
+    environment:
+      PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
+    volumes:
+      - .:/app:delegated
+      - ~/.composer:/root/.composer:delegated
+    working_dir: /app
+  app84:
+    build:
+      context: .
+      args:
+        PHP_TAG: '8.4-cli-bookworm'
+    environment:
+      PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
+    volumes:
+      - .:/app:delegated
+      - ~/.composer:/root/.composer:delegated
+    working_dir: /app

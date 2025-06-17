@@ -1,0 +1,35 @@
+name: cases
+on:
+  push:
+    branches:
+    - main
+    - "2.**"
+
+jobs:
+  case-incompatible-signature:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version:
+          - "8.0"
+          - "8.4"
+        composer-version:
+          - "v2.4.0"
+          - "v2"
+        composer-tweak:
+          - "--prefer-lowest"
+          - ""
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          ini-values: memory_limit=-1
+          tools: composer:${{ matrix.composer-version }}
+      - name: Run case
+        run: |
+          cd cases/incompatible-signature
+          composer --version
+          composer update --no-interaction --no-progress ${{ matrix.composer-tweak }}
