@@ -16,6 +16,7 @@ use Acme\Attribute\ActiveRecord\SchemaAttribute;
 use Acme\Attribute\ActiveRecord\Serial;
 use Acme\Attribute\ActiveRecord\Text;
 use Acme\Attribute\ActiveRecord\Varchar;
+use Acme\Attribute\AutowiredService;
 use Acme\Attribute\Get;
 use Acme\Attribute\Handler;
 use Acme\Attribute\Permission;
@@ -129,7 +130,13 @@ final class PluginTest extends TestCase
                 [
                     [ new Index('active'), \Acme\PSR4\ActiveRecord\Article::class ],
                 ]
-            ]
+            ],
+            [
+                AutowiredService::class,
+                [
+                    [ new AutowiredService(factory: '@Acme\PSR4\SignatureMap\SignatureMapProviderFactory::create'), \Acme\PSR4\SignatureMapProvider::class ],
+                ]
+            ],
 
         ];
     }

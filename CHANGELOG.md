@@ -1,5 +1,29 @@
 # CHANGELOG
 
+## v2.1.0
+
+### New Requirements
+
+None
+
+### New features
+
+Attributes are now collected from interfaces and traits as well as classes.
+
+### Deprecated Features
+
+None
+
+### Backward Incompatible Changes
+
+None
+
+### Other Changes
+
+None
+
+
+
 ## v2.0.2
 
 ### New Requirements
