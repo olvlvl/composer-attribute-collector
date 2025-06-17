@@ -58,6 +58,7 @@ final class ConfigTest extends TestCase
                 "$cwd/vendor/vendor1/package1/file.php",
             ],
             useCache: false,
+            isDebug: false,
         );
 
         $actual = Config::from($composer);

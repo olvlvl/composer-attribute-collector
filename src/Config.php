@@ -37,7 +37,7 @@ final class Config
      */
     public const VENDOR_PLACEHOLDER = '{vendor}';
 
-    public static function from(PartialComposer $composer): self
+    public static function from(PartialComposer $composer, bool $isDebug = false): self
     {
         $vendorDir = self::resolveVendorDir($composer);
         $composerFile = Factory::getComposerFile();
@@ -63,6 +63,7 @@ final class Config
             include: $include,
             exclude: $exclude,
             useCache: $useCache,
+            isDebug: $isDebug,
         );
     }
 
@@ -95,6 +96,8 @@ final class Config
      *     Paths that should be excluded from the attribute collection.
      * @param bool $useCache
      *     Whether a cache should be used during the process.
+     * @param bool $isDebug
+     *     Whether debug messages should be logged.
      */
     public function __construct(
         public string $vendorDir,
@@ -102,6 +105,7 @@ final class Config
         public array $include,
         public array $exclude,
         public bool $useCache,
+        public bool $isDebug,
     ) {
         $this->excludeRegExp = count($exclude) ? self::compileExclude($this->exclude) : null;
     }

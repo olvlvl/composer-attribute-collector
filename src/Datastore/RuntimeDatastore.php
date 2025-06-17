@@ -4,6 +4,9 @@ namespace olvlvl\ComposerAttributeCollector\Datastore;
 
 use olvlvl\ComposerAttributeCollector\Datastore;
 
+/**
+ * @internal
+ */
 final class RuntimeDatastore implements Datastore
 {
     /**

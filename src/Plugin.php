@@ -7,17 +7,11 @@ use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
-use Composer\Util\Platform;
-use olvlvl\ComposerAttributeCollector\Datastore\FileDatastore;
-use olvlvl\ComposerAttributeCollector\Datastore\RuntimeDatastore;
-use olvlvl\ComposerAttributeCollector\Filter\ContentFilter;
-use olvlvl\ComposerAttributeCollector\Filter\ClassFilter;
-use olvlvl\ComposerAttributeCollector\Logger\ComposerLogger;
+use Symfony\Component\Process\Process;
 
 use function file_exists;
 use function file_put_contents;
 use function microtime;
-use function sprintf;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -82,94 +76,22 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
     public static function onPostAutoloadDump(Event $event): void
     {
         $composer = $event->getComposer();
-        $config = Config::from($composer);
         $io = $event->getIO();
+        $config = Config::from($composer, isDebug: $io->isDebug());
 
         require_once $config->vendorDir . "/autoload.php";
 
-        $start = microtime(true);
         $io->write('<info>Generating attributes file</info>');
-        $logger = new ComposerLogger($io);
-        self::dump($config, $logger);
-        $elapsed = self::renderElapsedTime($start);
+        $start = microtime(true);
+        self::dump($config);
+        $elapsed = ElapsedTime::render($start);
         $io->write("<info>Generated attributes file in $elapsed</info>");
     }
 
-    public static function dump(Config $config, Logger $log): void
+    public static function dump(Config $config): void
     {
-        //
-        // Scan the included paths
-        //
-        $start = microtime(true);
-        $datastore = self::buildDefaultDatastore($config, $log);
-        $classMapGenerator = new MemoizeClassMapGenerator($datastore, $log);
-        foreach ($config->include as $include) {
-            $classMapGenerator->scanPaths($include, $config->excludeRegExp);
-        }
-        $classMap = $classMapGenerator->getMap();
-        $elapsed = self::renderElapsedTime($start);
-        $log->debug("Generating attributes file: scanned paths in $elapsed");
-
-        //
-        // Filter the class map
-        //
-        $start = microtime(true);
-        $classMapFilter = new MemoizeClassMapFilter($datastore, $log);
-        $filter = self::buildFileFilter();
-        $classMap = $classMapFilter->filter(
-            $classMap,
-            fn (string $class, string $filepath): bool => $filter->filter($filepath, $class, $log)
-        );
-        $elapsed = self::renderElapsedTime($start);
-        $log->debug("Generating attributes file: filtered class map in $elapsed");
-
-        //
-        // Collect attributes
-        //
-        $start = microtime(true);
-        $attributeCollector = new MemoizeAttributeCollector(new ClassAttributeCollector($log), $datastore, $log);
-        $collection = $attributeCollector->collectAttributes($classMap);
-        $elapsed = self::renderElapsedTime($start);
-        $log->debug("Generating attributes file: collected attributes in $elapsed");
-
-        //
-        // Render attributes
-        //
-        $start = microtime(true);
-        $code = self::render($collection);
-        file_put_contents($config->attributesFile, $code);
-        $elapsed = self::renderElapsedTime($start);
-        $log->debug("Generating attributes file: rendered code in $elapsed");
-    }
-
-    private static function buildDefaultDatastore(Config $config, Logger $log): Datastore
-    {
-        if (!$config->useCache) {
-            return new RuntimeDatastore();
-        }
-
-        $basePath = Platform::getCwd();
-
-        assert($basePath !== '');
-
-        return new FileDatastore($basePath . DIRECTORY_SEPARATOR . self::CACHE_DIR, $log);
-    }
-
-    private static function renderElapsedTime(float $start): string
-    {
-        return sprintf("%.03f ms", (microtime(true) - $start) * 1000);
-    }
-
-    private static function buildFileFilter(): Filter
-    {
-        return new Filter\Chain([
-            new ContentFilter(),
-            new ClassFilter()
-        ]);
-    }
-
-    private static function render(TransientCollection $collector): string
-    {
-        return TransientCollectionRenderer::render($collector);
+        $cmd = __DIR__ . '/../collector.php';
+        $process = new Process([ $cmd, '--', serialize($config) ]);
+        $process->mustRun(fn (string $type, string $line) => print($line));
     }
 }
