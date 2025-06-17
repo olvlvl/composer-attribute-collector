@@ -4,10 +4,14 @@
 .gitattributes export-ignore
 .github export-ignore
 .gitignore export-ignore
-docker-compose.yml export-ignore
+cases/ export-ignore
+CHANGELOG.md export-ignore
+CODE_OF_CONDUCT.md export-ignore
+CONTRIBUTING.md export-ignore
+docker-compose.yaml export-ignore
 Dockerfile export-ignore
 Makefile export-ignore
-phpcs.xml
+phpcs.xml export-ignore
 phpstan.neon export-ignore
 phpunit.xml export-ignore
 tests/ export-ignore
