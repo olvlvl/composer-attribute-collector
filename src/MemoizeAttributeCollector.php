@@ -22,12 +22,10 @@ class MemoizeAttributeCollector
      *     array<TransientTargetClass>,
      *     array<TransientTargetMethod>,
      *     array<TransientTargetProperty>,
+     *     array<TransientTargetParameter>,
      * }>
-     *     Where _key_ is a class and _value is an array where:
+     *     Where _key_ is a class and _value_ is an array where:
      *     - `0` is a timestamp
-     *     - `1` is an array of class attributes
-     *     - `2` is an array of method attributes
-     *     - `3` is an array of property attributes
      */
     private array $state;
 
@@ -58,7 +56,8 @@ class MemoizeAttributeCollector
                 $classAttributes,
                 $methodAttributes,
                 $propertyAttributes,
-            ] = $this->state[$class] ?? [ 0, [], [], [] ];
+                $parameterAttributes,
+            ] = $this->state[$class] ?? [ 0, [], [], [], [] ];
 
             $mtime = filemtime($filepath);
 
@@ -75,6 +74,7 @@ class MemoizeAttributeCollector
                         $classAttributes,
                         $methodAttributes,
                         $propertyAttributes,
+                        $parameterAttributes,
                     ] = $classAttributeCollector->collectAttributes($class);
                 } catch (Throwable $e) {
                     $this->log->error(
@@ -82,7 +82,13 @@ class MemoizeAttributeCollector
                     );
                 }
 
-                $this->state[$class] = [ time(), $classAttributes, $methodAttributes, $propertyAttributes ];
+                $this->state[$class] = [
+                    time(),
+                    $classAttributes,
+                    $methodAttributes,
+                    $propertyAttributes,
+                    $parameterAttributes,
+                ];
             }
 
             if (count($classAttributes)) {
@@ -90,6 +96,9 @@ class MemoizeAttributeCollector
             }
             if (count($methodAttributes)) {
                 $collector->addMethodAttributes($class, $methodAttributes);
+            }
+            if (count($parameterAttributes)) {
+                $collector->addParameterAttributes($class, $parameterAttributes);
             }
             if (count($propertyAttributes)) {
                 $collector->addTargetProperties($class, $propertyAttributes);

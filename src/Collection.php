@@ -22,11 +22,15 @@ final class Collection
      * @param array<class-string, array<array{ mixed[], class-string, non-empty-string }>> $targetProperties
      *     Where _key_ is an attribute class and _value_ an array of arrays
      *     where 0 are the attribute arguments, 1 is a target class, and 2 is the target property.
+     * @param array<class-string, array<array{ mixed[], class-string, non-empty-string, non-empty-string }>> $targetParameters
+     *     Where _key_ is an attribute class and _value_ an array of arrays where 0 are the
+     *     attribute arguments, 1 is a target class, 2 is the target method, and 3 is the target parameter.
      */
     public function __construct(
         private array $targetClasses,
         private array $targetMethods,
         private array $targetProperties,
+        private array $targetParameters,
     ) {
     }
 
@@ -114,6 +118,50 @@ final class Collection
      *
      * @param class-string<T> $attribute
      *
+     * @return array<TargetParameter<T>>
+     */
+    public function findTargetParameters(string $attribute): array
+    {
+        return array_map(
+            fn(array $t) => self::createParameterAttribute($attribute, ...$t),
+            $this->targetParameters[$attribute] ?? [],
+        );
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $attribute
+     * @param array<mixed> $arguments
+     * @param class-string $class
+     * @param non-empty-string $method
+     * @param non-empty-string $parameter
+     *
+     * @return TargetParameter<T>
+     */
+    private static function createParameterAttribute(
+        string $attribute,
+        array $arguments,
+        string $class,
+        string $method,
+        string $parameter,
+    ): object {
+        try {
+            $a = new $attribute(...$arguments);
+            return new TargetParameter($a, $class, $method, $parameter);
+        } catch (Throwable $e) {
+            throw new RuntimeException(
+                "An error occurred while instantiating attribute $attribute on parameter $class::$method($parameter)",
+                previous: $e,
+            );
+        }
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $attribute
+     *
      * @return array<TargetProperty<T>>
      */
     public function findTargetProperties(string $attribute): array
@@ -188,6 +236,32 @@ final class Collection
                         $arguments,
                         $class,
                         $method,
+                    );
+                }
+            }
+        }
+
+        return $ar;
+    }
+
+    /**
+     * @param callable(class-string $attribute, class-string $class, non-empty-string $method, non-empty-string $parameter):bool $predicate
+     *
+     * @return array<TargetParameter<object>>
+     */
+    public function filterTargetParameters(callable $predicate): array
+    {
+        $ar = [];
+
+        foreach ($this->targetParameters as $attribute => $references) {
+            foreach ($references as [$arguments, $class, $method, $parameter]) {
+                if ($predicate($attribute, $class, $method, $parameter)) {
+                    $ar[] = self::createParameterAttribute(
+                        $attribute,
+                        $arguments,
+                        $class,
+                        $method,
+                        $parameter,
                     );
                 }
             }

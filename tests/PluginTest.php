@@ -24,12 +24,16 @@ use Acme\Attribute\Resource;
 use Acme\Attribute\Route;
 use Acme\Attribute\Subscribe;
 use Acme\PSR4\Presentation\ArticleController;
+use Acme81\Attribute\ParameterA;
+use Acme81\Attribute\ParameterB;
 use olvlvl\ComposerAttributeCollector\Attributes;
 use olvlvl\ComposerAttributeCollector\Config;
 use olvlvl\ComposerAttributeCollector\Plugin;
 use olvlvl\ComposerAttributeCollector\TargetClass;
 use olvlvl\ComposerAttributeCollector\TargetMethod;
+use olvlvl\ComposerAttributeCollector\TargetParameter;
 use olvlvl\ComposerAttributeCollector\TargetProperty;
+use PhpParser\Node\Param;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 
@@ -165,6 +169,10 @@ final class PluginTest extends TestCase
                 Route::class,
                 [
                     [
+                        new Route("/articles/method/", 'GET', 'articles:method'),
+                        'Acme\PSR4\Presentation\ArticleController::aMethod'
+                    ],
+                    [
                         new Route("/articles", 'GET', 'articles:list'),
                         'Acme\PSR4\Presentation\ArticleController::list'
                     ],
@@ -188,6 +196,52 @@ final class PluginTest extends TestCase
                 [
                     [ new Subscribe(), 'Acme\PSR4\SubscriberA::onEventA' ],
                     [ new Subscribe(), 'Acme\PSR4\SubscriberB::onEventA' ],
+                ]
+            ],
+
+        ];
+    }
+
+    /**
+     * @dataProvider provideTargetParameters
+     *
+     * @param class-string $attribute
+     * @param array<array{ object, callable-string }> $expected
+     */
+    public function testTargetParameters(string $attribute, array $expected): void
+    {
+        $actual = Attributes::findTargetParameters($attribute);
+
+        $this->assertEquals($expected, $this->collectParameters($actual));
+    }
+
+    /**
+     * @return array<array{ class-string, array<array{ object, callable-string }> }>
+     */
+    public static function provideTargetParameters(): array
+    {
+        return [
+
+            [
+                ParameterA::class,
+                [
+                    [
+                        new ParameterA('my parameter label'),
+                        'Acme\PSR4\Presentation\ArticleController::aMethod(myParameter)'
+                    ],
+                    [
+                        new ParameterA('my yet another parameter label'),
+                        'Acme\PSR4\Presentation\ArticleController::aMethod(yetAnotherParameter)'
+                    ],
+                ]
+            ],
+            [
+                ParameterB::class,
+                [
+                    [
+                        new ParameterB('my 2nd parameter label', 'some more data'),
+                        'Acme\PSR4\Presentation\ArticleController::aMethod(anotherParameter)'
+                    ],
                 ]
             ],
 
@@ -262,6 +316,7 @@ final class PluginTest extends TestCase
         );
 
         $this->assertEquals([
+            [ new Route("/articles/method/", 'GET', 'articles:method'), 'Acme\PSR4\Presentation\ArticleController::aMethod' ],
             [ new Route("/articles", 'GET', 'articles:list'), 'Acme\PSR4\Presentation\ArticleController::list' ],
             [ new Route("/articles/{id}", 'GET', 'articles:show'), 'Acme\PSR4\Presentation\ArticleController::show' ],
             [ new Get(), 'Acme\Presentation\FileController::list' ],
@@ -301,6 +356,18 @@ final class PluginTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testFilterTargetParameters(): void
+    {
+        $actual = Attributes::filterTargetParameters(
+            Attributes::predicateForAttributeInstanceOf(ParameterA::class)
+        );
+
+        $this->assertEquals([
+            [ new ParameterA("my parameter label"), 'Acme\PSR4\Presentation\ArticleController::aMethod(myParameter)' ],
+            [ new ParameterA('my yet another parameter label'), 'Acme\PSR4\Presentation\ArticleController::aMethod(yetAnotherParameter)' ],
+        ], $this->collectParameters($actual));
+    }
+
     public function testFilterTargetProperties(): void
     {
         $actual = Attributes::filterTargetProperties(
@@ -326,8 +393,9 @@ final class PluginTest extends TestCase
         ], $forClass->classAttributes);
 
         $this->assertEquals([
-            'list' => [ new Route("/articles", id: 'articles:list') ],
-            'show' => [ new Route("/articles/{id}", id: 'articles:show') ],
+            'list' => [ new Route("/articles", 'GET', 'articles:list') ],
+            'show' => [ new Route("/articles/{id}", 'GET', 'articles:show') ],
+            'aMethod' => [ new Route("/articles/method/", 'GET', 'articles:method') ],
         ], $forClass->methodsAttributes);
     }
 
@@ -369,6 +437,26 @@ final class PluginTest extends TestCase
         usort($methods, fn($a, $b) => $a[1] <=> $b[1]);
 
         return $methods;
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param TargetParameter<T>[] $targets
+     *
+     * @return array<array{T, string}>
+     */
+    private function collectParameters(array $targets): array
+    {
+        $parameters = [];
+
+        foreach ($targets as $target) {
+            $parameters[] = [ $target->attribute, "$target->class::$target->method($target->name)" ];
+        }
+
+        usort($parameters, fn($a, $b) => $a[1] <=> $b[1]);
+
+        return $parameters;
     }
 
     /**

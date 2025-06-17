@@ -22,8 +22,11 @@ _discover_ attribute targets in a codebase—for known targets you can use refle
 - Can cache discoveries to speed up consecutive runs.
 
 > [!NOTE]
-> Currently, the plugin supports class, method, and property targets.
+> Currently, the plugin supports class, method, property, and parameter targets.
 > You're welcome to [contribute](CONTRIBUTING.md) if you're interested in expending its support.
+
+> [!WARNING]
+> Attributes used on functions are ignored at this time.
 
 
 
@@ -57,6 +60,11 @@ foreach (Attributes::findTargetMethods(Route::class) as $target) {
 // Find the target properties of the Column attribute.
 foreach (Attributes::findTargetProperties(Column::class) as $target) {
     var_dump($target->attribute, $target->class, $target->name);
+}
+
+// Find the target method parameters of the UserInput attribute.
+foreach (Attributes::findTargetParameters(UserInput::class) as $target) {
+    var_dump($target->attribute, $target->class, $target->method, $target->name);
 }
 
 // Filter target methods using a predicate.

@@ -10,6 +10,10 @@ None
 
 Attributes are now collected from interfaces and traits as well as classes.
 
+Parameter attributes are now collected. Use the method `findTargetParameters()`
+to find target parameters, and the method `filterTargetParameters()` to filter
+target parameters according to a predicate.
+
 ### Deprecated Features
 
 None
