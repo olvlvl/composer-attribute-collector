@@ -114,6 +114,9 @@ class ClassAttributeCollector
     private static function isAttributeIgnored(ReflectionAttribute $attribute): bool
     {
         static $ignored = [
+            \AllowDynamicProperties::class => true,
+            \Deprecated::class => true,
+            \Override::class => true,
             \ReturnTypeWillChange::class => true,
             \SensitiveParameter::class => true,
             InheritsAttributes::class => true,
