@@ -41,7 +41,7 @@ final class ClassFilterTest extends TestCase
     {
         $actual = $this->sut->filter($this->path, \Acme\PSR4\SampleTrait::class, $this->log);
 
-        $this->assertFalse($actual);
+        $this->assertTrue($actual);
     }
 
     public function testDiscardOnError(): void

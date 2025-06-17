@@ -213,6 +213,7 @@ abstract class CollectorTestAbstract extends TestCase
                 UrlGetter::class,
                 [
                     [ new UrlGetter(), 'Acme\PSR4\InheritedAttributeSample::get_url' ],
+                    [ new UrlGetter(), 'Acme\PSR4\Routing\UrlTrait::get_url' ],
                 ],
             ],
 
