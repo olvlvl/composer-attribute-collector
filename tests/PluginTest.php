@@ -156,39 +156,39 @@ final class PluginTest extends TestCase
     {
         return [
 
-//            [
-//                Route::class,
-//                [
-//                    [
-//                        new Route("/articles/method/", 'GET', 'articles:method'),
-//                        'Acme\PSR4\Presentation\ArticleController::aMethod'
-//                    ],
-//                    [
-//                        new Route("/articles", 'GET', 'articles:list'),
-//                        'Acme\PSR4\Presentation\ArticleController::list'
-//                    ],
-//                    [
-//                        new Route("/articles/{id}", 'GET', 'articles:show'),
-//                        'Acme\PSR4\Presentation\ArticleController::show'
-//                    ],
-//                ]
-//            ],
-//            [
-//                Get::class,
-//                [
-//                    [ new Get(), 'Acme\Presentation\FileController::list' ],
-//                    [ new Get('/{id}'), 'Acme\Presentation\FileController::show' ],
-//                    [ new Get(), 'Acme\Presentation\ImageController::list' ],
-//                    [ new Get('/{id}'), 'Acme\Presentation\ImageController::show' ],
-//                ]
-//            ],
-//            [
-//                Subscribe::class,
-//                [
-//                    [ new Subscribe(), 'Acme\PSR4\SubscriberA::onEventA' ],
-//                    [ new Subscribe(), 'Acme\PSR4\SubscriberB::onEventA' ],
-//                ]
-//            ],
+            [
+                Route::class,
+                [
+                    [
+                        new Route("/articles/method/", 'GET', 'articles:method'),
+                        'Acme\PSR4\Presentation\ArticleController::aMethod'
+                    ],
+                    [
+                        new Route("/articles", 'GET', 'articles:list'),
+                        'Acme\PSR4\Presentation\ArticleController::list'
+                    ],
+                    [
+                        new Route("/articles/{id}", 'GET', 'articles:show'),
+                        'Acme\PSR4\Presentation\ArticleController::show'
+                    ],
+                ]
+            ],
+            [
+                Get::class,
+                [
+                    [ new Get(), 'Acme\Presentation\FileController::list' ],
+                    [ new Get('/{id}'), 'Acme\Presentation\FileController::show' ],
+                    [ new Get(), 'Acme\Presentation\ImageController::list' ],
+                    [ new Get('/{id}'), 'Acme\Presentation\ImageController::show' ],
+                ]
+            ],
+            [
+                Subscribe::class,
+                [
+                    [ new Subscribe(), 'Acme\PSR4\SubscriberA::onEventA' ],
+                    [ new Subscribe(), 'Acme\PSR4\SubscriberB::onEventA' ],
+                ]
+            ],
             [
                 UrlGetter::class,
                 [
