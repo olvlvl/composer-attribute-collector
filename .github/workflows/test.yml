@@ -15,6 +15,9 @@ jobs:
         - "8.1"
         - "8.2"
         - "8.4"
+        composer-tweak:
+          - "--prefer-lowest"
+          - ""
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -35,13 +38,13 @@ jobs:
         restore-keys: "php-${{ matrix.php-version }}"
 
     - name: Install dependencies
-      run: composer install --no-interaction --no-progress
+      run: composer update --no-interaction --no-progress ${{ matrix.composer-tweak }}
 
     - name: Run PHPUnit
       run: make test-coveralls
 
     - name: Upload code coverage
-      if: ${{ matrix.php-version == '8.0' }}
+      if: ${{ matrix.php-version == '8.0' && matrix.composer-tweak == '' }}
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |

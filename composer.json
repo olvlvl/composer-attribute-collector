@@ -36,8 +36,8 @@
   },
   "require-dev": {
     "composer/composer": ">=2.4",
-    "phpstan/phpstan": "^2.0",
-    "phpunit/phpunit": "^9.5"
+    "phpstan/phpstan": "^2.1.17",
+    "phpunit/phpunit": "^9.6.23"
   },
   "extra": {
     "class": "olvlvl\\ComposerAttributeCollector\\Plugin",
