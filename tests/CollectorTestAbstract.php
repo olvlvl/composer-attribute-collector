@@ -350,6 +350,24 @@ abstract class CollectorTestAbstract extends TestCase
     /**
      * @requires PHP >= 8.1
      */
+    public function testNestedAttributes81(): void
+    {
+        $expected = [
+            new TargetClass(
+                new \Acme81\Attribute\SampleNested(new \Acme81\Attribute\SampleNestedValue(1)),
+                \Acme81\PSR4\Presentation\ArticleController::class,
+            )
+        ];
+        $actual = Attributes::filterTargetClasses(
+            Attributes::predicateForAttributeInstanceOf(\Acme81\Attribute\SampleNested::class)
+        );
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
     public function testFilterTargetMethods81(): void
     {
         $expected = [
