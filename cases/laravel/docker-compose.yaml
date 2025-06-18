@@ -1,0 +1,24 @@
+---
+services:
+  app82:
+    build:
+      context: .
+      args:
+        PHP_TAG: '8.2-cli-bookworm'
+    environment:
+      PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
+    volumes:
+      - .:/app:delegated
+      - ~/.composer:/root/.composer:delegated
+    working_dir: /app
+  app84:
+    build:
+      context: .
+      args:
+        PHP_TAG: '8.4-cli-bookworm'
+    environment:
+      PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
+    volumes:
+      - .:/app:delegated
+      - ~/.composer:/root/.composer:delegated
+    working_dir: /app

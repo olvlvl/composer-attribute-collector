@@ -222,6 +222,8 @@ Use cases are available to test the plugin in real conditions:
 
 - [Symfony](cases/symfony) A Symfony application, created with `symfony new`.
 
+- [Laravel](cases/symfony) A Laravel application, created with `laravel new`.
+
 
 
 ## Frequently Asked Questions
