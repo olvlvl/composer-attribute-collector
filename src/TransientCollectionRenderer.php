@@ -52,11 +52,12 @@ final class TransientCollectionRenderer
      * @param iterable<class-string, iterable<TransientTargetClass|TransientTargetMethod|TransientTargetParameter|TransientTargetProperty>> $targetByClass
      *
      * @return array<class-string, array<array{
-     *     array<int|string, mixed>,
+     *     string,
      *     class-string,
      *     2?:non-empty-string,
      *     3?:non-empty-string
-     * }>>
+     * }>> Where _key_ is an attribute class and _value_ is an array of parameters,
+     *     where `1` is the serialized arguments and `2` is the target class.
      */
     private static function targetsToArray(iterable $targetByClass): array
     {
@@ -64,7 +65,7 @@ final class TransientCollectionRenderer
 
         foreach ($targetByClass as $class => $targets) {
             foreach ($targets as $t) {
-                $a = [ $t->arguments, $class ];
+                $a = [ serialize($t->arguments), $class ];
 
                 if ($t instanceof TransientTargetParameter) {
                     $a[] = $t->method;
