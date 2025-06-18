@@ -144,7 +144,7 @@ prefer to use Composer's autoloading feature:
 
 ```json
 {
-  "autoloading": {
+  "autoload": {
     "files": [
       "vendor/attributes.php"
     ]
