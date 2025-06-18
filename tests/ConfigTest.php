@@ -4,13 +4,10 @@ namespace tests\olvlvl\ComposerAttributeCollector;
 
 use Composer\Package\RootPackageInterface;
 use Composer\PartialComposer;
+use Composer\Util\Platform;
 use olvlvl\ComposerAttributeCollector\Config;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-
-use function assert;
-use function getcwd;
-use function is_string;
 
 final class ConfigTest extends TestCase
 {
@@ -34,8 +31,7 @@ final class ConfigTest extends TestCase
             ->method('getExtra')
             ->willReturn($extra);
 
-        $cwd = getcwd();
-        assert(is_string($cwd));
+        $cwd = Platform::getCwd();
         $config = $this->createMock(\Composer\Config::class);
         $config
             ->method('get')
@@ -57,6 +53,62 @@ final class ConfigTest extends TestCase
                 "$cwd/tests/Acme/PSR4/IncompatibleSignature.php",
                 "$cwd/vendor/vendor1/package1/file.php",
             ],
+            useCache: false,
+            isDebug: false,
+        );
+
+        $actual = Config::from($composer);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testResolveIncludeFromAutoload(): void
+    {
+        $package = $this->createMock(RootPackageInterface::class);
+        $package
+            ->method('getExtra')
+            ->willReturn([]);
+        $package
+            ->expects($this->once())
+            ->method('getAutoload')
+            ->willReturn([
+                'classmap' => [
+                    'src/classmap',
+                    'src/bootstrap.php',
+                ],
+                'psr-0' => [
+                    'Acme/PSR4' => './src/psr-0',
+                ],
+                'psr-4' => [
+                    'Acme/PSR4' => 'src/psr-4',
+                ],
+                'files' => [
+                    './src/files'
+                ]
+            ]);
+
+        $cwd = Platform::getCwd();
+        $config = $this->createMock(\Composer\Config::class);
+        $config
+            ->method('get')
+            ->with('vendor-dir')
+            ->willReturn("$cwd/vendor");
+
+        $composer = new PartialComposer();
+        $composer->setConfig($config);
+        $composer->setPackage($package);
+
+        $expected = new Config(
+            vendorDir: "$cwd/vendor",
+            attributesFile: "$cwd/vendor/attributes.php",
+            include: [
+                "$cwd/src/classmap",
+                "$cwd/src/bootstrap.php",
+                "$cwd/src/psr-0",
+                "$cwd/src/psr-4",
+                "$cwd/src/files",
+            ],
+            exclude: [],
             useCache: false,
             isDebug: false,
         );

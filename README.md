@@ -4,19 +4,19 @@
 [![Code Coverage](https://coveralls.io/repos/github/olvlvl/composer-attribute-collector/badge.svg?branch=main)](https://coveralls.io/r/olvlvl/composer-attribute-collector?branch=main)
 [![Downloads](https://img.shields.io/packagist/dt/olvlvl/composer-attribute-collector.svg)](https://packagist.org/packages/olvlvl/composer-attribute-collector)
 
-**composer-attribute-collector** is a plugin for [Composer][]. Its ambition is to provide a
-convenient way—and near zero cost—to retrieve targets of PHP 8 attributes. After the autoloader has
-been dumped, the plugin collects attribute targets and generates a static file. These targets can be
-retrieved through a convenient interface, without reflection. The plugin is useful when you need to
-_discover_ attribute targets in a codebase—for known targets you can use reflection.
+**composer-attribute-collector** is a [Composer][] plugin designed to effectively _discover_ PHP 8
+attribute targets, and later retrieve them at near zero cost, without runtime reflection. After the
+autoloader dump, it collects attributes and generates a static file for fast access. This provides a
+convenient way to _discover_ attribute-backed classes, methods, or properties—ideal for codebase
+analysis. (For known targets, traditional reflection remains an option.)
 
 
 
 #### Features
 
-- Little configuration
+- Zero configuration
 - No reflection in the generated file
-- No impact on performance
+- Might improve performance
 - No dependency (except Composer of course)
 - A single interface to get attribute targets: classes, methods, and properties
 - Can cache discoveries to speed up consecutive runs.
@@ -91,11 +91,11 @@ var_dump($attributes->propertyAttributes);
 
 Here are a few steps to get you started.
 
-### 1\. Configure the plugin
+### 1\. Configure the plugin (optional)
 
-The plugin only inspects paths and files specified in the configuration with the `include` property.
-That is usually your "src" directory. Add this section to your `composer.json` file to enable the
-generation of the "attributes" file when the autoloader is dumped.
+The collector automatically scans `autoload` paths of the root `composer.json` for a
+zero-configuration experience. You can override them via
+`extra.composer-attribute-collector.include`.
 
 ```json
 {
@@ -162,8 +162,8 @@ Here are a few ways you can configure the plugin.
 
 ### Including paths or files ([root-only][])
 
-Use the `include` property to define the paths or files to inspect for attributes. Without this
-property, the "attributes" file will be empty.
+The collector automatically scans `autoload` paths of the root `composer.json`, but you can override
+them via the `include` property.
 
 The specified paths are relative to the `composer.json` file, and the `{vendor}` placeholder is
 replaced with the path to the vendor folder.
@@ -182,7 +182,7 @@ replaced with the path to the vendor folder.
 
 ### Excluding paths or files ([root-only][])
 
-Use the `exclude` property to exclude paths or files from inspection. This is handy when files
+Use the `exclude` property to exclude paths or files from scanning. This is handy when files
 cause issues or have side effects.
 
 The specified paths are relative to the `composer.json` file, and the `{vendor}` placeholder is
@@ -277,9 +277,9 @@ PHP. If the plugin is too slow for your liking, try running the command with
 **How do I include a class that inherits its attributes?**
 
 To speed up the collection process, the plugin first looks at PHP files as plain text for hints of
-attribute usage. If a class inherits its attributes from traits, properties, or methods, it is
-ignored. Use the attribute `[#\olvlvl\ComposerAttributeCollector\InheritsAttributes]` to force the
-collection.
+attribute usage. If a class inherits its attributes from traits, properties, or methods, but doesn't
+use attributes itself, it will be ignored. Use the attribute
+`[#\olvlvl\ComposerAttributeCollector\InheritsAttributes]` to force the collection.
 
 ```php
 trait UrlTrait
