@@ -1,8 +1,12 @@
 name: code-style
 
 on:
-- push
-- pull_request
+  push:
+    branches:
+      - '!case-**'
+  pull_request:
+    branches:
+      - '!case-**'
 
 jobs:
   phpcs:

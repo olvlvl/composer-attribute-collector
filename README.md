@@ -213,45 +213,14 @@ COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE=1 composer dump-autoload
 
 
 
-## Test drive with the Symfony Demo
+## Use cases
 
-You can try the plugin with a fresh installation of the [Symfony Demo Application](https://github.com/symfony/demo).
+Use cases are available to test the plugin in real conditions:
 
-> [!TIP]
-> The demo application configured with the plugin is [available on GitHub](https://github.com/olvlvl/composer-attribute-collector-usecase-symfony).
+- [Incompatible signature](cases/incompatible-signature) The plugin is able to collect attributes,
+  although the PSR Logger version used by Composer and the application are incompatible.
 
-See the [Getting started](#getting-started) section to set up the plugin. If all went well, the file
-`vendor/attributes.php` should be available.
-
-Now, you can try to get the controller methods tagged as routes. Create a PHP file with the
-following content and run it:
-
-```php
-<?php
-
-use olvlvl\ComposerAttributeCollector\Attributes;
-use Symfony\Component\Routing\Annotation\Route;
-
-require_once 'vendor/autoload.php';
-
-$predicate = Attributes::predicateForAttributeInstanceOf(Route::class);
-$targets = Attributes::filterTargetMethods($predicate);
-
-foreach ($targets as $target) {
-    echo "action: $target->class#$target->name, path: {$target->attribute->getPath()}\n";
-}
-```
-
-You should see an output similar to the following excerpt:
-
-```
-action: App\Controller\BlogController#index, path: /
-action: App\Controller\BlogController#index, path: /rss.xml
-action: App\Controller\BlogController#index, path: /page/{page<[1-9]\d{0,8}>}
-action: App\Controller\BlogController#postShow, path: /posts/{slug}
-action: App\Controller\BlogController#commentNew, path: /comment/{postSlug}/new
-action: App\Controller\BlogController#search, path: /search
-```
+- [Symfony](cases/symfony) A Symfony application, created with `symfony new`.
 
 
 
