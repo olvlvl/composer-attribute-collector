@@ -2,11 +2,11 @@ name: code-style
 
 on:
   push:
-    branches:
-      - '!case-**'
+    branches-ignore:
+    - 'case-**'
   pull_request:
-    branches:
-      - '!case-**'
+    branches-ignore:
+    - 'case-**'
 
 jobs:
   phpcs:
