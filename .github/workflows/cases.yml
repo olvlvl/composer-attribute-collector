@@ -4,6 +4,7 @@ on:
     branches:
     - main
     - "2.**"
+    - "case-**"
 
 jobs:
   case-incompatible-signature:
@@ -12,7 +13,6 @@ jobs:
       matrix:
         php-version:
           - "8.0"
-          - "8.4"
         composer-version:
           - "v2.4.0"
           - "v2"
@@ -26,10 +26,33 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          ini-values: memory_limit=-1
           tools: composer:${{ matrix.composer-version }}
       - name: Run case
         run: |
           cd cases/incompatible-signature
           composer --version
           composer update --no-interaction --no-progress ${{ matrix.composer-tweak }}
+
+  case-symfony:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version:
+          - "8.2"
+          - "8.4"
+        composer-version:
+          - "v2.4.0"
+          - "v2"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer:${{ matrix.composer-version }}
+      - name: Run case
+        run: |
+          cd cases/symfony
+          composer install --no-interaction --no-progress
+          php test.php
