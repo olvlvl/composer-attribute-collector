@@ -45,6 +45,8 @@ None
 
 [#35](https://github.com/olvlvl/composer-attribute-collector/pull/35) The collector runs as a command to avoid clashes between packages used by Composer and those used by the application, such as incompatible signatures between different versions of the PSR Logger. (@olvlvl)
 
+Added use cases for [incompatible signature](https://github.com/olvlvl/composer-attribute-collector/pull/40), [Symfony](https://github.com/olvlvl/composer-attribute-collector/pull/43), and [Laravel](https://github.com/olvlvl/composer-attribute-collector/pull/42).
+
 
 
 ## v2.0.2
@@ -82,11 +84,11 @@ None
 
 None
 
-### Backward Incompatible Changes
+### Deprecated Features
 
 None
 
-### Deprecated Features
+### Backward Incompatible Changes
 
 None
 
