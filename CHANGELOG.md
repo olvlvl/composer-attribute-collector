@@ -31,6 +31,8 @@ None
     }
     ```
 
+- [#44](https://github.com/olvlvl/composer-attribute-collector/pull/44) The collector automatically scans `autoload` paths of the root `composer.json` for a zero-configuration experience. (@olvlvl)
+
 ### Deprecated Features
 
 None

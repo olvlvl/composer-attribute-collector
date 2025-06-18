@@ -3,6 +3,7 @@
 namespace olvlvl\ComposerAttributeCollector;
 
 use Composer\Factory;
+use Composer\Package\PackageInterface;
 use Composer\PartialComposer;
 use Composer\Util\Platform;
 use InvalidArgumentException;
@@ -31,6 +32,7 @@ final class Config
     public const EXTRA_INCLUDE = 'include';
     public const EXTRA_EXCLUDE = 'exclude';
     public const ENV_USE_CACHE = 'COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE';
+    public const FILENAME = 'attributes.php';
 
     /**
      * If a path starts with this placeholder, it is replaced with the absolute path to the vendor directory.
@@ -48,18 +50,24 @@ final class Config
         }
 
         $rootDir .= DIRECTORY_SEPARATOR;
+        $attributesFile = $vendorDir . DIRECTORY_SEPARATOR . self::FILENAME;
 
+        $package = $composer->getPackage();
         /** @var array{ include?: non-empty-string[], exclude?: non-empty-string[] } $extra */
-        $extra = $composer->getPackage()->getExtra()[self::EXTRA] ?? [];
+        $extra = $package->getExtra()[self::EXTRA] ?? [];
 
-        $include = self::expandPaths($extra[self::EXTRA_INCLUDE] ?? [], $vendorDir, $rootDir);
+        $include = self::expandPaths(
+            $extra[self::EXTRA_INCLUDE] ?? self::resolveInclude($package, $attributesFile),
+            $vendorDir,
+            $rootDir,
+        );
         $exclude = self::expandPaths($extra[self::EXTRA_EXCLUDE] ?? [], $vendorDir, $rootDir);
 
         $useCache = filter_var(Platform::getEnv(self::ENV_USE_CACHE), FILTER_VALIDATE_BOOL);
 
         return new self(
             $vendorDir,
-            attributesFile: "$vendorDir/attributes.php",
+            attributesFile: $attributesFile,
             include: $include,
             exclude: $exclude,
             useCache: $useCache,
@@ -79,6 +87,29 @@ final class Config
         }
 
         return $vendorDir;
+    }
+
+    /**
+     * @param non-empty-string $attributesFile
+     *
+     * @return non-empty-string[]
+     */
+    public static function resolveInclude(PackageInterface $package, string $attributesFile): array
+    {
+        $include = [];
+
+        foreach ($package->getAutoload() as $paths) {
+            /** @var non-empty-string[] $paths */
+            foreach ($paths as $path) {
+                if (realpath($path) === $attributesFile) {
+                    continue;
+                }
+
+                $include[] = $path;
+            }
+        }
+
+        return $include;
     }
 
     /**
@@ -142,6 +173,10 @@ final class Config
         $expanded = [];
 
         foreach ($paths as $path) {
+            if (str_starts_with($path, "./")) {
+                $path = substr($path, 2);
+            }
+
             if (str_starts_with($path, self::VENDOR_PLACEHOLDER)) {
                 $path = $vendorDir . substr($path, strlen(self::VENDOR_PLACEHOLDER));
             } else {
