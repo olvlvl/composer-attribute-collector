@@ -12,6 +12,9 @@ use Symfony\Component\Process\Process;
 use function file_exists;
 use function file_put_contents;
 use function microtime;
+use function sys_get_temp_dir;
+use function tempnam;
+use function unlink;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -91,7 +94,19 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
     public static function dump(Config $config): void
     {
         $cmd = __DIR__ . '/../collector.php';
-        $process = new Process([ $cmd, '--', serialize($config) ]);
-        $process->mustRun(fn (string $type, string $line) => print($line));
+        $tmpFile = tempnam(sys_get_temp_dir(), 'composer-attribute-collector-');
+        if ($tmpFile === false) {
+            throw new \RuntimeException('Unable to create temporary file');
+        }
+        file_put_contents($tmpFile, serialize($config));
+
+        try {
+            $process = new Process([ $cmd, $tmpFile ]);
+            $process->mustRun(function (string $type, string $line): void {
+                print($line);
+            });
+        } finally {
+            unlink($tmpFile);
+        }
     }
 }

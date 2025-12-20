@@ -5,11 +5,18 @@ namespace olvlvl\ComposerAttributeCollector;
 
 require 'vendor/autoload.php';
 
-$serializedConfig = $argv[2]
-    ?? throw new \Exception("Configuration is missing");
+$configFile = $argv[1]
+    ?? throw new \Exception("Configuration file is missing");
+
+$serializedConfig = file_get_contents($configFile)
+    ?: throw new \Exception("Unable to read configuration file");
 
 /** @var Config $config */
-$config = unserialize($serializedConfig);
+$config = unserialize($serializedConfig, [
+    'allowed_classes' => [
+        Config::class,
+    ],
+]);
 
 $log = new class($config->isDebug) implements Logger
 {

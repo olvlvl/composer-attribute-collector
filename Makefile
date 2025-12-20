@@ -57,4 +57,4 @@ test-container84:
 .PHONY: lint
 lint:
 	@XDEBUG_MODE=off phpcs -s
-	@XDEBUG_MODE=off vendor/bin/phpstan
+	@XDEBUG_MODE=off vendor/bin/phpstan --memory-limit=-1
