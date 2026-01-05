@@ -1,3 +1,35 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=id">Bahasa Indonesia</a>
+        | <a href="https://openaitx.github.io/view.html?user=olvlvl&project=composer-attribute-collector&lang=as">অসমীয়া</
+      </div>
+    </div>
+  </details>
+</div>
+
 # composer-attribute-collector
 
 [![Release](https://img.shields.io/packagist/v/olvlvl/composer-attribute-collector.svg)](https://packagist.org/packages/olvlvl/composer-attribute-collector)
