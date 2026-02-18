@@ -6,7 +6,7 @@ RUN <<-EOF
 	apt-get install -y autoconf pkg-config unzip
 	pecl channel-update pecl.php.net
 	pecl install xdebug
-	docker-php-ext-enable opcache xdebug
+	docker-php-ext-enable xdebug
 EOF
 
 RUN <<-EOF

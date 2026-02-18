@@ -49,9 +49,9 @@ test-container82:
 	@-docker compose run --rm app82 bash
 	@docker compose down -v
 
-.PHONY: test-container84
-test-container84:
-	@-docker compose run --rm app84 bash
+.PHONY: test-container85
+test-container85:
+	@-docker compose run --rm app85 bash
 	@docker compose down -v
 
 .PHONY: lint

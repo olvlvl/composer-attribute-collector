@@ -33,11 +33,11 @@ services:
       - .:/app:delegated
       - ~/.composer:/root/.composer:delegated
     working_dir: /app
-  app84:
+  app85:
     build:
       context: .
       args:
-        PHP_TAG: '8.4-cli-trixie'
+        PHP_TAG: '8.5-cli-trixie'
     environment:
       PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
     volumes:
