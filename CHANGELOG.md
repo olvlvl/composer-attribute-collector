@@ -1,5 +1,29 @@
 # CHANGELOG
 
+## v2.1.1
+
+### New Requirements
+
+- composer-plugin-api v2.3
+
+### New features
+
+None
+
+### Deprecated Features
+
+None
+
+### Backward Incompatible Changes
+
+None
+
+### Other Changes
+
+None
+
+
+
 ## v2.1.0
 
 ### New Requirements

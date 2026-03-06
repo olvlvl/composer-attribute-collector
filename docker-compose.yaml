@@ -5,6 +5,7 @@ services:
       context: .
       args:
         PHP_TAG: '8.0-cli-bullseye'
+        COMPOSER_TAG: '2.3'
     environment:
       PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
     volumes:
@@ -38,6 +39,7 @@ services:
       context: .
       args:
         PHP_TAG: '8.5-cli-trixie'
+        COMPOSER_TAG: latest
     environment:
       PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
     volumes:
