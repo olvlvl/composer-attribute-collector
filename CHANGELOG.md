@@ -1,5 +1,30 @@
 # CHANGELOG
 
+## v2.1.2
+
+### New Requirements
+
+None
+
+### New features
+
+None
+
+### Deprecated Features
+
+None
+
+### Backward Incompatible Changes
+
+None
+
+### Other Changes
+
+Execute the collector with `/usr/bin/env php` instead of executing the script directly, because the
+permission might be dropped by indelicate unarchivers. (fix #49)
+
+
+
 ## v2.1.1
 
 ### New Requirements
