@@ -93,7 +93,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
 
     public static function dump(Config $config): void
     {
-        $cmd = __DIR__ . '/../collector.php';
+        $collector = __DIR__ . '/../collector.php';
         $tmpFile = tempnam(sys_get_temp_dir(), 'composer-attribute-collector-');
         if ($tmpFile === false) {
             throw new \RuntimeException('Unable to create temporary file');
@@ -101,7 +101,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         file_put_contents($tmpFile, serialize($config));
 
         try {
-            $process = new Process([ $cmd, $tmpFile ]);
+            $process = new Process([ "/usr/bin/env", "php", $collector, $tmpFile ]);
             $process->mustRun(function (string $type, string $line): void {
                 print($line);
             });
