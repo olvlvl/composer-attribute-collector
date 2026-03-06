@@ -5,20 +5,24 @@ on:
     - main
     - "2.**"
     - "case-**"
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 jobs:
   case-incompatible-signature:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version:
-          - "8.0"
-        composer-version:
-          - "v2.4.0"
-          - "v2"
-        composer-tweak:
-          - "--prefer-lowest"
-          - ""
+        includes:
+          - php-version: "8.0"
+            composer-version: "v2.3.0"
+            composer-tweak: "--prefer-lowest"
+          - php-version: "8.5"
+            composer-version: "v2"
+            composer-tweak: ""
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,12 +40,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version:
-          - "8.2"
-          - "8.4"
-        composer-version:
-          - "v2.4.0"
-          - "v2"
+        includes:
+          - php-version: "8.2"
+            composer-version: "v2.3.0"
+          - php-version: "8.5"
+            composer-version: "latest"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -60,12 +63,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version:
-          - "8.2"
-          - "8.4"
-        composer-version:
-          - "v2.4.0"
-          - "v2"
+        includes:
+          - php-version: "8.2"
+            composer-version: "v2.3.0"
+          - php-version: "8.5"
+            composer-version: "latest"
     steps:
       - name: Checkout
         uses: actions/checkout@v4

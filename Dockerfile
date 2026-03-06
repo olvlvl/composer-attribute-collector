@@ -1,4 +1,7 @@
 ARG PHP_TAG=8.0-cli-trixie
+ARG COMPOSER_TAG=2.3
+
+FROM composer:${COMPOSER_TAG} AS composer_source
 FROM php:${PHP_TAG}
 
 RUN <<-EOF
@@ -23,7 +26,7 @@ RUN <<-EOF
 	SHELL
 EOF
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer_source /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV PATH="/root/.composer/vendor/bin:${PATH}"
 

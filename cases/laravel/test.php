@@ -12,6 +12,15 @@ $expected = [
     new TargetClass(new SampleAttribute(), App\Providers\AppServiceProvider::class),
 ];
 
+$sortFn = fn($a, $b) => strcmp($a->name, $b->name);
+
+usort($actual, $sortFn);
+usort($expected, $sortFn);
+
+echo "Found Target Classes:\n";
+
 var_dump($actual);
 
 $actual == $expected or throw new \RuntimeException("Target classes don't match expected");
+
+echo "✓ Expectation matched, Yay!\n";

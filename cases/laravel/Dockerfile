@@ -1,4 +1,4 @@
-ARG PHP_TAG=8.2-cli-buster
+ARG PHP_TAG=8.2-cli-trixie
 FROM php:${PHP_TAG}
 
 RUN <<-EOF
@@ -23,6 +23,6 @@ RUN <<-EOF
 	SHELL
 EOF
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.3 /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV PATH="/root/.composer/vendor/bin:${PATH}"

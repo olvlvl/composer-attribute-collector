@@ -5,6 +5,10 @@ on:
     branches-ignore:
     - 'case-**'
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
     branches-ignore:
     - 'case-**'
 
@@ -14,14 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version:
-        - "8.0"
-        - "8.1"
-        - "8.2"
-        - "8.5"
-        composer-tweak:
-          - "--prefer-lowest"
-          - ""
+        includes:
+          - php-version: "8.0"
+            composer-tweak: "--prefer-lowest"
+          - php-version: "8.5"
+            composer-tweak: ""
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -48,7 +49,7 @@ jobs:
       run: make test-coveralls
 
     - name: Upload code coverage
-      if: ${{ matrix.php-version == '8.0' && matrix.composer-tweak == '' }}
+      if: ${{ matrix.php-version == '8.5' && matrix.composer-tweak == '' }}
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
