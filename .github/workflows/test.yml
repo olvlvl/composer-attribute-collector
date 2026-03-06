@@ -1,16 +1,6 @@
 name: test
 
-on:
-  push:
-    branches-ignore:
-    - 'case-**'
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-    branches-ignore:
-    - 'case-**'
+on: [ push ]
 
 jobs:
   phpunit:
