@@ -1,4 +1,4 @@
-name: static-analysis
+name: quality
 
 on:
   push:
@@ -9,6 +9,21 @@ on:
     - 'case-**'
 
 jobs:
+  phpcs:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        coverage: none
+        php-version: "8.5"
+        ini-values: memory_limit=-1
+        tools: phpcs, cs2pr
+    - name: Run PHP Code Sniffer
+      run: phpcs -q --report=checkstyle | cs2pr
+
   phpstan:
     name: phpstan
     runs-on: ubuntu-latest

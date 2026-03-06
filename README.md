@@ -279,8 +279,8 @@ The project is continuously tested by [GitHub actions](https://github.com/olvlvl
 
 [![Cases](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/cases.yml/badge.svg?branch=main)](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/cases.yml)
 [![Tests](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/test.yml)
-[![Static Analysis](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/static-analysis.yml/badge.svg?branch=main)](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/static-analysis.yml)
-[![Code Style](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/code-style.yml/badge.svg?branch=main)](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/code-style.yml)
+[![Static Analysis](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/quality.yml/badge.svg?job=phpstan)](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/quality.yml)
+[![Code Style](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/quality.yml/badge.svg?job=phpcs)](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/quality.yml)
 
 
 
