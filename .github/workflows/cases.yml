@@ -1,15 +1,5 @@
 name: cases
-on:
-  push:
-    branches:
-    - main
-    - "2.**"
-    - "case-**"
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
+on: [ push ]
 
 jobs:
   case-incompatible-signature:
@@ -34,6 +24,7 @@ jobs:
       - name: Run case
         run: |
           cd cases/incompatible-signature
+          make plugin-copy
           composer update --no-interaction --no-progress ${{ matrix.composer-tweak }}
 
   case-symfony:
@@ -56,6 +47,7 @@ jobs:
       - name: Run case
         run: |
           cd cases/symfony
+          make plugin-copy
           composer install --no-interaction --no-progress
           php test.php
 
@@ -80,5 +72,6 @@ jobs:
       - name: Run case
         run: |
           cd cases/laravel
+          make plugin-copy
           composer install --no-interaction --no-progress
           php test.php

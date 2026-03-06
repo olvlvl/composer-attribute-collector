@@ -1,12 +1,6 @@
 name: quality
 
-on:
-  push:
-    branches-ignore:
-    - 'case-**'
-  pull_request:
-    branches-ignore:
-    - 'case-**'
+on: [ push ]
 
 jobs:
   phpcs:

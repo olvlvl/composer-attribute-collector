@@ -1,8 +1,14 @@
 {
+  "repositories": [
+    {
+      "type": "path",
+      "url": "composer-attribute-collector"
+    }
+  ],
   "require": {
     "php": ">=8.0",
     "psr/log": "^3.0",
-    "olvlvl/composer-attribute-collector": "^2.1.0"
+    "olvlvl/composer-attribute-collector": "@dev"
   },
   "config": {
     "allow-plugins": {
