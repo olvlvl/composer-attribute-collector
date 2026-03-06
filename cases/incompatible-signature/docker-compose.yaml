@@ -8,9 +8,9 @@ services:
     environment:
       PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
     volumes:
-      - .:/app:delegated
+      - ./../../:/app:delegated
       - ~/.composer:/root/.composer:delegated
-    working_dir: /app
+    working_dir: /app/cases/incompatible-signature
   app81:
     build:
       context: .

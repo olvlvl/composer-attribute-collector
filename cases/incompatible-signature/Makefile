@@ -1,7 +1,13 @@
-# do not edit the following lines
+COPY=composer-attribute-collector/
 
 vendor:
 	@composer install --prefer-lowest
+
+.PHONY: plugin-copy
+plugin-copy:
+	cp -r ../../src $(COPY)
+	cp ../../composer.json $(COPY)
+	cp ../../collector.php $(COPY)
 
 .PHONY: test-container
 test-container: test-container80
