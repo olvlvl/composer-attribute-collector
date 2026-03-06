@@ -13,11 +13,11 @@ plugin-copy:
 test-container: test-container82
 
 .PHONY: test-container82
-test-container82:
+test-container82: plugin-copy
 	@-docker compose run --rm app82 bash
 	@docker compose down -v
 
 .PHONY: test-container84
-test-container84:
+test-container84: plugin-copy
 	@-docker compose run --rm app84 bash
 	@docker compose down -v
