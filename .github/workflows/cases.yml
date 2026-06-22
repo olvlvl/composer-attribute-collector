@@ -15,7 +15,7 @@ jobs:
             composer-tweak: ""
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -38,7 +38,7 @@ jobs:
             composer-version: "latest"
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -62,7 +62,7 @@ jobs:
             composer-version: "latest"
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
