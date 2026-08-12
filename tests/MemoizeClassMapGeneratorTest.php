@@ -23,6 +23,8 @@ final class MemoizeClassMapGeneratorTest extends TestCase
         $remove = [
             self::DIR . 'a.php',
             self::DIR . 'a/b/c/b.php',
+            self::DIR . 'modification.php',
+            self::DIR . 'deletion.php',
         ];
 
         foreach ($remove as $filename) {
@@ -83,13 +85,47 @@ final class MemoizeClassMapGeneratorTest extends TestCase
         ], $map);
     }
 
+    public function testMemoizeDetectsFileModification(): void
+    {
+        self::write("modification.php", "<?php\nclass ModificationA {}");
+
+        $map = $this->map(self::DIR);
+        $this->assertEquals(['ModificationA' => self::DIR . 'modification.php'], $map);
+
+        self::write("modification.php", "<?php\nclass ModificationA {}\nclass ModificationB {}");
+
+        $map = $this->map(self::DIR);
+        $this->assertEquals([
+            'ModificationA' => self::DIR . 'modification.php',
+            'ModificationB' => self::DIR . 'modification.php',
+        ], $map);
+    }
+
+    public function testMemoizeDetectsFileDeletion(): void
+    {
+        self::write("deletion.php", "<?php\nclass DeletionA {}");
+
+        $map = $this->map(self::DIR);
+        $this->assertEquals(['DeletionA' => self::DIR . 'deletion.php'], $map);
+
+        unlink(self::DIR . 'deletion.php');
+
+        $map = $this->map(self::DIR);
+        $this->assertEmpty($map);
+    }
+
     private static function write(string $name, string $data): void
     {
-        file_put_contents(self::DIR . $name, $data);
+        static $offset = 0;
+        $offset++;
 
-        // Because the modified time granularity is a second, we need the set the time to the next second,
-        // so that we don't have to use sleep().
-        touch(self::DIR, time() + 1);
+        $file = self::DIR . $name;
+
+        file_put_contents($file, $data);
+
+        // Because the modified time granularity is a second, we use an incrementing offset
+        // to guarantee distinct mtimes without sleep().
+        touch($file, time() + $offset);
     }
 
     /**

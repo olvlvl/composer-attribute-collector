@@ -8,10 +8,10 @@ use RuntimeException;
 
 use function array_filter;
 use function array_merge;
+use function file_exists;
 use function filemtime;
 use function is_dir;
 use function is_int;
-use function time;
 
 use const ARRAY_FILTER_USE_KEY;
 
@@ -23,10 +23,9 @@ class MemoizeClassMapGenerator
     private const KEY = 'classmap';
 
     /**
-     * @var array<non-empty-string, array{ int, array<class-string, non-empty-string> }>
-     *     Where _key_ is a directory path and _value_ an array
-     *     where `0` is a timestamp, and `1` is an array
-     *     where _key_ is a class and _value_ its pathname.
+     * @var array<non-empty-string, array{ array<class-string, non-empty-string>, array<non-empty-string, int> }>
+     *     Where _key_ is a directory or file path and _value_ an array
+     *     where `0` is a class map, and `1` is a map of file paths to their mtimes.
      */
     private array $state;
 
@@ -62,7 +61,7 @@ class MemoizeClassMapGenerator
 
         $maps = [];
 
-        foreach ($this->state as [, $map]) {
+        foreach ($this->state as [$map]) {
             $maps[] = $map;
         }
 
@@ -82,30 +81,70 @@ class MemoizeClassMapGenerator
     public function scanPaths(string $path, ?string $excluded = null): void
     {
         $this->paths[$path] = true;
-        [ $timestamp ] = $this->state[$path] ?? [ 0 ];
+        [ , $cachedFileMtimes ] = $this->state[$path] ?? [ [], [] ];
 
-        if ($this->shouldUpdate($timestamp, $path)) {
+        if ($this->shouldUpdate($path, $cachedFileMtimes)) {
             $inner = new ClassMapGenerator();
             $inner->avoidDuplicateScans();
             $inner->scanPaths($path, $excluded);
             $map = $inner->getClassMap()->getMap();
 
-            $this->state[$path] = [ time(), $map ];
+            $fileMtimes = [];
+            foreach ($map as $filepath) {
+                $mtime = filemtime($filepath);
+                assert(is_int($mtime));
+                $fileMtimes[$filepath] = $mtime;
+            }
+
+            $this->state[$path] = [ $map, $fileMtimes ];
         }
     }
 
-    private function shouldUpdate(int $timestamp, string $path): bool
+    /**
+     * @param array<non-empty-string, int> $cachedFileMtimes
+     */
+    private function shouldUpdate(string $path, array $cachedFileMtimes): bool
     {
-        if (!$timestamp) {
+        if (!$cachedFileMtimes) {
             return true;
         }
 
-        $mtime = filemtime($path);
+        $maxCachedMtime = 0;
 
-        assert(is_int($mtime));
+        foreach ($cachedFileMtimes as $filepath => $cachedMtime) {
+            if ($cachedMtime > $maxCachedMtime) {
+                $maxCachedMtime = $cachedMtime;
+            }
 
-        if ($timestamp < $mtime) {
-            $diff = $mtime - $timestamp;
+            if (!file_exists($filepath)) {
+                $this->log->debug("Refresh class map: file '$filepath' was removed");
+
+                return true;
+            }
+
+            $currentMtime = filemtime($filepath);
+
+            assert(is_int($currentMtime));
+
+            if ($currentMtime !== $cachedMtime) {
+                $diff = $currentMtime - $cachedMtime;
+                $this->log->debug("Refresh class map: file '$filepath' changed ($diff sec)");
+
+                return true;
+            }
+        }
+
+        return $this->hasNewerDirectoryMtime($path, $maxCachedMtime);
+    }
+
+    private function hasNewerDirectoryMtime(string $path, int $maxCachedMtime): bool
+    {
+        $dirMtime = filemtime($path);
+
+        assert(is_int($dirMtime));
+
+        if ($dirMtime > $maxCachedMtime) {
+            $diff = $dirMtime - $maxCachedMtime;
             $this->log->debug("Refresh class map for path '$path' ($diff sec ago)");
 
             return true;
@@ -118,7 +157,7 @@ class MemoizeClassMapGenerator
 
         foreach (new DirectoryIterator($path) as $di) {
             if ($di->isDir() && !$di->isDot()) {
-                if ($this->shouldUpdate($timestamp, $di->getPathname())) {
+                if ($this->hasNewerDirectoryMtime($di->getPathname(), $maxCachedMtime)) {
                     return true;
                 }
             }
