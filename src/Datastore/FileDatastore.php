@@ -51,7 +51,7 @@ final class FileDatastore implements Datastore
     {
         $filename = $this->formatFilename($key);
 
-        file_put_contents($filename, serialize($data));
+        file_put_contents($filename, serialize($data), LOCK_EX);
     }
 
     /**
