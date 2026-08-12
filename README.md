@@ -224,6 +224,8 @@ Use cases are available to test the plugin in real conditions:
 
 - [Laravel](cases/laravel) A Laravel application, created with `laravel new`.
 
+- [Yii Router](https://github.com/yiisoft/router-composer-attribute-collector) A route collector for Yii.
+
 
 
 ## Frequently Asked Questions

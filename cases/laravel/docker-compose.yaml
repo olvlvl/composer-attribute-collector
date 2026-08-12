@@ -6,7 +6,7 @@ services:
       args:
         PHP_TAG: '8.2-cli-trixie'
     environment:
-      PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
+      PHP_IDE_CONFIG: 'serverName=olvlvl/composer-attribute-collector'
     volumes:
       - .:/app:delegated
       - composer-cache:/root/.composer/cache
@@ -17,7 +17,7 @@ services:
       args:
         PHP_TAG: '8.4-cli-trixie'
     environment:
-      PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
+      PHP_IDE_CONFIG: 'serverName=olvlvl/composer-attribute-collector'
     volumes:
       - .:/app:delegated
       - composer-cache:/root/.composer/cache

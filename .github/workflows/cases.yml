@@ -75,3 +75,27 @@ jobs:
           make plugin-copy
           composer install --no-interaction --no-progress
           php test.php
+
+  case-yiisoft-router:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        includes:
+          - php-version: "8.2"
+            composer-version: "v2.3.0"
+          - php-version: "8.5"
+            composer-version: "latest"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer:${{ matrix.composer-version }}
+      - name: Run case
+        run: |
+          cd cases/yiisoft-router
+          make plugin-copy
+          composer install --no-interaction --no-progress
+          php test.php

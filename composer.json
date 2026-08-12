@@ -1,5 +1,6 @@
 {
   "name": "olvlvl/composer-attribute-collector",
+  "version": "2.2.0",
   "type": "composer-plugin",
   "description": "A convenient and near zero-cost way to retrieve targets of PHP 8 attributes",
   "license": "BSD-3-Clause",
