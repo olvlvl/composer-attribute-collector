@@ -60,6 +60,7 @@ class MemoizeAttributeCollector
             ] = $this->state[$class] ?? [ 0, [], [], [], [] ];
 
             $mtime = filemtime($filepath);
+            assert(is_int($mtime));
 
             if ($timestamp < $mtime) {
                 if ($timestamp) {
@@ -83,7 +84,7 @@ class MemoizeAttributeCollector
                 }
 
                 $this->state[$class] = [
-                    time(),
+                    $mtime,
                     $classAttributes,
                     $methodAttributes,
                     $propertyAttributes,
