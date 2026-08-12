@@ -27,7 +27,10 @@
     ]
   },
   "config": {
-    "sort-packages": true
+    "sort-packages": true,
+    "allow-plugins": {
+      "symfony/flex": false
+    }
   },
   "require": {
     "php": ">=8.0",

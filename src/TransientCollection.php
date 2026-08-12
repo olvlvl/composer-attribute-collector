@@ -65,7 +65,7 @@ final class TransientCollection
      * @param iterable<TransientTargetProperty> $targets
      *     The target class.
      */
-    public function addTargetProperties(string $class, iterable $targets): void
+    public function addPropertyAttributes(string $class, iterable $targets): void
     {
         $this->properties[$class] = $targets;
     }

@@ -9,6 +9,7 @@ services:
       PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
     volumes:
       - .:/app:delegated
+      - composer-cache:/root/.composer/cache
     working_dir: /app
   app84:
     build:
@@ -19,4 +20,8 @@ services:
       PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
     volumes:
       - .:/app:delegated
+      - composer-cache:/root/.composer/cache
     working_dir: /app
+
+volumes:
+  composer-cache:
