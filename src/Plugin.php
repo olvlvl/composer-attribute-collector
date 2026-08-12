@@ -25,7 +25,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
 {
     public const CACHE_DIR = '.composer-attribute-collector';
     public const VERSION_MAJOR = 2;
-    public const VERSION_MINOR = 1;
+    public const VERSION_MINOR = 2;
 
     /**
      * @uses onPostAutoloadDump

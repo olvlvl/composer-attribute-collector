@@ -8,7 +8,7 @@ None
 
 ### New features
 
-None
+- [#60](https://github.com/olvlvl/composer-attribute-collector/pull/60) Track per-file mtime in MemoizeClassMapGenerator.
 
 ### Deprecated Features
 
