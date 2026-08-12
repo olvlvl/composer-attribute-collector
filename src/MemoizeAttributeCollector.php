@@ -101,7 +101,7 @@ class MemoizeAttributeCollector
                 $collector->addParameterAttributes($class, $parameterAttributes);
             }
             if (count($propertyAttributes)) {
-                $collector->addTargetProperties($class, $propertyAttributes);
+                $collector->addPropertyAttributes($class, $propertyAttributes);
             }
         }
 
