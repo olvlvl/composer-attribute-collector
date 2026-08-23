@@ -228,12 +228,12 @@ Use cases are available to test the plugin in real conditions:
 
 ## Frequently Asked Questions
 
-**Do I need to generate an optimized autoloader?**
+### Do I need to generate an optimized autoloader?
 
 You don't need to generate an optimized autoloader for this to work. The plugin uses code similar
 to Composer to find classes. Anything that works with Composer should work with the plugin.
 
-**Can I use the plugin during development?**
+### Can I use the plugin during development?
 
 Yes, you can use the plugin during development, but keep in mind the "attributes" file is only
 generated after the autoloader is dumped. If you modify attributes you will have to run
@@ -245,7 +245,7 @@ watchers][phpstorm-watchers]. You could also use [spatie/file-system-watcher][],
 PHP. If the plugin is too slow for your liking, try running the command with
 `COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE=yes`, it will enable caching and speed up consecutive runs.
 
-**How do I include a class that inherits its attributes?**
+### How do I include a class that inherits its attributes?
 
 To speed up the collection process, the plugin first looks at PHP files as plain text for hints of
 attribute usage. If a class inherits its attributes from traits, properties, or methods, but doesn't
@@ -269,13 +269,51 @@ class InheritedAttributeSample
 }
 ```
 
+### The plugin fails when closures are used as parameter of an attribute
+
+The plugin fails when closures are used as parameter of an attribute because there's no way to
+serialize closures in PHP.
+
+```php
+// FAILS: The closure argument cannot be serialized by the collector
+#[Assert\When(
+    expression: static fn(Discount $d) =>$d->getType() === 'percent',
+    constraints: [new Assert\NotBlank()],
+)]
+private ?string $discountValue;
+```
+
+As a workaround, you can create a subclass and pass the closure during `__construct`. This
+works because the plugin serializes the arguments of the attribute, not the attribute itself.
+
+```php
+// WORKS: The custom attribute has no serialized arguments
+#[\Attribute(\Attribute::TARGET_PROPERTY)]
+class DiscountPercentValidation extends Assert\When
+{
+    public function __construct()
+    {
+        parent::__construct(
+            expression: static fn(Discount $d) => $d->getType() === 'percent',
+            constraints: [new Assert\NotBlank()],
+        );
+    }
+}
+
+// Use your custom attribute without any arguments:
+#[DiscountPercentValidation]
+private ?string $discountValue;
+```
+
+
+
 ----------
 
 
 
 ## Continuous Integration
 
-The project is continuously tested by [GitHub actions](https://github.com/olvlvl/composer-attribute-collector/actions).
+The project is continuously tested by [GitHub Actions](https://github.com/olvlvl/composer-attribute-collector/actions).
 
 [![Cases](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/cases.yml/badge.svg?branch=main)](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/cases.yml)
 [![Tests](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/test.yml)

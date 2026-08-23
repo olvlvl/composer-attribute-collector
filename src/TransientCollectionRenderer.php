@@ -64,6 +64,8 @@ final class TransientCollectionRenderer
 
         foreach ($targetByClass as $class => $targets) {
             foreach ($targets as $t) {
+                self::assertExportable($t->arguments);
+
                 $a = [ $t->arguments, $class ];
 
                 if ($t instanceof TransientTargetParameter) {
@@ -83,5 +85,20 @@ final class TransientCollectionRenderer
         }
 
         return $by;
+    }
+
+    /**
+     * @param array<mixed> $arguments
+     */
+    private static function assertExportable(array $arguments): void
+    {
+        foreach ($arguments as $argument) {
+            if ($argument instanceof \Closure) {
+                throw new \InvalidArgumentException(
+                    "PHP 8.5 Closures in constant expressions are not supported yet." .
+                    " Please, check the README for a workaround."
+                );
+            }
+        }
     }
 }
