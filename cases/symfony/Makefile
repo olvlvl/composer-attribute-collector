@@ -9,6 +9,13 @@ plugin-copy:
 	cp ../../composer.json $(COPY)
 	cp ../../collector.php $(COPY)
 
+COMPOSER_ATTRIBUTE_COLLECTOR_STRATEGY := $(or $(COMPOSER_ATTRIBUTE_COLLECTOR_STRATEGY),static)
+
+.PHONY: test
+test:
+	composer config extra.composer-attribute-collector.strategy "$(COMPOSER_ATTRIBUTE_COLLECTOR_STRATEGY)"
+	php test.php
+
 .PHONY: test-container
 test-container: test-container82
 

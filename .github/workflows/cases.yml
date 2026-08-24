@@ -6,69 +6,73 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        includes:
-          - php-version: "8.0"
-            composer-version: "v2.3.0"
-            composer-tweak: "--prefer-lowest"
-          - php-version: "8.5"
-            composer-version: "v2"
-            composer-tweak: ""
+        include:
+          - php: "8.0"
+            composer: "v2.3.0"
+            composer_tweak: "--prefer-lowest"
+          - php: "8.5"
+            composer: "v2"
+            composer_tweak: ""
     steps:
       - name: Checkout
         uses: actions/checkout@v7
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
-          tools: composer:${{ matrix.composer-version }}
+          php-version: ${{ matrix.php }}
+          tools: composer:${{ matrix.composer }}
       - name: Run case
         run: |
           cd cases/incompatible-signature
           make plugin-copy
-          composer update --no-interaction --no-progress ${{ matrix.composer-tweak }}
+          composer update --no-interaction --no-progress ${{ matrix.composer_tweak }}
 
   case-symfony:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        includes:
-          - php-version: "8.2"
-            composer-version: "v2.3.0"
-          - php-version: "8.5"
-            composer-version: "latest"
+        include:
+          - php: "8.2"
+            composer: "v2.3.0"
+            strategy: static
+          - php: "8.5"
+            composer: "latest"
+            strategy: reference
     steps:
       - name: Checkout
         uses: actions/checkout@v7
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
-          tools: composer:${{ matrix.composer-version }}
+          php-version: ${{ matrix.php }}
+          tools: composer:${{ matrix.composer }}
       - name: Run case
+        env:
+          COMPOSER_ATTRIBUTE_COLLECTOR_STRATEGY: ${{ matrix.strategy }}
         run: |
           cd cases/symfony
           make plugin-copy
           composer install --no-interaction --no-progress
-          php test.php
+          make test
 
   case-laravel:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        includes:
-          - php-version: "8.2"
-            composer-version: "v2.3.0"
-          - php-version: "8.5"
-            composer-version: "latest"
+        include:
+          - php: "8.2"
+            composer: "v2.3.0"
+          - php: "8.5"
+            composer: "latest"
     steps:
       - name: Checkout
         uses: actions/checkout@v7
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: ${{ matrix.php }}
           ini-values: memory_limit=-1
-          tools: composer:${{ matrix.composer-version }}
+          tools: composer:${{ matrix.composer }}
       - name: Run case
         run: |
           cd cases/laravel
