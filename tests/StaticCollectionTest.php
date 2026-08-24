@@ -17,11 +17,11 @@ use Acme\Presentation\ImageController;
 use Acme\PSR4\ActiveRecord\Article;
 use Acme\PSR4\DeleteMenu;
 use Acme\PSR4\Presentation\ArticleController;
-use Closure;
 use Acme81\Attribute\ParameterA;
 use Acme81\Attribute\ParameterB;
+use Closure;
 use olvlvl\ComposerAttributeCollector\Attributes;
-use olvlvl\ComposerAttributeCollector\Collection;
+use olvlvl\ComposerAttributeCollector\StaticCollection;
 use olvlvl\ComposerAttributeCollector\TargetClass;
 use olvlvl\ComposerAttributeCollector\TargetMethod;
 use olvlvl\ComposerAttributeCollector\TargetParameter;
@@ -31,16 +31,16 @@ use RuntimeException;
 
 use function in_array;
 
-final class CollectionTest extends TestCase
+final class StaticCollectionTest extends TestCase
 {
     /**
      * @dataProvider provideInstantiationErrorIsDecorated
      *
-     * @param Closure(Collection):void $act
+     * @param Closure(StaticCollection):void $act
      */
     public function testInstantiationErrorIsDecorated(string $expectedMessage, Closure $act): void
     {
-        $collection = new Collection(
+        $collection = new StaticCollection(
             targetClasses: [
                 Permission::class => [
                     [ serialize([ 'Permission' => 'is_admin' ]), DeleteMenu::class ],
@@ -60,6 +60,8 @@ final class CollectionTest extends TestCase
             ]
         );
 
+        Attributes::with(fn() => $collection);
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage($expectedMessage);
         $act($collection);
@@ -74,23 +76,23 @@ final class CollectionTest extends TestCase
 
             [
                 "An error occurred while instantiating attribute Acme\Attribute\Permission on class Acme\PSR4\DeleteMenu",
-                fn(Collection $c) => $c->findTargetClasses(Permission::class),
+                fn(StaticCollection $c) => $c->findTargetClasses(Permission::class),
             ],
             [
                 "An error occurred while instantiating attribute Acme\Attribute\Route on method Acme\PSR4\Presentation\ArticleController::list",
-                fn(Collection $c) => $c->findTargetMethods(Route::class),
+                fn(StaticCollection $c) => $c->findTargetMethods(Route::class),
             ],
             [
                 "An error occurred while instantiating attribute Acme\Attribute\ActiveRecord\Serial on property Acme\PSR4\ActiveRecord\Article::id",
-                fn(Collection $c) => $c->findTargetProperties(Serial::class),
+                fn(StaticCollection $c) => $c->findTargetProperties(Serial::class),
             ],
             [
                 "An error occurred while instantiating attribute Acme\Attribute\Permission on class Acme\PSR4\DeleteMenu",
-                fn(Collection $c) => $c->forClass(DeleteMenu::class),
+                fn() => Attributes::forClass(DeleteMenu::class),
             ],
             [
                 "An error occurred while instantiating attribute Acme\Attribute\Route on method Acme\PSR4\Presentation\ArticleController::list",
-                fn(Collection $c) => $c->forClass(ArticleController::class),
+                fn() => Attributes::forClass(ArticleController::class),
             ],
 
         ];
@@ -98,7 +100,7 @@ final class CollectionTest extends TestCase
 
     public function testFilterTargetClasses(): void
     {
-        $collection = new Collection(
+        $collection = new StaticCollection(
             targetClasses: [
                 Route::class => [
                     [ serialize([ 'pattern' => '/articles' ]), ArticleController::class ],
@@ -126,7 +128,7 @@ final class CollectionTest extends TestCase
 
     public function testFilterTargetMethods(): void
     {
-        $collection = new Collection(
+        $collection = new StaticCollection(
             targetClasses: [
             ],
             targetMethods: [
@@ -157,7 +159,7 @@ final class CollectionTest extends TestCase
 
     public function testFilterTargetParameters(): void
     {
-        $collection = new Collection(
+        $collection = new StaticCollection(
             targetClasses: [
             ],
             targetMethods: [
@@ -187,7 +189,7 @@ final class CollectionTest extends TestCase
 
     public function testFilterTargetProperties(): void
     {
-        $collection = new Collection(
+        $collection = new StaticCollection(
             targetClasses: [
             ],
             targetMethods: [
@@ -233,7 +235,7 @@ final class CollectionTest extends TestCase
 
     public function testForClass(): void
     {
-        $collection = new Collection(
+        $collection = new StaticCollection(
             targetClasses: [
                 Index::class => [
                     [ serialize([ 'slug', 'unique' => true ]), Article::class ],
@@ -266,7 +268,9 @@ final class CollectionTest extends TestCase
             ]
         );
 
-        $actual = $collection->forClass(Article::class);
+        Attributes::with(fn() => $collection);
+
+        $actual = Attributes::forClass(Article::class);
 
         $this->assertEquals([
             new Index('slug', unique: true),

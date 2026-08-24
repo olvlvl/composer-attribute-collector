@@ -9,6 +9,7 @@ None
 ### New features
 
 - [#60](https://github.com/olvlvl/composer-attribute-collector/pull/60) Track per-file mtime in MemoizeClassMapGenerator.
+- An alternative generation strategy for maximum compatibility.
 
 ### Deprecated Features
 
@@ -21,6 +22,7 @@ None
 ### Other Changes
 
 - [#36](https://github.com/olvlvl/composer-attribute-collector/pull/36) Attribute arguments are now serialized to support [nested attributes introduced in PHP 8.1](https://wiki.php.net/rfc/new_in_initializers).
+
 
 
 

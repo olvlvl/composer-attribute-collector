@@ -13,6 +13,7 @@ use function array_map;
 use function dirname;
 use function filter_var;
 use function implode;
+use function in_array;
 use function is_string;
 use function preg_quote;
 use function realpath;
@@ -31,6 +32,18 @@ final class Config
     public const EXTRA = 'composer-attribute-collector';
     public const EXTRA_INCLUDE = 'include';
     public const EXTRA_EXCLUDE = 'exclude';
+    public const EXTRA_STRATEGY = 'strategy';
+    /**
+     * Use {@link self::STRATEGY_REFERENCE} to generate a reference representation of the collected attributes.
+     * Getting attributes this way ensures maximum compatibility, but requires reflection.
+     */
+    public const STRATEGY_REFERENCE = 'reference';
+    /**
+     * Use {@link self::STRATEGY_STATIC} to generate a static representation of the collected attributes,
+     * with their arguments. Getting attributes this way requires no reflection, but fails with closure in constant
+     * expressions.
+     */
+    public const STRATEGY_STATIC = 'static';
     public const ENV_USE_CACHE = 'COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE';
     public const FILENAME = 'attributes.php';
 
@@ -53,7 +66,7 @@ final class Config
         $attributesFile = $vendorDir . DIRECTORY_SEPARATOR . self::FILENAME;
 
         $package = $composer->getPackage();
-        /** @var array{ include?: non-empty-string[], exclude?: non-empty-string[] } $extra */
+        /** @var array{ include?: non-empty-string[], exclude?: non-empty-string[], strategy?: string } $extra */
         $extra = $package->getExtra()[self::EXTRA] ?? [];
 
         $include = self::expandPaths(
@@ -62,6 +75,15 @@ final class Config
             $rootDir,
         );
         $exclude = self::expandPaths($extra[self::EXTRA_EXCLUDE] ?? [], $vendorDir, $rootDir);
+
+        $strategy = $extra[self::EXTRA_STRATEGY] ?? self::STRATEGY_STATIC;
+
+        if (!in_array($strategy, [ self::STRATEGY_REFERENCE, self::STRATEGY_STATIC ], true)) {
+            throw new InvalidArgumentException(
+                "Invalid strategy '$strategy', expected '" . self::STRATEGY_REFERENCE
+                . "' or '" . self::STRATEGY_STATIC . "'",
+            );
+        }
 
         $useCache = filter_var(Platform::getEnv(self::ENV_USE_CACHE), FILTER_VALIDATE_BOOL);
 
@@ -72,6 +94,7 @@ final class Config
             exclude: $exclude,
             useCache: $useCache,
             isDebug: $isDebug,
+            strategy: $strategy,
         );
     }
 
@@ -129,6 +152,8 @@ final class Config
      *     Whether a cache should be used during the process.
      * @param bool $isDebug
      *     Whether debug messages should be logged.
+     * @param string $strategy
+     *     The strategy for the attribute collection rendering
      */
     public function __construct(
         public string $vendorDir,
@@ -137,6 +162,7 @@ final class Config
         public array $exclude,
         public bool $useCache,
         public bool $isDebug,
+        public string $strategy = self::STRATEGY_STATIC,
     ) {
         $this->excludeRegExp = count($exclude) ? self::compileExclude($this->exclude) : null;
     }

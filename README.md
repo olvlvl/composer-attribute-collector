@@ -200,6 +200,23 @@ replaced with the path to the vendor folder.
 }
 ```
 
+### Switch strategy for the generation ([root-only][])
+
+By default, the plugin generates a static file with everything required to instantiate attributes
+without using reflection. This can be an issue with [PHP 8.5's Closures in constant expressions](https://wiki.php.net/rfc/closures_in_const_expr)
+because closures cannot be serialized. Use the `reference` strategy for maximum compatibility;
+the generated file will only contain references, and attributes will be created using reflection.
+
+```json
+{
+  "extra": {
+    "composer-attribute-collector": {
+      "strategy": "reference"
+    }
+  }
+}
+```
+
 ### Cache discoveries between runs
 
 The plugin is able to maintain a cache to reuse discoveries between runs. To enable the cache,
@@ -267,42 +284,6 @@ class InheritedAttributeSample
 {
     use UrlTrait;
 }
-```
-
-### The plugin fails when closures are used as parameter of an attribute
-
-The plugin fails when closures are used as parameter of an attribute because there's no way to
-serialize closures in PHP.
-
-```php
-// FAILS: The closure argument cannot be serialized by the collector
-#[Assert\When(
-    expression: static fn(Discount $d) =>$d->getType() === 'percent',
-    constraints: [new Assert\NotBlank()],
-)]
-private ?string $discountValue;
-```
-
-As a workaround, you can create a subclass and pass the closure during `__construct`. This
-works because the plugin serializes the arguments of the attribute, not the attribute itself.
-
-```php
-// WORKS: The custom attribute has no serialized arguments
-#[\Attribute(\Attribute::TARGET_PROPERTY)]
-class DiscountPercentValidation extends Assert\When
-{
-    public function __construct()
-    {
-        parent::__construct(
-            expression: static fn(Discount $d) => $d->getType() === 'percent',
-            constraints: [new Assert\NotBlank()],
-        );
-    }
-}
-
-// Use your custom attribute without any arguments:
-#[DiscountPercentValidation]
-private ?string $discountValue;
 ```
 
 

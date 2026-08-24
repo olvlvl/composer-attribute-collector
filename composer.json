@@ -20,7 +20,8 @@
     "psr-4": {
       "tests\\olvlvl\\ComposerAttributeCollector\\": "tests",
       "Acme\\": "tests/Acme",
-      "Acme81\\": "tests/Acme81"
+      "Acme81\\": "tests/Acme81",
+      "Acme85\\": "tests/Acme85"
     },
     "classmap": [
       "tests/Acme/ClassMap"

@@ -94,6 +94,8 @@ final class Collector
 
     private function render(TransientCollection $collector): string
     {
-        return TransientCollectionRenderer::render($collector);
+        return $this->config->strategy === Config::STRATEGY_STATIC
+            ? StaticCollectionRenderer::render($collector)
+            : ReferenceCollectionRenderer::render($collector);
     }
 }

@@ -6,8 +6,10 @@ use Acme85\Attribute\WithClosure;
 
 class SampleWithClosure
 {
-    #[WithClosure(static function ($str) {
-        return strtoupper($str);
+    public const MAGIC_STRING = "I'M A CLOSURE";
+
+    #[WithClosure(static function () {
+        return self::MAGIC_STRING;
     })]
     public string $name;
 }

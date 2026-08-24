@@ -5,11 +5,11 @@ namespace tests\olvlvl\ComposerAttributeCollector;
 use Acme85\Attribute\WithClosure;
 use Acme85\PSR4\SampleWithClosure;
 use olvlvl\ComposerAttributeCollector\TransientCollection;
-use olvlvl\ComposerAttributeCollector\TransientCollectionRenderer;
+use olvlvl\ComposerAttributeCollector\StaticCollectionRenderer;
 use olvlvl\ComposerAttributeCollector\TransientTargetProperty;
 use PHPUnit\Framework\TestCase;
 
-final class TransientCollectionRendererTest extends TestCase
+final class StaticCollectionRendererTest extends TestCase
 {
     /**
      * @requires PHP >= 8.5
@@ -25,8 +25,8 @@ final class TransientCollectionRendererTest extends TestCase
             ], SampleWithClosure::class),
         ]);
 
-        $this->expectExceptionMessageMatches("/PHP 8\\.5 Closures in constant expressions are not supported yet/");
+        $this->expectExceptionMessageMatches("/PHP 8\\.5 Closures in constant expressions are not supported by the 'static' strategy/");
 
-        TransientCollectionRenderer::render($collector);
+        StaticCollectionRenderer::render($collector);
     }
 }
