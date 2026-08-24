@@ -15,10 +15,7 @@ final class FileDatastoreTest extends TestCase
     private const DIR = __DIR__ . '/sandbox/';
     private const KEY = 'file-datastore';
 
-    /**
-     * @var MockObject&Logger
-     */
-    private MockObject|Logger $log;
+    private MockObject&Logger $log;
     private FileDatastore $sut;
 
     protected function setUp(): void

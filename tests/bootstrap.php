@@ -7,12 +7,7 @@ use olvlvl\ComposerAttributeCollector\Plugin;
 use function dirname;
 use function is_dir;
 
-$autoload = require dirname(__DIR__) . '/vendor/autoload.php';
-
-// Avoid Acme85 cases breaking older versions.
-if (PHP_VERSION_ID >= 85000) {
-    $autoload->addPsr4("Acme85\\", "tests/Acme85");
-}
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 /**
  * @return non-empty-string

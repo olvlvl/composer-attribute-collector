@@ -3,10 +3,9 @@
 namespace olvlvl\ComposerAttributeCollector;
 
 /**
- * @readonly
  * @internal
  */
-final class TransientTargetMethod
+final readonly class TransientTargetMethod
 {
     /**
      * @param class-string $attribute The attribute class.

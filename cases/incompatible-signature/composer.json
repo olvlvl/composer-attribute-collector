@@ -6,7 +6,7 @@
     }
   ],
   "require": {
-    "php": ">=8.0",
+    "php": ">=8.2",
     "psr/log": "^3.0",
     "olvlvl/composer-attribute-collector": "@dev"
   },

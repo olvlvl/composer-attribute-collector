@@ -1,5 +1,5 @@
-ARG PHP_TAG=8.0-cli-trixie
-ARG COMPOSER_TAG=2.3
+ARG PHP_TAG=8.2-cli-trixie
+ARG COMPOSER_TAG=2.9.8
 
 FROM composer:${COMPOSER_TAG} AS composer_source
 FROM php:${PHP_TAG}

@@ -10,9 +10,8 @@ use RuntimeException;
 
 /**
  * @internal
- * @readonly
  */
-final class Collector
+final readonly class Collector
 {
     public function __construct(
         private Config $config,

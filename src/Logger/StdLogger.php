@@ -2,32 +2,34 @@
 
 namespace olvlvl\ComposerAttributeCollector\Logger;
 
-use Composer\IO\IOInterface;
 use olvlvl\ComposerAttributeCollector\Logger;
 
 /**
  * @internal
- * @readonly
  */
-final class ComposerLogger implements Logger
+final readonly class StdLogger implements Logger
 {
     public function __construct(
-        private IOInterface $io
+        private bool $isDebug,
     ) {
     }
 
     public function debug(\Stringable|string $message): void
     {
-        $this->io->debug($message);
+        if (!$this->isDebug) {
+            return;
+        }
+
+        fwrite(STDERR, $message . PHP_EOL);
     }
 
     public function warning(\Stringable|string $message): void
     {
-        $this->io->warning($message);
+        fwrite(STDERR, "\033[33m$message\033[0m" . PHP_EOL);
     }
 
     public function error(\Stringable|string $message): void
     {
-        $this->io->error($message);
+        fwrite(STDERR, "\033[31m$message\033[0m" . PHP_EOL);
     }
 }

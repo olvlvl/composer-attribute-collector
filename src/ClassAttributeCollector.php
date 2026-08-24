@@ -9,9 +9,8 @@ use ReflectionException;
 
 /**
  * @internal
- * @readonly
  */
-class ClassAttributeCollector
+readonly class ClassAttributeCollector
 {
     public function __construct(
         private Logger $log,

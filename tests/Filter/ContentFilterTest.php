@@ -1,16 +1,10 @@
 <?php
 
-/*
- * (c) Olivier Laviale <olivier.laviale@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace tests\olvlvl\ComposerAttributeCollector\Filter;
 
 use olvlvl\ComposerAttributeCollector\Filter\ContentFilter;
 use olvlvl\ComposerAttributeCollector\Logger;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject as MockObjectAlias;
 use PHPUnit\Framework\TestCase;
 
@@ -27,9 +21,7 @@ final class ContentFilterTest extends TestCase
         $this->log = $this->getMockBuilder(Logger::class)->getMock();
     }
 
-    /**
-     * @dataProvider provideAttribute
-     */
+    #[DataProvider("provideAttribute")]
     public function testAttribute(string $case): void
     {
         $this->log->expects($this->once())
@@ -45,7 +37,7 @@ final class ContentFilterTest extends TestCase
         $this->assertFalse($actual);
     }
 
-    public function provideAttribute(): array
+    public static function provideAttribute(): array
     {
         return [
 
@@ -57,9 +49,7 @@ final class ContentFilterTest extends TestCase
         ];
     }
 
-    /**
-     * @@dataProvider provideClass
-     */
+    #[DataProvider("provideClass")]
     public function testClass(string $case, bool $expected): void
     {
         $this->log->expects($this->never())
@@ -75,7 +65,7 @@ final class ContentFilterTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function provideClass(): array
+    public static function provideClass(): array
     {
         return [
 

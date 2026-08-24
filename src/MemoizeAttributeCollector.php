@@ -30,9 +30,9 @@ class MemoizeAttributeCollector
     private array $state;
 
     public function __construct(
-        private ClassAttributeCollector $classAttributeCollector,
-        private Datastore $datastore,
-        private Logger $log,
+        private readonly ClassAttributeCollector $classAttributeCollector,
+        private readonly Datastore $datastore,
+        private readonly Logger $log,
     ) {
         /** @phpstan-ignore-next-line */
         $this->state = $this->datastore->get(self::KEY);

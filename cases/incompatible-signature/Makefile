@@ -10,17 +10,7 @@ plugin-copy:
 	cp ../../collector.php $(COPY)
 
 .PHONY: test-container
-test-container: test-container80
-
-.PHONY: test-container80
-test-container80: plugin-copy
-	@-docker compose run --rm app80 bash
-	@docker compose down -v
-
-.PHONY: test-container81
-test-container81: plugin-copy
-	@-docker-compose run --rm app81 bash
-	@docker-compose down -v
+test-container: test-container82
 
 .PHONY: test-container82
 test-container82: plugin-copy

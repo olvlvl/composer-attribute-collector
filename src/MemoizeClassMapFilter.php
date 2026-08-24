@@ -24,8 +24,8 @@ class MemoizeClassMapFilter
     private array $state;
 
     public function __construct(
-        private Datastore $datastore,
-        private Logger $io,
+        private readonly Datastore $datastore,
+        private readonly Logger $io,
     ) {
         /** @phpstan-ignore-next-line */
         $this->state = $this->datastore->get(self::KEY);

@@ -5,7 +5,7 @@ namespace olvlvl\ComposerAttributeCollector\Filter;
 use olvlvl\ComposerAttributeCollector\Filter;
 use olvlvl\ComposerAttributeCollector\Logger;
 
-final class Chain implements Filter
+final readonly class Chain implements Filter
 {
     /**
      * @param iterable<Filter> $filters

@@ -22,7 +22,7 @@ use const DIRECTORY_SEPARATOR;
 /**
  * @internal
  */
-final class FileDatastore implements Datastore
+final readonly class FileDatastore implements Datastore
 {
     /**
      * @param non-empty-string $dir

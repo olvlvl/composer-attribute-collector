@@ -3,6 +3,8 @@
 
 namespace olvlvl\ComposerAttributeCollector;
 
+use olvlvl\ComposerAttributeCollector\Logger\StdLogger;
+
 require 'vendor/autoload.php';
 
 $configFile = $argv[1]
@@ -18,32 +20,6 @@ $config = unserialize($serializedConfig, [
     ],
 ]);
 
-$log = new class($config->isDebug) implements Logger
-{
-    public function __construct(
-        private bool $isDebug,
-    ) {
-    }
-
-    public function debug(\Stringable|string $message): void
-    {
-        if (!$this->isDebug) {
-            return;
-        }
-
-        fwrite(STDERR, $message . PHP_EOL);
-    }
-
-    public function warning(\Stringable|string $message): void
-    {
-        fwrite(STDERR, "\033[33m$message\033[0m" . PHP_EOL);
-    }
-
-    public function error(\Stringable|string $message): void
-    {
-        fwrite(STDERR, "\033[31m$message\033[0m" . PHP_EOL);
-    }
-};
-
+$log = new StdLogger($config->isDebug);
 $collector = new Collector($config, $log);
 $collector->dump();

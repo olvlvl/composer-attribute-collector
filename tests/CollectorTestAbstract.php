@@ -1,12 +1,5 @@
 <?php
 
-/*
- * (c) Olivier Laviale <olivier.laviale@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace tests\olvlvl\ComposerAttributeCollector;
 
 use Acme\Attribute\ActiveRecord\Boolean;
@@ -34,6 +27,7 @@ use olvlvl\ComposerAttributeCollector\TargetMethod;
 use olvlvl\ComposerAttributeCollector\TargetParameter;
 use olvlvl\ComposerAttributeCollector\TargetProperty;
 use PhpParser\Node\Param;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 
@@ -41,8 +35,6 @@ use function getcwd;
 use function is_string;
 use function str_contains;
 use function usort;
-
-use const PHP_VERSION_ID;
 
 abstract class CollectorTestAbstract extends TestCase
 {
@@ -83,11 +75,10 @@ abstract class CollectorTestAbstract extends TestCase
         $filepath = "$vendorDir/attributes.php";
         $exclude = [
             "$cwd/tests/Acme/PSR4/IncompatibleSignature.php",
+            "$cwd/tests/Acme/PSR4/MissingInterface.php",
+            "$cwd/tests/Acme/PSR4/MissingParent.php",
+            "$cwd/tests/Acme85",
         ];
-
-        if (PHP_VERSION_ID < 80100) {
-            $exclude[] = "$cwd/tests/Acme81";
-        }
 
         return new Config(
             vendorDir: $vendorDir,
@@ -102,11 +93,10 @@ abstract class CollectorTestAbstract extends TestCase
     }
 
     /**
-     * @dataProvider provideTargetClasses
-     *
      * @param class-string $attribute
      * @param array<array{ object, class-string }> $expected
      */
+    #[DataProvider('provideTargetClasses')]
     public function testTargetClasses(string $attribute, array $expected): void
     {
         $actual = Attributes::findTargetClasses($attribute);
@@ -157,11 +147,10 @@ abstract class CollectorTestAbstract extends TestCase
     }
 
     /**
-     * @dataProvider provideTargetMethods
-     *
      * @param class-string $attribute
      * @param array<array{ object, callable-string }> $expected
      */
+    #[DataProvider('provideTargetMethods')]
     public function testTargetMethods(string $attribute, array $expected): void
     {
         $actual = Attributes::findTargetMethods($attribute);
@@ -221,11 +210,10 @@ abstract class CollectorTestAbstract extends TestCase
     }
 
     /**
-     * @dataProvider provideTargetParameters
-     *
      * @param class-string $attribute
      * @param array<array{ object, callable-string }> $expected
      */
+    #[DataProvider('provideTargetParameters')]
     public function testTargetParameters(string $attribute, array $expected): void
     {
         $actual = Attributes::findTargetParameters($attribute);
@@ -267,11 +255,10 @@ abstract class CollectorTestAbstract extends TestCase
     }
 
     /**
-     * @dataProvider provideTargetProperties
-     *
      * @param class-string $attribute
      * @param array<array{ object, string }> $expected
      */
+    #[DataProvider('provideTargetProperties')]
     public function testTargetProperties(string $attribute, array $expected): void
     {
         $actual = Attributes::findTargetProperties($attribute);
@@ -347,9 +334,6 @@ abstract class CollectorTestAbstract extends TestCase
         ], $this->collectMethods($actual));
     }
 
-    /**
-     * @requires PHP >= 8.1
-     */
     public function testFilterTargetMethods81(): void
     {
         $expected = [

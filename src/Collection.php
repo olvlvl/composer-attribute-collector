@@ -10,7 +10,7 @@ use function array_map;
 /**
  * @internal
  */
-final class Collection
+final readonly class Collection
 {
     /**
      * @param array<class-string, array<array{ mixed[], class-string }>> $targetClasses

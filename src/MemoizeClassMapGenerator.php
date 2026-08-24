@@ -36,8 +36,8 @@ class MemoizeClassMapGenerator
     private array $paths;
 
     public function __construct(
-        private Datastore $datastore,
-        private Logger $log,
+        private readonly Datastore $datastore,
+        private readonly Logger $log,
     ) {
         /** @phpstan-ignore-next-line */
         $this->state = $this->datastore->get(self::KEY);

@@ -7,13 +7,12 @@ use Acme85\PSR4\SampleWithClosure;
 use olvlvl\ComposerAttributeCollector\TransientCollection;
 use olvlvl\ComposerAttributeCollector\TransientCollectionRenderer;
 use olvlvl\ComposerAttributeCollector\TransientTargetProperty;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 
 final class TransientCollectionRendererTest extends TestCase
 {
-    /**
-     * @requires PHP >= 8.5
-     */
+    #[RequiresPhp(">= 8.5")]
     public function testShouldFailOnClosureAsArgument()
     {
         $collector = new TransientCollection();

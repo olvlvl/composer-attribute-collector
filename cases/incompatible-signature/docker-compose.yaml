@@ -1,34 +1,12 @@
 ---
 services:
-  app80:
-    build:
-      context: .
-      args:
-        PHP_TAG: '8.0-cli-bullseye'
-    environment:
-      PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
-    volumes:
-      - ./../../:/app:delegated
-      - composer-cache:/root/.composer/cache
-    working_dir: /app/cases/incompatible-signature
-  app81:
-    build:
-      context: .
-      args:
-        PHP_TAG: '8.1-cli-bullseye'
-    environment:
-      PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
-    volumes:
-      - .:/app:delegated
-      - composer-cache:/root/.composer/cache
-    working_dir: /app
   app82:
     build:
       context: .
       args:
         PHP_TAG: '8.2-cli-trixie'
     environment:
-      PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
+      PHP_IDE_CONFIG: 'serverName=olvlvl/composer-attribute-collector'
     volumes:
       - .:/app:delegated
       - composer-cache:/root/.composer/cache
@@ -39,7 +17,7 @@ services:
       args:
         PHP_TAG: '8.4-cli-trixie'
     environment:
-      PHP_IDE_CONFIG: 'serverName=olvlvl/attribute-collector'
+      PHP_IDE_CONFIG: 'serverName=olvlvl/composer-attribute-collector'
     volumes:
       - .:/app:delegated
       - composer-cache:/root/.composer/cache

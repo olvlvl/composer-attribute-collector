@@ -13,6 +13,7 @@ use olvlvl\ComposerAttributeCollector\TransientTargetClass;
 use olvlvl\ComposerAttributeCollector\TransientTargetMethod;
 use olvlvl\ComposerAttributeCollector\TransientTargetParameter;
 use olvlvl\ComposerAttributeCollector\TransientTargetProperty;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 
@@ -28,13 +29,12 @@ final class ClassAttributeCollectorTest extends TestCase
     }
 
     /**
-     * @dataProvider provideCollectAttributes
-     *
      * @param class-string $class
      * @param array<int|string, mixed> $expected
      *
      * @throws ReflectionException
      */
+    #[DataProvider('provideCollectAttributes')]
     public function testCollectAttributes(string $class, array $expected): void
     {
         $actual = $this->sut->collectAttributes($class);

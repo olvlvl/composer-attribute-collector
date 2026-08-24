@@ -6,9 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        includes:
-          - php-version: "8.0"
-            composer-version: "v2.3.0"
+        include:
+          - php-version: "8.2"
+            composer-version: "v2.9.8"
             composer-tweak: "--prefer-lowest"
           - php-version: "8.5"
             composer-version: "v2"
@@ -31,9 +31,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        includes:
+        include:
           - php-version: "8.2"
-            composer-version: "v2.3.0"
+            composer-version: "v2.9.8"
           - php-version: "8.5"
             composer-version: "latest"
     steps:
@@ -55,9 +55,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        includes:
+        include:
           - php-version: "8.2"
-            composer-version: "v2.3.0"
+            composer-version: "v2.9.8"
           - php-version: "8.5"
             composer-version: "latest"
     steps:

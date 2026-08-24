@@ -26,6 +26,7 @@ use olvlvl\ComposerAttributeCollector\TargetClass;
 use olvlvl\ComposerAttributeCollector\TargetMethod;
 use olvlvl\ComposerAttributeCollector\TargetParameter;
 use olvlvl\ComposerAttributeCollector\TargetProperty;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -34,10 +35,9 @@ use function in_array;
 final class CollectionTest extends TestCase
 {
     /**
-     * @dataProvider provideInstantiationErrorIsDecorated
-     *
      * @param Closure(Collection):void $act
      */
+    #[DataProvider('provideInstantiationErrorIsDecorated')]
     public function testInstantiationErrorIsDecorated(string $expectedMessage, Closure $act): void
     {
         $collection = new Collection(

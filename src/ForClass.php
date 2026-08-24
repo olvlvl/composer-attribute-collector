@@ -2,10 +2,7 @@
 
 namespace olvlvl\ComposerAttributeCollector;
 
-/**
- * @readonly
- */
-final class ForClass
+final readonly class ForClass
 {
     /**
      * @param iterable<object> $classAttributes

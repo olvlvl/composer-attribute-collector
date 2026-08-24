@@ -23,10 +23,9 @@ use function strlen;
 use const DIRECTORY_SEPARATOR;
 
 /**
- * @readonly
  * @internal
  */
-final class Config
+final readonly class Config
 {
     public const EXTRA = 'composer-attribute-collector';
     public const EXTRA_INCLUDE = 'include';
@@ -113,7 +112,6 @@ final class Config
     }
 
     /**
-     * @readonly
      * @var non-empty-string|null
      */
     public ?string $excludeRegExp;

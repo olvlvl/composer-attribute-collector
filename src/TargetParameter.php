@@ -3,11 +3,9 @@
 namespace olvlvl\ComposerAttributeCollector;
 
 /**
- * @readonly
- *
  * @template T of object
  */
-final class TargetParameter
+final readonly class TargetParameter
 {
     /**
      * @param T $attribute
