@@ -23,6 +23,7 @@ final class ConfigTest extends TestCase
                     'tests/Acme/PSR4/IncompatibleSignature.php',
                     '{vendor}/vendor1/package1/file.php',
                 ],
+                Config::EXTRA_STRATEGY => Config::STRATEGY_STATIC,
             ]
         ];
 
@@ -55,11 +56,42 @@ final class ConfigTest extends TestCase
             ],
             useCache: false,
             isDebug: false,
+            strategy: Config::STRATEGY_STATIC,
         );
 
         $actual = Config::from($composer);
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testFromFailsOnInvalidStrategy(): void
+    {
+        $extra = [
+            Config::EXTRA => [
+                Config::EXTRA_STRATEGY => 'nonsense',
+            ],
+        ];
+
+        $package = $this->createMock(RootPackageInterface::class);
+        $package
+            ->method('getExtra')
+            ->willReturn($extra);
+
+        $cwd = Platform::getCwd();
+        $config = $this->createMock(\Composer\Config::class);
+        $config
+            ->method('get')
+            ->with('vendor-dir')
+            ->willReturn("$cwd/vendor");
+
+        $composer = new PartialComposer();
+        $composer->setConfig($config);
+        $composer->setPackage($package);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid strategy 'nonsense'");
+
+        Config::from($composer);
     }
 
     public function testResolveIncludeFromAutoload(): void

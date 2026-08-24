@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 final class InvalidAttributeTest extends TestCase
 {
-    public function testInvalidAttribute()
+    public function testInvalidAttribute(): void
     {
         $config = self::makeConfig();
         $logger = new SpyLogger();

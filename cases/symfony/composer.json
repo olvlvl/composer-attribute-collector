@@ -14,12 +14,12 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "olvlvl/composer-attribute-collector": "@dev",
-        "symfony/console": "^7.4.16",
+        "symfony/console": "^7.4.17",
         "symfony/dotenv": "^7.4.15",
         "symfony/flex": "^2.11",
-        "symfony/framework-bundle": "^7.4.16",
+        "symfony/framework-bundle": "^7.4.17",
         "symfony/runtime": "^7.4.14",
-        "symfony/yaml": "^7.4.15"
+        "symfony/yaml": "^7.4.17"
     },
     "config": {
         "allow-plugins": {
@@ -73,6 +73,9 @@
         "symfony": {
             "allow-contrib": false,
             "require": "^7.4.12"
+        },
+        "composer-attribute-collector": {
+            "strategy": "static"
         }
     }
 }

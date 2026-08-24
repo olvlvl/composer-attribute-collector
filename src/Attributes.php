@@ -21,6 +21,7 @@ final class Attributes
 
         self::$collection = null;
         self::$provider = $provider;
+        self::$forClassCache = [];
 
         return $previous;
     }
@@ -130,12 +131,42 @@ final class Attributes
 
     /**
      * @param class-string $class
-     *
-     * @return ForClass
      */
     public static function forClass(string $class): ForClass
     {
-        return self::$forClassCache[$class] ??= self::getCollection()->forClass($class);
+        return self::$forClassCache[$class] ??= self::computeForClass($class);
+    }
+
+    /**
+     * @param class-string $class
+     */
+    private static function computeForClass(string $class): ForClass
+    {
+        $collection = self::getCollection();
+
+        $classAttributes = [];
+
+        foreach ($collection->filterTargetClasses(fn($a, $c): bool => $c === $class) as $targetClass) {
+            $classAttributes[] = $targetClass->attribute;
+        }
+
+        $methodAttributes = [];
+
+        foreach ($collection->filterTargetMethods(fn($a, $c): bool => $c === $class) as $targetMethod) {
+            $methodAttributes[$targetMethod->name][] = $targetMethod->attribute;
+        }
+
+        $propertyAttributes = [];
+
+        foreach ($collection->filterTargetProperties(fn($a, $c): bool => $c === $class) as $targetProperty) {
+            $propertyAttributes[$targetProperty->name][] = $targetProperty->attribute;
+        }
+
+        return new ForClass(
+            $classAttributes,
+            $methodAttributes,
+            $propertyAttributes,
+        );
     }
 
     private static function getCollection(): Collection

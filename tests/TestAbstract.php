@@ -20,14 +20,15 @@ use Acme\Attribute\Subscribe;
 use Acme\PSR4\Presentation\ArticleController;
 use Acme81\Attribute\ParameterA;
 use Acme81\Attribute\ParameterB;
+use Acme85\PSR4\SampleWithClosure;
 use olvlvl\ComposerAttributeCollector\Attributes;
 use olvlvl\ComposerAttributeCollector\Config;
 use olvlvl\ComposerAttributeCollector\TargetClass;
 use olvlvl\ComposerAttributeCollector\TargetMethod;
 use olvlvl\ComposerAttributeCollector\TargetParameter;
 use olvlvl\ComposerAttributeCollector\TargetProperty;
-use PhpParser\Node\Param;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 
@@ -36,12 +37,19 @@ use function is_string;
 use function str_contains;
 use function usort;
 
-abstract class CollectorTestAbstract extends TestCase
+abstract class TestAbstract extends TestCase
 {
     /**
      * @var array<class-string, bool>
      */
     private static array $initialized = [];
+
+    /**
+     * @return Config::STRATEGY_*
+     */
+    abstract protected static function getStrategy(): string;
+
+    abstract protected static function dump(Config $config): void;
 
     /**
      * @throws ReflectionException
@@ -54,7 +62,7 @@ abstract class CollectorTestAbstract extends TestCase
             return;
         }
 
-        $config = self::makeConfig();
+        $config = static::makeConfig();
 
         static::dump($config);
 
@@ -65,20 +73,26 @@ abstract class CollectorTestAbstract extends TestCase
         self::$initialized[get_called_class()] = true;
     }
 
-    abstract protected static function dump(Config $config): void;
-
-    private static function makeConfig(): Config
+    protected static function makeConfig(): Config
     {
         $cwd = getcwd();
         assert(is_string($cwd));
         $vendorDir = __DIR__ . '/sandbox';
         $filepath = "$vendorDir/attributes.php";
+        $strategy = static::getStrategy();
         $exclude = [
             "$cwd/tests/Acme/PSR4/IncompatibleSignature.php",
             "$cwd/tests/Acme/PSR4/MissingInterface.php",
             "$cwd/tests/Acme/PSR4/MissingParent.php",
-            "$cwd/tests/Acme85",
         ];
+
+        if ($strategy != Config::STRATEGY_REFERENCE) {
+            $exclude[] = "$cwd/tests/Acme81/PSR4/Presentation/NestedUserSample.php";
+        }
+
+        if (PHP_VERSION_ID < 80500 || $strategy != Config::STRATEGY_REFERENCE) {
+            $exclude[] = "$cwd/tests/Acme85";
+        }
 
         return new Config(
             vendorDir: $vendorDir,
@@ -89,6 +103,7 @@ abstract class CollectorTestAbstract extends TestCase
             exclude: $exclude,
             useCache: false,
             isDebug: false,
+            strategy: $strategy,
         );
     }
 
@@ -359,6 +374,41 @@ abstract class CollectorTestAbstract extends TestCase
         );
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testNestedObjects(): void
+    {
+        if (static::getStrategy() != Config::STRATEGY_REFERENCE) {
+            $this->markTestSkipped();
+        }
+
+        $actual = Attributes::filterTargetClasses(
+            Attributes::predicateForAttributeInstanceOf(\Acme81\Attribute\SampleNested::class),
+        );
+
+        $this->assertCount(1, $actual);
+
+        $attribute = $actual[0]->attribute;
+        $this->assertInstanceOf(\Acme81\Attribute\SampleNested::class, $attribute);
+    }
+
+    #[RequiresPhp(">= 8.5")]
+    public function testClosureInConstant(): void
+    {
+        if (static::getStrategy() != Config::STRATEGY_REFERENCE) {
+            $this->markTestSkipped();
+        }
+
+        $actual = Attributes::filterTargetProperties(
+            Attributes::predicateForAttributeInstanceOf(\Acme85\Attribute\WithClosure::class),
+        );
+
+        $this->assertCount(1, $actual);
+
+        /** @var \Acme85\Attribute\WithClosure $attribute */
+        $attribute = $actual[0]->attribute;
+        $this->assertInstanceOf(\Acme85\Attribute\WithClosure::class, $attribute);
+        $this->assertEquals(SampleWithClosure::MAGIC_STRING, ($attribute->closure)());
     }
 
     public function testFilterTargetParameters(): void

@@ -34,8 +34,10 @@ jobs:
         include:
           - php-version: "8.2"
             composer-version: "v2.9.8"
+            strategy: static
           - php-version: "8.5"
             composer-version: "latest"
+            strategy: reference
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -45,11 +47,13 @@ jobs:
           php-version: ${{ matrix.php-version }}
           tools: composer:${{ matrix.composer-version }}
       - name: Run case
+        env:
+          COMPOSER_ATTRIBUTE_COLLECTOR_STRATEGY: ${{ matrix.strategy }}
         run: |
           cd cases/symfony
           make plugin-copy
           composer install --no-interaction --no-progress
-          php test.php
+          make test
 
   case-laravel:
     runs-on: ubuntu-latest
