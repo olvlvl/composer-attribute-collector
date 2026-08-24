@@ -1,0 +1,19 @@
+- name: "New Requirement"
+  color: "0075ca"
+  description: "Changes that introduce new system requirements or dependencies"
+
+- name: "New feature"
+  color: "a2eeef"
+  description: "Adds new functionality"
+
+- name: "Deprecated Feature"
+  color: "d93f0b"
+  description: "Marks features intended for removal in future releases"
+
+- name: "Backward Incompatible Change"
+  color: "b60205"
+  description: "Breaking changes that require downstream updates"
+
+- name: "Other Change"
+  color: "e99695"
+  description: "Miscellaneous or maintenance updates"
