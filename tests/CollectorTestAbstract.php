@@ -42,8 +42,6 @@ use function is_string;
 use function str_contains;
 use function usort;
 
-use const PHP_VERSION_ID;
-
 abstract class CollectorTestAbstract extends TestCase
 {
     /**
@@ -84,10 +82,6 @@ abstract class CollectorTestAbstract extends TestCase
         $exclude = [
             "$cwd/tests/Acme/PSR4/IncompatibleSignature.php",
         ];
-
-        if (PHP_VERSION_ID < 80100) {
-            $exclude[] = "$cwd/tests/Acme81";
-        }
 
         return new Config(
             vendorDir: $vendorDir,
@@ -347,9 +341,6 @@ abstract class CollectorTestAbstract extends TestCase
         ], $this->collectMethods($actual));
     }
 
-    /**
-     * @requires PHP >= 8.1
-     */
     public function testFilterTargetMethods81(): void
     {
         $expected = [

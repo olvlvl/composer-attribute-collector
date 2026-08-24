@@ -33,12 +33,12 @@
     }
   },
   "require": {
-    "php": ">=8.0",
-    "composer-plugin-api": ">=2.3",
+    "php": ">=8.2",
+    "composer-plugin-api": "^2.3",
     "composer/class-map-generator": "^1.4"
   },
   "require-dev": {
-    "composer/composer": ">=2.3",
+    "composer/composer": "^2.9.8",
     "phpstan/phpstan": "^2.1.17",
     "phpunit/phpunit": "^9.6.23"
   },

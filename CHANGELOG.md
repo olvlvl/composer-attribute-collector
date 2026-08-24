@@ -1,5 +1,30 @@
 # CHANGELOG
 
+## v3.0.0
+
+### New Requirements
+
+- Bump PHP requirement from 8.0 to 8.2.
+- Bump Composer requirement from 2.3 to 2.9.8, following [security recommendation](https://blog.packagist.com/composer-2-9-8-and-2-2-28-fix-github-actions-token-disclosure-in-error-messages/).
+
+### New features
+
+None
+
+### Deprecated Features
+
+None
+
+### Backward Incompatible Changes
+
+None
+
+### Other Changes
+
+- Fix GitHub Action matrixes.
+
+
+
 ## v2.1.2
 
 ### New Requirements
