@@ -9,21 +9,7 @@ use Acme81\Attribute\Route;
 use Acme81\Attribute\SampleNested;
 use Acme81\Attribute\SampleNestedValue;
 
-#[Route('/articles')]
-class ArticleController
+#[SampleNested(new SampleNestedValue(1))]
+class NestedUserSample
 {
-    #[Route('/:id', method: Method::GET)]
-    public function show()
-    {
-    }
-
-    #[Get]
-    public function list()
-    {
-    }
-
-    #[Post]
-    public function new()
-    {
-    }
 }

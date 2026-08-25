@@ -10,6 +10,7 @@
 ### New features
 
 - [#60](https://github.com/olvlvl/composer-attribute-collector/pull/60) Track per-file mtime in `MemoizeClassMapGenerator`.
+- An alternative generation strategy for maximum compatibility.
 
 ### Deprecated Features
 
