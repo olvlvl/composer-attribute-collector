@@ -160,7 +160,7 @@ Here are a few ways you can configure the plugin.
 
 
 
-### Including paths or files ([root-only][])
+### Include paths or files ([root-only][])
 
 The collector automatically scans `autoload` paths of the root `composer.json`, but you can override
 them via the `include` property.
@@ -180,20 +180,23 @@ replaced with the path to the vendor folder.
 }
 ```
 
-### Excluding paths or files ([root-only][])
+### Exclude files from scanning ([root-only][])
 
-Use the `exclude` property to exclude paths or files from scanning. This is handy when files
+Use the `exclude` property to exclude some files or paths from scanning. This is handy when files
 cause issues or have side effects.
 
 The specified paths are relative to the `composer.json` file, and the `{vendor}` placeholder is
-replaced with the path to the vendor folder.
+replaced with the path to the vendor folder. Entries follow [Composer's `exclude-from-classmap`](https://getcomposer.org/doc/04-schema.md#exclude-files-from-classmaps)
+glob syntax: `*` matches anything but `/`, `**` matches anything, and `**` is implicitly added
+to the end of each path.
 
 ```json
 {
   "extra": {
     "composer-attribute-collector": {
       "exclude": [
-        "path-or-file/to/exclude"
+        "path-or-file/to/exclude",
+        "tests/**"
       ]
     }
   }
