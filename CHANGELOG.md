@@ -10,6 +10,7 @@
 ### New features
 
 - [#60](https://github.com/olvlvl/composer-attribute-collector/pull/60) Track per-file mtime in `MemoizeClassMapGenerator`.
+- [#45](https://github.com/olvlvl/composer-attribute-collector/issues/45) The `exclude` directive now supports glob patterns, following Composer's `exclude-from-classmap` behavior.
 - An alternative generation strategy for maximum compatibility.
 
 ### Deprecated Features

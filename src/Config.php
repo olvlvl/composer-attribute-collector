@@ -5,11 +5,11 @@ namespace olvlvl\ComposerAttributeCollector;
 use Composer\Factory;
 use Composer\Package\PackageInterface;
 use Composer\PartialComposer;
+use Composer\Pcre\Preg;
 use Composer\Util\Platform;
 use InvalidArgumentException;
 use RuntimeException;
 
-use function array_map;
 use function dirname;
 use function filter_var;
 use function implode;
@@ -17,9 +17,11 @@ use function in_array;
 use function is_string;
 use function preg_quote;
 use function realpath;
+use function rtrim;
 use function str_ends_with;
 use function str_starts_with;
 use function strlen;
+use function strtr;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -145,7 +147,7 @@ final readonly class Config
      * @param non-empty-string[] $include
      *     Paths that should be included in the attribute collection.
      * @param non-empty-string[] $exclude
-     *     Paths that should be excluded from the attribute collection.
+     *     Glob patterns for paths that should be excluded from the attribute collection.
      * @param bool $useCache
      *     Whether a cache should be used during the process.
      * @param bool $isDebug
@@ -166,15 +168,28 @@ final readonly class Config
     }
 
     /**
+     * Compiles the `exclude` patterns into a regular expression, following Composer's
+     * `exclude-from-classmap` behavior: `*` matches anything but `/`, `**` matches anything,
+     * and a path matches everything under it.
+     *
      * @param non-empty-string[] $exclude
      *
      * @return non-empty-string
      */
     private static function compileExclude(array $exclude): string
     {
-        $regexp = implode('|', array_map(fn (string $path) => preg_quote($path), $exclude));
+        $patterns = [];
 
-        return "($regexp)";
+        foreach ($exclude as $path) {
+            $path = strtr($path, '\\', '/');
+            $path = preg_quote(rtrim($path, '/'));
+            $path = Preg::replace('{/+}', '/', $path);
+            $path = strtr($path, [ '\\*\\*' => '.+?', '\\*' => '[^/]+?' ]);
+
+            $patterns[] = $path . '($|/)';
+        }
+
+        return '{(' . implode('|', $patterns) . ')}';
     }
 
     /**
