@@ -18,8 +18,8 @@
         <exclude-pattern>tests/bootstrap.php</exclude-pattern>
     </rule>
     <rule ref="Generic.Files.LineLength.TooLong">
-        <exclude-pattern>src/ReferenceCollection.php</exclude-pattern>
-        <exclude-pattern>src/StaticCollection.php</exclude-pattern>
+        <exclude-pattern>src/Collection/ReferenceCollection.php</exclude-pattern>
+        <exclude-pattern>src/Collection/StaticCollection.php</exclude-pattern>
         <exclude-pattern>tests/*</exclude-pattern>
     </rule>
     <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">

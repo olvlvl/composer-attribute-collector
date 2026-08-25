@@ -2,13 +2,16 @@
 
 namespace olvlvl\ComposerAttributeCollector;
 
-use olvlvl\ComposerAttributeCollector\Datastore\FileDatastore;
-use olvlvl\ComposerAttributeCollector\Datastore\RuntimeDatastore;
-use olvlvl\ComposerAttributeCollector\Filter\ClassFilter;
-use olvlvl\ComposerAttributeCollector\Filter\ContentFilter;
-use RuntimeException;
+use olvlvl\ComposerAttributeCollector\Factory\CollectionRendererFactory;
+use olvlvl\ComposerAttributeCollector\Factory\DatastoreFactory;
+use olvlvl\ComposerAttributeCollector\Factory\FilterFactory;
+
+use function file_put_contents;
+use function microtime;
 
 /**
+ * Orchestrates the collection of the attributes and the generation of the 'attributes.php' file.
+ *
  * @internal
  */
 final readonly class Collector
@@ -20,81 +23,102 @@ final readonly class Collector
     }
 
     /**
-     * Dumps the 'attributes.php' file.
+     * Orchestrates the collection of the attributes and the generation of the 'attributes.php' file.
      */
-    public function dump(): void
+    public function run(): void
     {
-        $config = $this->config;
-        $log =  $this->log;
+        // setup
+        $datastore = DatastoreFactory::from($this->config, $this->log);
+        $filter = FilterFactory::create();
+        $renderer = CollectionRendererFactory::from($this->config);
 
-        //
-        // Scan the included paths
-        //
+        // steps
+        $classMap = $this->generateClassMap($datastore);
+        $filteredClassMap = $this->filterClassMap($classMap, $filter, $datastore);
+        $collection = $this->collectAttributes($filteredClassMap, $datastore);
+
+        // render
+        $this->render($collection, $renderer);
+    }
+
+    /**
+     * @return array<class-string, non-empty-string>
+     *     Where _key_ is a class and _value_ its path.
+     */
+    private function generateClassMap(Datastore $datastore): array
+    {
         $start = microtime(true);
-        $datastore = $this->buildDefaultDatastore();
-        $classMapGenerator = new MemoizeClassMapGenerator($datastore, $log);
-        foreach ($config->include as $include) {
-            $classMapGenerator->scanPaths($include, $config->excludeRegExp);
+
+        $classMapGenerator = new MemoizeClassMapGenerator($datastore, $this->log);
+
+        foreach ($this->config->include as $include) {
+            $classMapGenerator->scanPaths($include, $this->config->excludeRegExp);
         }
-        $classMap = $classMapGenerator->getMap();
-        $elapsed = ElapsedTime::render($start);
-        $log->debug("Generating attributes file: scanned paths in $elapsed");
 
-        //
-        // Filter the class map
-        //
+        $this->logElapsed('scanning paths', $start);
+
+        return $classMapGenerator->getMap();
+    }
+
+    /**
+     * @param array<class-string, non-empty-string> $classMap
+     *     Where _key_ is a class and _value_ its pathname.
+     *
+     * @return array<class-string, non-empty-string>
+     */
+    private function filterClassMap(array $classMap, Filter $filter, Datastore $datastore): array
+    {
         $start = microtime(true);
-        $classMapFilter = new MemoizeClassMapFilter($datastore, $log);
-        $filter = $this->buildFileFilter();
-        $classMap = $classMapFilter->filter(
+
+        $classMapFilter = new MemoizeClassMapFilter($datastore, $this->log);
+
+        $filtered = $classMapFilter->filter(
             $classMap,
-            fn (string $class, string $filepath): bool => $filter->filter($filepath, $class, $log)
+            fn (string $class, string $filepath): bool => $filter->filter($filepath, $class, $this->log),
         );
-        $elapsed = ElapsedTime::render($start);
-        $log->debug("Generating attributes file: filtered class map in $elapsed");
 
-        //
-        // Collect attributes
-        //
+        $this->logElapsed('filtering class map', $start);
+
+        return $filtered;
+    }
+
+    /**
+     * @param array<class-string, non-empty-string> $classMap
+     *     Where _key_ is a class and _value_ its pathname.
+     */
+    private function collectAttributes(array $classMap, Datastore $datastore): TransientCollection
+    {
         $start = microtime(true);
-        $attributeCollector = new MemoizeAttributeCollector(new ClassAttributeCollector($log), $datastore, $log);
+
+        $attributeCollector = new MemoizeAttributeCollector(
+            new ClassAttributeCollector($this->log),
+            $datastore,
+            $this->log,
+        );
+
         $collection = $attributeCollector->collectAttributes($classMap);
-        $elapsed = ElapsedTime::render($start);
-        $log->debug("Generating attributes file: collected attributes in $elapsed");
 
-        //
-        // Render attributes
-        //
+        $this->logElapsed('collecting attributes', $start);
+
+        return $collection;
+    }
+
+    /**
+     * @param class-string<CollectionRenderer> $renderer
+     */
+    private function render(TransientCollection $collection, string $renderer): void
+    {
         $start = microtime(true);
-        $code = $this->render($collection);
-        file_put_contents($config->attributesFile, $code);
-        $elapsed = ElapsedTime::render($start);
-        $log->debug("Generating attributes file: rendered code in $elapsed");
+
+        $code = $renderer::render($collection);
+
+        file_put_contents($this->config->attributesFile, $code);
+
+        $this->logElapsed('rendering code', $start);
     }
 
-    private function buildDefaultDatastore(): Datastore
+    private function logElapsed(string $label, float $start): void
     {
-        if (!$this->config->useCache) {
-            return new RuntimeDatastore();
-        }
-
-        $basePath = getcwd() ?: throw new RuntimeException('Unable to locate base path');
-
-        return new FileDatastore($basePath . DIRECTORY_SEPARATOR . Plugin::CACHE_DIR, $this->log);
-    }
-
-    private function buildFileFilter(): Filter
-    {
-        return new Filter\Chain([
-            new ContentFilter(),
-            new ClassFilter()
-        ]);
-    }
-
-    private function render(TransientCollection $collector): string
-    {
-        return $this->config->strategy === Config::STRATEGY_STATIC
-            ? StaticCollectionRenderer::render($collector)
-            : ReferenceCollectionRenderer::render($collector);
+        $this->log->debug("Generating attributes file: $label in " . ElapsedTime::render($start));
     }
 }

@@ -23,6 +23,7 @@ None
 ### Other Changes
 
 - Fixed GitHub Action matrixes.
+- Refactored the collector to separate the generation steps and their dependencies.
 
 
 

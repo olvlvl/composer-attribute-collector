@@ -5,6 +5,9 @@ namespace tests\olvlvl\ComposerAttributeCollector;
 use olvlvl\ComposerAttributeCollector\Config;
 use olvlvl\ComposerAttributeCollector\Plugin;
 
+/**
+ * Test the pluging with {@link Config::STRATEGY_REFERENCE}.
+ */
 final class PluginReferenceTest extends TestAbstract
 {
     #[\Override]
@@ -13,6 +16,7 @@ final class PluginReferenceTest extends TestAbstract
         return Config::STRATEGY_REFERENCE;
     }
 
+    #[\Override]
     protected static function dump(Config $config): void
     {
         Plugin::dump($config);

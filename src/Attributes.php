@@ -15,12 +15,15 @@ final class Attributes
     private static ?Closure $provider = null;
     private static ?Collection $collection;
 
+    /**
+     * Swaps the attributes provider and reset the state.
+     */
     public static function with(Closure $provider): ?Closure
     {
         $previous = self::$provider;
 
-        self::$collection = null;
         self::$provider = $provider;
+        self::$collection = null;
         self::$forClassCache = [];
 
         return $previous;
