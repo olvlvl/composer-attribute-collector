@@ -3,8 +3,8 @@
 namespace olvlvl\ComposerAttributeCollector\Factory;
 
 use olvlvl\ComposerAttributeCollector\CollectionRenderer;
+use olvlvl\ComposerAttributeCollector\CollectionRenderer\EmbeddedCollectionRenderer;
 use olvlvl\ComposerAttributeCollector\CollectionRenderer\ReferenceCollectionRenderer;
-use olvlvl\ComposerAttributeCollector\CollectionRenderer\StaticCollectionRenderer;
 use olvlvl\ComposerAttributeCollector\Config;
 
 /**
@@ -19,8 +19,8 @@ final class CollectionRendererFactory
      */
     public static function from(Config $config): string
     {
-        return $config->strategy === Config::STRATEGY_STATIC
-            ? StaticCollectionRenderer::class
+        return $config->strategy === Config::STRATEGY_EMBEDDED
+            ? EmbeddedCollectionRenderer::class
             : ReferenceCollectionRenderer::class;
     }
 }

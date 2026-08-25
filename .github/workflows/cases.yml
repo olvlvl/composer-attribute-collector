@@ -34,7 +34,7 @@ jobs:
         include:
           - php-version: "8.2"
             composer-version: "v2.9.8"
-            strategy: static
+            strategy: embedded
           - php-version: "8.5"
             composer-version: "latest"
             strategy: reference

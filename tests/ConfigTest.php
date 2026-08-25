@@ -26,7 +26,7 @@ final class ConfigTest extends TestCase
                     'tests/Acme/PSR4/IncompatibleSignature.php',
                     '{vendor}/vendor1/package1/file.php',
                 ],
-                Config::EXTRA_STRATEGY => Config::STRATEGY_STATIC,
+                Config::EXTRA_STRATEGY => Config::STRATEGY_EMBEDDED,
             ]
         ];
 
@@ -59,7 +59,7 @@ final class ConfigTest extends TestCase
             ],
             useCache: false,
             isDebug: false,
-            strategy: Config::STRATEGY_STATIC,
+            strategy: Config::STRATEGY_EMBEDDED,
         );
 
         $actual = Config::from($composer);
