@@ -1,6 +1,6 @@
 <?php
 
-namespace tests\olvlvl\ComposerAttributeCollector;
+namespace tests\olvlvl\ComposerAttributeCollector\Collection;
 
 use Acme\Attribute\ActiveRecord\Id;
 use Acme\Attribute\ActiveRecord\Index;
@@ -21,7 +21,7 @@ use Acme81\Attribute\ParameterA;
 use Acme81\Attribute\ParameterB;
 use Closure;
 use olvlvl\ComposerAttributeCollector\Attributes;
-use olvlvl\ComposerAttributeCollector\StaticCollection;
+use olvlvl\ComposerAttributeCollector\Collection\StaticCollection;
 use olvlvl\ComposerAttributeCollector\TargetClass;
 use olvlvl\ComposerAttributeCollector\TargetMethod;
 use olvlvl\ComposerAttributeCollector\TargetParameter;

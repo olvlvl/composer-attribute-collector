@@ -1,7 +1,12 @@
 <?php
 
-namespace olvlvl\ComposerAttributeCollector;
+namespace olvlvl\ComposerAttributeCollector\Collection;
 
+use olvlvl\ComposerAttributeCollector\Collection;
+use olvlvl\ComposerAttributeCollector\TargetClass;
+use olvlvl\ComposerAttributeCollector\TargetMethod;
+use olvlvl\ComposerAttributeCollector\TargetParameter;
+use olvlvl\ComposerAttributeCollector\TargetProperty;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
@@ -12,7 +17,7 @@ use ReflectionMethod;
  *
  * @internal
  */
-final class ReferenceCollection implements Collection
+final readonly class ReferenceCollection implements Collection
 {
     /**
      * @param array<class-string, array<array{ class-string }>> $targetClasses

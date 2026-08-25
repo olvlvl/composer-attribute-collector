@@ -2,6 +2,8 @@
 
 namespace olvlvl\ComposerAttributeCollector;
 
+use olvlvl\ComposerAttributeCollector\CollectionRenderer\ReferenceCollectionRenderer;
+use olvlvl\ComposerAttributeCollector\CollectionRenderer\StaticCollectionRenderer;
 use olvlvl\ComposerAttributeCollector\Datastore\FileDatastore;
 use olvlvl\ComposerAttributeCollector\Datastore\RuntimeDatastore;
 use olvlvl\ComposerAttributeCollector\Filter\ClassFilter;

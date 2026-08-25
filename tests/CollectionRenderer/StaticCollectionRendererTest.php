@@ -1,10 +1,10 @@
 <?php
 
-namespace tests\olvlvl\ComposerAttributeCollector;
+namespace tests\olvlvl\ComposerAttributeCollector\CollectionRenderer;
 
 use Acme85\Attribute\WithClosure;
 use Acme85\PSR4\SampleWithClosure;
-use olvlvl\ComposerAttributeCollector\StaticCollectionRenderer;
+use olvlvl\ComposerAttributeCollector\CollectionRenderer\StaticCollectionRenderer;
 use olvlvl\ComposerAttributeCollector\TransientCollection;
 use olvlvl\ComposerAttributeCollector\TransientTargetProperty;
 use PHPUnit\Framework\Attributes\RequiresPhp;

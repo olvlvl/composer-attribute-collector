@@ -1,7 +1,12 @@
 <?php
 
-namespace olvlvl\ComposerAttributeCollector;
+namespace olvlvl\ComposerAttributeCollector\Collection;
 
+use olvlvl\ComposerAttributeCollector\Collection;
+use olvlvl\ComposerAttributeCollector\TargetClass;
+use olvlvl\ComposerAttributeCollector\TargetMethod;
+use olvlvl\ComposerAttributeCollector\TargetParameter;
+use olvlvl\ComposerAttributeCollector\TargetProperty;
 use RuntimeException;
 use Throwable;
 
@@ -12,7 +17,7 @@ use function array_map;
  *
  * @internal
  */
-final class StaticCollection implements Collection
+final readonly class StaticCollection implements Collection
 {
     /**
      * @param array<class-string, array<array{ mixed[], class-string }>> $targetClasses
