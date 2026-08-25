@@ -22,4 +22,4 @@ $config = unserialize($serializedConfig, [
 
 $log = new StdLogger($config->isDebug);
 $collector = new Collector($config, $log);
-$collector->dump();
+$collector->run();

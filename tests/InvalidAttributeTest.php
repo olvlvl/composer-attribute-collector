@@ -14,7 +14,7 @@ final class InvalidAttributeTest extends TestCase
         $logger = new SpyLogger();
         $collector = new Collector($config, $logger);
 
-        $collector->dump();
+        $collector->run();
 
         $expected = [
             "Discarding 'Acme\PSR4\MissingInterface' because an error occurred during loading: Interface \"Acme\PSR4\UndefinedInterface\" not found",
