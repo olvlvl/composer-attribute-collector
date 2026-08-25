@@ -4,13 +4,13 @@ namespace tests\olvlvl\ComposerAttributeCollector\CollectionRenderer;
 
 use Acme85\Attribute\WithClosure;
 use Acme85\PSR4\SampleWithClosure;
-use olvlvl\ComposerAttributeCollector\CollectionRenderer\StaticCollectionRenderer;
+use olvlvl\ComposerAttributeCollector\CollectionRenderer\EmbeddedCollectionRenderer;
 use olvlvl\ComposerAttributeCollector\TransientCollection;
 use olvlvl\ComposerAttributeCollector\TransientTargetProperty;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 
-final class StaticCollectionRendererTest extends TestCase
+final class EmbeddedCollectionRendererTest extends TestCase
 {
     #[RequiresPhp(">= 8.5")]
     public function testShouldFailOnClosureAsArgument()
@@ -24,8 +24,8 @@ final class StaticCollectionRendererTest extends TestCase
             ], SampleWithClosure::class),
         ]);
 
-        $this->expectExceptionMessageMatches("/PHP 8\\.5 Closures in constant expressions are not supported by the 'static' strategy/");
+        $this->expectExceptionMessageMatches("/PHP 8\\.5 Closures in constant expressions are not supported by the 'embedded' strategy/");
 
-        StaticCollectionRenderer::render($collector);
+        EmbeddedCollectionRenderer::render($collector);
     }
 }

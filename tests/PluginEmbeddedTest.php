@@ -6,14 +6,14 @@ use olvlvl\ComposerAttributeCollector\Config;
 use olvlvl\ComposerAttributeCollector\Plugin;
 
 /**
- * Test the pluging with {@link Config::STRATEGY_STATIC}.
+ * Test the pluging with {@link Config::STRATEGY_EMBEDDED}.
  */
-final class PluginStaticTest extends TestAbstract
+final class PluginEmbeddedTest extends TestAbstract
 {
     #[\Override]
     protected static function getStrategy(): string
     {
-        return Config::STRATEGY_STATIC;
+        return Config::STRATEGY_EMBEDDED;
     }
 
     #[\Override]

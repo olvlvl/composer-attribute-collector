@@ -6,14 +6,14 @@ use olvlvl\ComposerAttributeCollector\Collector;
 use olvlvl\ComposerAttributeCollector\Config;
 
 /**
- * Test {@link Collector} with {@link Config::STRATEGY_STATIC}.
+ * Test {@link Collector} with {@link Config::STRATEGY_EMBEDDED}.
  */
-final class CollectorStaticTest extends TestAbstract
+final class CollectorEmbeddedTest extends TestAbstract
 {
     #[\Override]
     protected static function getStrategy(): string
     {
-        return Config::STRATEGY_STATIC;
+        return Config::STRATEGY_EMBEDDED;
     }
 
     #[\Override]

@@ -40,11 +40,11 @@ final readonly class Config
      */
     public const STRATEGY_REFERENCE = 'reference';
     /**
-     * Use {@link self::STRATEGY_STATIC} to generate a static representation of the collected attributes,
+     * Use {@link self::STRATEGY_EMBEDDED} to generate an embedded representation of the collected attributes,
      * with their arguments. Getting attributes this way requires no reflection, but fails with closure in constant
      * expressions.
      */
-    public const STRATEGY_STATIC = 'static';
+    public const STRATEGY_EMBEDDED = 'embedded';
     public const ENV_USE_CACHE = 'COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE';
     public const FILENAME = 'attributes.php';
 
@@ -77,12 +77,12 @@ final readonly class Config
         );
         $exclude = self::expandPaths($extra[self::EXTRA_EXCLUDE] ?? [], $vendorDir, $rootDir);
 
-        $strategy = $extra[self::EXTRA_STRATEGY] ?? self::STRATEGY_STATIC;
+        $strategy = $extra[self::EXTRA_STRATEGY] ?? self::STRATEGY_EMBEDDED;
 
-        if (!in_array($strategy, [ self::STRATEGY_REFERENCE, self::STRATEGY_STATIC ], true)) {
+        if (!in_array($strategy, [ self::STRATEGY_REFERENCE, self::STRATEGY_EMBEDDED ], true)) {
             throw new InvalidArgumentException(
                 "Invalid strategy '$strategy', expected '" . self::STRATEGY_REFERENCE
-                . "' or '" . self::STRATEGY_STATIC . "'",
+                . "' or '" . self::STRATEGY_EMBEDDED . "'",
             );
         }
 
@@ -162,7 +162,7 @@ final readonly class Config
         public array $exclude,
         public bool $useCache,
         public bool $isDebug,
-        public string $strategy = self::STRATEGY_STATIC,
+        public string $strategy = self::STRATEGY_EMBEDDED,
     ) {
         $this->excludeRegExp = count($exclude) ? self::compileExclude($this->exclude) : null;
     }

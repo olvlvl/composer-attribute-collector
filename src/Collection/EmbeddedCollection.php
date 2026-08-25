@@ -17,7 +17,7 @@ use function array_map;
  *
  * @internal
  */
-final readonly class StaticCollection implements Collection
+final readonly class EmbeddedCollection implements Collection
 {
     /**
      * @param array<class-string, array<array{ mixed[], class-string }>> $targetClasses

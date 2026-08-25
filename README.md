@@ -205,10 +205,11 @@ to the end of each path.
 
 ### Switch generation strategy ([root-only][])
 
-By default, the plugin generates a static file with everything required to instantiate attributes
-without using reflection, which can be an issue with [PHP 8.1's New in initializers](https://www.php.net/releases/8.1/en.php#new_in_initializers)
-or [PHP 8.5's Closures in constant expressions](https://wiki.php.net/rfc/closures_in_const_expr). Use the `reference` strategy for maximum compatibility;
-the generated file will only contain references, and attributes will be created using reflection.
+By default, the plugin generates an embedded representation of the collected attributes, with their
+arguments, which requires no reflection. This can be an issue with [PHP 8.1's New in initializers](https://www.php.net/releases/8.1/en.php#new_in_initializers)
+or [PHP 8.5's Closures in constant expressions](https://wiki.php.net/rfc/closures_in_const_expr).
+Use the `reference` strategy for maximum compatibility; the generated file will only contain
+references, and attributes will be created using reflection.
 
 ```json
 {

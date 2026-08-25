@@ -9,7 +9,7 @@ plugin-copy:
 	cp ../../composer.json $(COPY)
 	cp ../../collector.php $(COPY)
 
-COMPOSER_ATTRIBUTE_COLLECTOR_STRATEGY := $(or $(COMPOSER_ATTRIBUTE_COLLECTOR_STRATEGY),static)
+COMPOSER_ATTRIBUTE_COLLECTOR_STRATEGY := $(or $(COMPOSER_ATTRIBUTE_COLLECTOR_STRATEGY),embedded)
 
 .PHONY: test
 test:

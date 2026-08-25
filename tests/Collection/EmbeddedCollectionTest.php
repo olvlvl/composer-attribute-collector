@@ -21,7 +21,7 @@ use Acme81\Attribute\ParameterA;
 use Acme81\Attribute\ParameterB;
 use Closure;
 use olvlvl\ComposerAttributeCollector\Attributes;
-use olvlvl\ComposerAttributeCollector\Collection\StaticCollection;
+use olvlvl\ComposerAttributeCollector\Collection\EmbeddedCollection;
 use olvlvl\ComposerAttributeCollector\TargetClass;
 use olvlvl\ComposerAttributeCollector\TargetMethod;
 use olvlvl\ComposerAttributeCollector\TargetParameter;
@@ -32,15 +32,15 @@ use RuntimeException;
 
 use function in_array;
 
-final class StaticCollectionTest extends TestCase
+final class EmbeddedCollectionTest extends TestCase
 {
     /**
-     * @param Closure(StaticCollection):void $act
+     * @param Closure(EmbeddedCollection):void $act
      */
     #[DataProvider('provideInstantiationErrorIsDecorated')]
     public function testInstantiationErrorIsDecorated(string $expectedMessage, Closure $act): void
     {
-        $collection = new StaticCollection(
+        $collection = new EmbeddedCollection(
             targetClasses: [
                 Permission::class => [
                     [ [ 'Permission' => 'is_admin' ], DeleteMenu::class ],
@@ -76,15 +76,15 @@ final class StaticCollectionTest extends TestCase
 
             [
                 "An error occurred while instantiating attribute Acme\Attribute\Permission on class Acme\PSR4\DeleteMenu",
-                fn(StaticCollection $c) => $c->findTargetClasses(Permission::class),
+                fn(EmbeddedCollection $c) => $c->findTargetClasses(Permission::class),
             ],
             [
                 "An error occurred while instantiating attribute Acme\Attribute\Route on method Acme\PSR4\Presentation\ArticleController::list",
-                fn(StaticCollection $c) => $c->findTargetMethods(Route::class),
+                fn(EmbeddedCollection $c) => $c->findTargetMethods(Route::class),
             ],
             [
                 "An error occurred while instantiating attribute Acme\Attribute\ActiveRecord\Serial on property Acme\PSR4\ActiveRecord\Article::id",
-                fn(StaticCollection $c) => $c->findTargetProperties(Serial::class),
+                fn(EmbeddedCollection $c) => $c->findTargetProperties(Serial::class),
             ],
             [
                 "An error occurred while instantiating attribute Acme\Attribute\Permission on class Acme\PSR4\DeleteMenu",
@@ -100,7 +100,7 @@ final class StaticCollectionTest extends TestCase
 
     public function testFilterTargetClasses(): void
     {
-        $collection = new StaticCollection(
+        $collection = new EmbeddedCollection(
             targetClasses: [
                 Route::class => [
                     [ [ 'pattern' => '/articles' ], ArticleController::class ],
@@ -128,7 +128,7 @@ final class StaticCollectionTest extends TestCase
 
     public function testFilterTargetMethods(): void
     {
-        $collection = new StaticCollection(
+        $collection = new EmbeddedCollection(
             targetClasses: [
             ],
             targetMethods: [
@@ -159,7 +159,7 @@ final class StaticCollectionTest extends TestCase
 
     public function testFilterTargetParameters(): void
     {
-        $collection = new StaticCollection(
+        $collection = new EmbeddedCollection(
             targetClasses: [
             ],
             targetMethods: [
@@ -189,7 +189,7 @@ final class StaticCollectionTest extends TestCase
 
     public function testFilterTargetProperties(): void
     {
-        $collection = new StaticCollection(
+        $collection = new EmbeddedCollection(
             targetClasses: [
             ],
             targetMethods: [
@@ -235,7 +235,7 @@ final class StaticCollectionTest extends TestCase
 
     public function testForClass(): void
     {
-        $collection = new StaticCollection(
+        $collection = new EmbeddedCollection(
             targetClasses: [
                 Index::class => [
                     [ [ 'slug', 'unique' => true ], Article::class ],

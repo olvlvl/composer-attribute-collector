@@ -2,8 +2,8 @@
 
 namespace tests\olvlvl\ComposerAttributeCollector\Factory;
 
+use olvlvl\ComposerAttributeCollector\CollectionRenderer\EmbeddedCollectionRenderer;
 use olvlvl\ComposerAttributeCollector\CollectionRenderer\ReferenceCollectionRenderer;
-use olvlvl\ComposerAttributeCollector\CollectionRenderer\StaticCollectionRenderer;
 use olvlvl\ComposerAttributeCollector\Config;
 use olvlvl\ComposerAttributeCollector\Factory\CollectionRendererFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -25,7 +25,7 @@ final class CollectionRendererFactoryTest extends TestCase
     public static function provideRenderer(): array
     {
         return [
-            'static' => [ Config::STRATEGY_STATIC, StaticCollectionRenderer::class ],
+            'embedded' => [ Config::STRATEGY_EMBEDDED, EmbeddedCollectionRenderer::class ],
             'reference' => [ Config::STRATEGY_REFERENCE, ReferenceCollectionRenderer::class ],
         ];
     }

@@ -38,7 +38,7 @@ final class DatastoreFactoryTest extends TestCase
             exclude: [],
             useCache: $useCache,
             isDebug: false,
-            strategy: Config::STRATEGY_STATIC,
+            strategy: Config::STRATEGY_EMBEDDED,
         );
     }
 }
