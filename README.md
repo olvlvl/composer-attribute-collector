@@ -4,8 +4,8 @@
 [![Code Coverage](https://coveralls.io/repos/github/olvlvl/composer-attribute-collector/badge.svg?branch=main)](https://coveralls.io/r/olvlvl/composer-attribute-collector?branch=main)
 [![Downloads](https://img.shields.io/packagist/dt/olvlvl/composer-attribute-collector.svg)](https://packagist.org/packages/olvlvl/composer-attribute-collector)
 
-**composer-attribute-collector** is a [Composer][] plugin designed to effectively _discover_ PHP 8
-attribute targets, and later retrieve them at near zero cost, without runtime reflection. After the
+**composer-attribute-collector** is a [Composer][] plugin that statically _discovers_ PHP 8
+attribute targets and retrieves them at near-zero cost, without runtime reflection. After the
 autoloader dump, it collects attributes and generates a static file for fast access. This provides a
 convenient way to _discover_ attribute-backed classes, methods, or properties—ideal for codebase
 analysis. (For known targets, traditional reflection remains an option.)
