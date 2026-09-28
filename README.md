@@ -236,6 +236,14 @@ COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE=1 composer dump-autoload
 
 ## Use cases
 
+Production use case:
+
+- [PHPStan](https://github.com/phpstan/phpstan-src) uses **composer-attribute-collector** to power a
+  lot of build-time configuration underpinnings.
+
+- [ICanBoogie](https://github.com/ICanBoogie/ICanBoogie) uses **composer-attribute-collector** for
+  autoconfiguration and service wiring.
+
 Use cases are available to test the plugin in real conditions:
 
 - [Incompatible signature](cases/incompatible-signature) The plugin is able to collect attributes,

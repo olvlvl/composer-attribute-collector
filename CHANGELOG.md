@@ -1,5 +1,29 @@
 # CHANGELOG
 
+## v3.0.2
+
+### New Requirements
+
+None
+
+### New features
+
+None
+
+### Deprecated Features
+
+None
+
+### Backward Incompatible Changes
+
+None
+
+### Other Changes
+
+Use `PHP_BINARY` instead of `/usr/bin/env php` for Windows compatibility.
+
+
+
 ## v3.0.0
 
 ### New Requirements
