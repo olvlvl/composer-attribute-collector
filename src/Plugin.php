@@ -101,7 +101,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         file_put_contents($tmpFile, serialize($config));
 
         try {
-            $process = new Process([ "/usr/bin/env", "php", $collector, $tmpFile ]);
+            $process = new Process([ PHP_BINARY, $collector, $tmpFile ]);
             $process->mustRun(function (string $type, string $line): void {
                 print($line);
             });

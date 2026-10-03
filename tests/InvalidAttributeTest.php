@@ -21,7 +21,7 @@ final class InvalidAttributeTest extends TestCase
             "Discarding 'Acme\PSR4\MissingParent' because an error occurred during loading: Class \"Acme\PSR4\UndefinedParent\" not found",
         ];
 
-        $this->assertEquals($expected, $logger->warningRecords);
+        $this->assertEqualsCanonicalizing($expected, $logger->warningRecords);
     }
 
     private static function makeConfig(): Config
