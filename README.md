@@ -279,7 +279,7 @@ PHP. If the plugin is too slow for your liking, try running the command with
 To speed up the collection process, the plugin first looks at PHP files as plain text for hints of
 attribute usage. If a class inherits its attributes from traits, properties, or methods, but doesn't
 use attributes itself, it will be ignored. Use the attribute
-`[#\olvlvl\ComposerAttributeCollector\InheritsAttributes]` to force the collection.
+`#[\olvlvl\ComposerAttributeCollector\InheritsAttributes]` to force the collection.
 
 ```php
 trait UrlTrait
