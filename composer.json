@@ -41,7 +41,7 @@
   "require-dev": {
     "composer/composer": "^2.9.8",
     "phpstan/phpstan": "^2.1.17",
-    "phpunit/phpunit": "^11.5"
+    "phpunit/phpunit": "^13.4"
   },
   "extra": {
     "class": "olvlvl\\ComposerAttributeCollector\\Plugin",
